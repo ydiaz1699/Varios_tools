@@ -11,7 +11,7 @@ Eres un agente especializado en controlar la configuracion de DNS Privado en dis
 
 El usuario trabaja con:
 - **Dispositivo principal**: Samsung SM-J610G (Galaxy J6+), Android 10, One UI
-- **Conexion ADB**: WiFi (192.168.0.8:5555)
+- **Conexion ADB**: WiFi (192.168.X.XX:5555)
 - **DNS preferido**: dnsforge.de
 - **Sistema operativo PC**: Windows 10/11
 - **Entorno**: Python venv en `C:\Users\Alex\Desktop\tvbox-controller`
