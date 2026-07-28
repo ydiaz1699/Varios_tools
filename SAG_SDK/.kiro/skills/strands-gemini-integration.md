@@ -1,7 +1,7 @@
-# Skill: Strands Agents SDK + Google Gemini Integration
+# Skill: Strands Agents SDK — Multi-Provider (TypeScript + Python)
 
 ## Descripción
-Guía completa para incorporar Strands Agents SDK (TypeScript) con el provider de Google Gemini en cualquier proyecto. Esta skill proporciona toda la información necesaria para que un LLM pueda integrar agentes autónomos con tool-use en cualquier tipo de proyecto.
+Guía completa para incorporar Strands Agents SDK en cualquier proyecto, con soporte para múltiples providers (Google Gemini, Amazon Bedrock/Claude, OpenAI, Ollama). Cubre tanto **TypeScript** como **Python**, incluyendo extended thinking, multi-provider dinámico, y patrones reales de producción.
 
 ## Cuándo usar esta skill
 - Cuando el usuario quiere agregar un agente autónomo a un proyecto existente
@@ -9,16 +9,378 @@ Guía completa para incorporar Strands Agents SDK (TypeScript) con el provider d
 - Cuando se quiere usar Gemini como LLM barato con capacidad de tool-use
 - Cuando se necesita conectar a un servidor MCP desde código
 - Cuando se quiere crear un bot, CLI, o servicio que use IA con herramientas
+- Cuando se necesita un agente que cambie de provider dinámicamente (Gemini/Bedrock/Ollama)
+- Cuando se quiere habilitar extended thinking (razonamiento profundo) con Claude
 
 ## Fuentes oficiales
-- Documentación: https://strandsagents.com/docs/user-guide/quickstart/typescript/
-- GitHub: https://github.com/strands-agents/harness-sdk (monorepo actual)
+- Documentación general: https://strandsagents.com/
+- Quickstart TypeScript: https://strandsagents.com/docs/user-guide/quickstart/typescript/
+- Quickstart Python: https://strandsagents.com/docs/user-guide/quickstart/python/
+- Google Gemini Provider: https://strandsagents.com/docs/user-guide/concepts/model-providers/google/
+- MCP Tools: https://strandsagents.com/docs/user-guide/concepts/tools/mcp-tools/
+- GitHub (monorepo): https://github.com/strands-agents/harness-sdk
+- GitHub (Python SDK): https://github.com/strands-agents/sdk-python
+- PyPI: https://pypi.org/project/strands-agents/
 - NPM: @strands-agents/sdk
-- Modelos Google: https://strandsagents.com/docs/user-guide/concepts/model-providers/google/
+- Extended Thinking (blog): https://aws.amazon.com/blogs/opensource/using-strands-agents-with-claude-4-interleaved-thinking/
+
+---
+---
+
+# PARTE 1: PYTHON
 
 ---
 
-## Instalación
+## Instalación Python
+
+### Con Gemini (recomendado — barato)
+```bash
+pip install 'strands-agents[gemini]' strands-agents-tools
+```
+
+### Con Bedrock (Claude — mejor razonamiento)
+```bash
+pip install strands-agents strands-agents-tools
+# + aws configure
+```
+
+### Con Ollama (local, gratis)
+```bash
+pip install strands-agents strands-agents-tools
+# + ollama serve && ollama pull llama3.1
+```
+
+### Versiones compatibles (julio 2026)
+- `strands-agents`: >=1.0.0
+- `strands-agents-tools`: >=0.1.0
+- Python: 3.10+
+
+---
+
+## Provider: Google Gemini (Python)
+
+```python
+from strands import Agent
+from strands.models.gemini import GeminiModel
+
+model = GeminiModel(
+    model_id="gemini-2.5-flash",
+    client_args={"api_key": "tu-key"},  # o usa env GOOGLE_API_KEY
+    params={
+        "temperature": 0.3,
+        "max_output_tokens": 4096,
+    },
+)
+
+agent = Agent(model=model, system_prompt="Eres un asistente experto.")
+result = agent("¿Qué hora es en Tokio?")
+print(result)
+```
+
+### Variables de entorno
+```bash
+export GOOGLE_API_KEY="tu-api-key"  # se lee automáticamente
+```
+
+Obtener en: https://aistudio.google.com/apikey (tier gratuito disponible)
+
+---
+
+## Provider: Amazon Bedrock con Extended Thinking (Python)
+
+```python
+import os
+from strands import Agent
+from strands.models.bedrock import BedrockModel
+
+model = BedrockModel(
+    model_id="us.anthropic.claude-sonnet-4-20250514-v1:0",
+    region_name=os.environ.get("AWS_REGION", "us-east-1"),
+    additional_request_fields={
+        "anthropic_beta": ["interleaved-thinking-2025-05-14"],
+        "thinking": {
+            "type": "enabled",
+            "budget_tokens": 10000,  # tokens para razonamiento interno
+        },
+    },
+)
+
+agent = Agent(model=model, system_prompt="Razona paso a paso.")
+result = agent("Diagnostica por qué nextcloud está lento")
+```
+
+### Qué hace Extended Thinking
+- Claude razona **internamente entre tool calls** (no visible al usuario)
+- Si una herramienta devuelve un error, lo detecta y corrige en la misma iteración
+- Ajusta su estrategia dinámicamente sin loops extra
+- `budget_tokens` controla cuánto puede "pensar" (más = más profundo, más caro)
+
+### Variables de entorno
+```bash
+export AWS_REGION=us-east-1
+# Requiere: aws configure (con acceso a Bedrock)
+```
+
+---
+
+## Provider: Ollama (Python — local, gratis)
+
+```python
+from strands import Agent
+from strands.models.ollama import OllamaModel
+
+model = OllamaModel(
+    model_id="llama3.1",
+    host="http://localhost:11434",
+)
+
+agent = Agent(model=model, system_prompt="Eres un asistente.")
+result = agent("Lista los archivos en /docker")
+```
+
+### Variables de entorno
+```bash
+export OLLAMA_HOST=http://localhost:11434
+# Requiere: ollama serve + ollama pull llama3.1
+```
+
+---
+
+## Patrón: Multi-Provider dinámico (Python)
+
+Seleccionar provider en runtime según variable de entorno. Este es el patrón
+usado en producción en el NAS Agent:
+
+```python
+import os
+from strands import Agent
+
+
+def get_model():
+    """Selecciona modelo según NAS_AGENT_MODEL (gemini|bedrock|ollama)."""
+    proveedor = os.environ.get("NAS_AGENT_MODEL", "gemini").lower()
+    model_id_override = os.environ.get("NAS_AGENT_MODEL_ID")
+
+    if proveedor == "gemini":
+        from strands.models.gemini import GeminiModel
+        return GeminiModel(
+            model_id=model_id_override or "gemini-2.5-flash",
+            client_args={"api_key": os.environ.get("GOOGLE_API_KEY")} if os.environ.get("GOOGLE_API_KEY") else None,
+            params={"temperature": 0.3, "max_output_tokens": 4096},
+        )
+
+    elif proveedor == "bedrock":
+        from strands.models.bedrock import BedrockModel
+        thinking_budget = int(os.environ.get("NAS_AGENT_THINKING_BUDGET", "10000"))
+        return BedrockModel(
+            model_id=model_id_override or "us.anthropic.claude-sonnet-4-20250514-v1:0",
+            region_name=os.environ.get("AWS_REGION", "us-east-1"),
+            additional_request_fields={
+                "anthropic_beta": ["interleaved-thinking-2025-05-14"],
+                "thinking": {"type": "enabled", "budget_tokens": thinking_budget},
+            },
+        )
+
+    elif proveedor == "ollama":
+        from strands.models.ollama import OllamaModel
+        return OllamaModel(
+            model_id=model_id_override or "llama3.1",
+            host=os.environ.get("OLLAMA_HOST", "http://localhost:11434"),
+        )
+
+    else:
+        raise ValueError(f"Provider '{proveedor}' no soportado. Opciones: gemini, bedrock, ollama")
+
+
+# Uso:
+model = get_model()
+agent = Agent(model=model, tools=[...], system_prompt="...")
+```
+
+---
+
+## Crear herramientas con @tool (Python)
+
+```python
+from strands import Agent, tool
+
+
+@tool
+def scan_ports() -> str:
+    """Escanea puertos en uso en el sistema.
+
+    Returns:
+        str: Lista de puertos ocupados y los siguientes disponibles
+    """
+    import subprocess
+    result = subprocess.run(
+        ["ss", "-tlnp"],
+        capture_output=True, text=True
+    )
+    return result.stdout
+
+
+@tool
+def disk_usage() -> str:
+    """Muestra el uso de disco del sistema.
+
+    Returns:
+        str: Resumen de uso de disco por partición
+    """
+    import subprocess
+    result = subprocess.run(
+        ["df", "-h", "--type=ext4", "--type=btrfs"],
+        capture_output=True, text=True
+    )
+    return result.stdout
+
+
+# Agrupar tools y crear agente
+ALL_TOOLS = [scan_ports, disk_usage]
+agent = Agent(model=model, tools=ALL_TOOLS, system_prompt="...")
+```
+
+### Reglas para @tool en Python
+1. El **docstring** se convierte en la descripción de la herramienta (el modelo lo lee)
+2. Los **type hints** definen el schema de parámetros
+3. El **return** debe ser `str` (o serializable a string)
+4. Errores se manejan devolviendo un string con "ERROR: ..."
+5. El decorador `@tool` registra la función automáticamente
+
+### Tool con parámetros
+```python
+@tool
+def service_logs(service: str, lines: int = 50) -> str:
+    """Muestra las últimas N líneas de logs de un servicio Docker.
+
+    Args:
+        service: Nombre del servicio (ej: "nextcloud", "plex")
+        lines: Número de líneas a mostrar (default: 50)
+
+    Returns:
+        str: Últimas líneas de logs del servicio
+    """
+    import subprocess
+    result = subprocess.run(
+        ["docker", "compose", "-f", f"/docker/{service}/compose.yml",
+         "logs", "--tail", str(lines)],
+        capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return f"ERROR: {result.stderr}"
+    return result.stdout
+```
+
+---
+
+## System Prompt con instrucciones de razonamiento (Python)
+
+Para mejorar la calidad de respuestas de cualquier provider, agregar instrucciones
+explícitas de razonamiento:
+
+```python
+SYSTEM_PROMPT = """
+# RAZONAMIENTO
+
+Antes de ejecutar cualquier acción, SIEMPRE razona paso a paso:
+
+1. **Entender** — ¿Qué está pidiendo exactamente el usuario?
+2. **Planificar** — ¿Qué información necesito? ¿En qué orden?
+3. **Verificar** — Consultar estado actual ANTES de actuar
+4. **Evaluar riesgo** — ¿La acción es reversible? ¿Puede causar downtime?
+5. **Ejecutar** — Solo actuar después de tener toda la información
+6. **Confirmar** — ¿El resultado es el esperado?
+
+## Reglas de razonamiento
+- Si la tarea tiene RIESGO: explica tu plan ANTES de ejecutar
+- Si hay AMBIGÜEDAD: pregunta antes de asumir
+- Si NO SABÉS algo: dilo. Nunca inventes.
+- Si algo FALLA: analiza el error, sugiere causa y solución
+
+# MISIÓN
+Eres un agente experto en [tu dominio]. Tu trabajo es...
+"""
+
+agent = Agent(model=model, tools=ALL_TOOLS, system_prompt=SYSTEM_PROMPT)
+```
+
+---
+
+## Strands Agent Tools (paquete comunitario, Python)
+
+```python
+# Herramientas listas para usar del paquete strands-agents-tools
+from strands_tools import calculator, python_repl, http_request
+
+agent = Agent(
+    model=model,
+    tools=[calculator, python_repl, http_request],
+)
+```
+
+Herramientas disponibles en `strands-agents-tools`:
+- `calculator` — Operaciones matemáticas
+- `python_repl` — Ejecuta código Python
+- `http_request` — HTTP GET/POST/etc.
+- `file_read` / `file_write` — Leer/escribir archivos
+- `shell` — Ejecutar comandos de shell
+
+---
+
+## Comparación de providers (Python)
+
+| Provider | Modelo | Costo/1M tokens | Tool-use | Extended Thinking | Setup |
+|----------|--------|:---------------:|:--------:|:-----------------:|-------|
+| **Gemini** | gemini-2.5-flash | ~$0.15 | Bueno | No | Solo API key |
+| **Bedrock** | Claude Sonnet 4 | ~$3.00 | El mejor | Sí (interleaved) | AWS credentials |
+| **Ollama** | llama3.1 | Gratis | Básico | No | Ollama local |
+
+### Recomendación por caso de uso
+- **Agente de producción (barato)**: Gemini — 20x más barato, suficiente para la mayoría
+- **Tareas complejas (razonamiento)**: Bedrock — extended thinking + mejor tool-use
+- **Privacidad total / sin internet**: Ollama — gratis, local, sin datos a la nube
+
+---
+
+## Ejecutar como módulo Python
+
+```bash
+# Estructura recomendada
+mi-agente/
+├── agent/
+│   ├── __init__.py
+│   ├── mi_agent.py      # Agent + get_model() + system prompt
+│   └── tools/
+│       ├── __init__.py   # export ALL_TOOLS = [...]
+│       └── mis_tools.py  # @tool functions
+└── requirements.txt
+
+# Ejecutar
+cd mi-agente
+python -m agent.mi_agent "tu pregunta"
+```
+
+---
+
+## Errores comunes (Python)
+
+| Error | Causa | Solución |
+|-------|-------|----------|
+| `ModuleNotFoundError: google.genai` | Falta dependencia Gemini | `pip install 'strands-agents[gemini]'` |
+| `GOOGLE_API_KEY not set` | Falta variable | `export GOOGLE_API_KEY=...` |
+| `botocore.exceptions.NoCredentialsError` | Sin AWS config | `aws configure` |
+| `ConnectionRefusedError` (Ollama) | Ollama no corre | `ollama serve` |
+| `ModelThrottledException` | Rate limit | Esperar y reintentar, o subir tier |
+| Tool no se ejecuta | Docstring vacío | El @tool NECESITA docstring para que el modelo lo entienda |
+
+---
+---
+
+# PARTE 2: TYPESCRIPT
+
+---
+
+## Instalación TypeScript
 
 ### Dependencias base
 ```bash
@@ -44,14 +406,12 @@ npm install @modelcontextprotocol/sdk
 
 ---
 
-## Configuración del provider Google Gemini
+## Configuración del provider Google Gemini (TypeScript)
 
 ### Variables de entorno
 ```env
 GOOGLE_API_KEY=tu-api-key-de-google-ai-studio
 ```
-
-Obtener en: https://aistudio.google.com/apikey
 
 ### Modelos disponibles (recomendados)
 | Modelo | Caso de uso | Costo aprox |
@@ -67,20 +427,20 @@ import { Agent } from '@strands-agents/sdk'
 import { GoogleModel } from '@strands-agents/sdk/models/google'
 
 const model = new GoogleModel({
-  apiKey: process.env.GOOGLE_API_KEY,    // o apiKey directo
-  modelId: 'gemini-2.5-flash',           // modelo a usar
+  apiKey: process.env.GOOGLE_API_KEY,
+  modelId: 'gemini-2.5-flash',
   params: {
-    temperature: 0.7,                     // creatividad (0-1)
-    maxOutputTokens: 4096,                // max tokens de respuesta
-    topP: 0.9,                            // nucleus sampling
-    topK: 40,                             // top-k sampling
+    temperature: 0.7,
+    maxOutputTokens: 4096,
+    topP: 0.9,
+    topK: 40,
   },
 })
 ```
 
 ---
 
-## Crear un agente básico
+## Crear un agente básico (TypeScript)
 
 ```typescript
 import { Agent } from '@strands-agents/sdk'
@@ -96,16 +456,13 @@ const agent = new Agent({
   systemPrompt: 'Eres un asistente experto en...',
 })
 
-// Invocar
 const result = await agent.invoke('Tu pregunta aquí')
 console.log(result.lastMessage)
 ```
 
 ---
 
-## Crear herramientas (tools)
-
-Las herramientas se definen con Zod schemas para validación de tipos:
+## Crear herramientas con Zod (TypeScript)
 
 ```typescript
 import { tool } from '@strands-agents/sdk'
@@ -119,13 +476,10 @@ const myTool = tool({
     param2: z.number().optional().describe('Parámetro opcional'),
   }),
   callback: (input) => {
-    // input está tipado según el schema
-    // Lógica de la herramienta aquí
     return `Resultado: ${input.param1}`
   },
 })
 
-// Asignar al agente
 const agent = new Agent({
   model,
   tools: [myTool],
@@ -137,9 +491,7 @@ const agent = new Agent({
 const asyncTool = tool({
   name: 'fetch_data',
   description: 'Obtiene datos de una API',
-  inputSchema: z.object({
-    url: z.string().url(),
-  }),
+  inputSchema: z.object({ url: z.string().url() }),
   callback: async (input) => {
     const response = await fetch(input.url)
     const data = await response.json()
@@ -150,9 +502,9 @@ const asyncTool = tool({
 
 ---
 
-## Conectar a un servidor MCP
+## Conectar a un servidor MCP (TypeScript)
 
-### Via stdio (el bot lanza el servidor como subproceso)
+### Via stdio
 ```typescript
 import { Agent, McpClient } from '@strands-agents/sdk'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
@@ -161,17 +513,11 @@ const mcpClient = new McpClient({
   transport: new StdioClientTransport({
     command: 'npx',
     args: ['tsx', 'ruta/al/servidor-mcp/index.ts'],
-    env: {
-      ...process.env,
-      DATABASE_URL: 'mysql://...',
-    },
+    env: { ...process.env, DATABASE_URL: 'mysql://...' },
   }),
 })
 
-const agent = new Agent({
-  model,
-  tools: [mcpClient],  // McpClient es un ToolProvider
-})
+const agent = new Agent({ model, tools: [mcpClient] })
 ```
 
 ### Via SSE (servidor ya corriendo)
@@ -180,84 +526,17 @@ import { McpClient } from '@strands-agents/sdk'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 
 const mcpClient = new McpClient({
-  transport: new SSEClientTransport(
-    new URL('http://localhost:3100/sse')
-  ),
+  transport: new SSEClientTransport(new URL('http://localhost:3100/sse')),
 })
 
-const agent = new Agent({
-  model,
-  tools: [mcpClient],
-})
-```
-
-### Cargar múltiples MCP servers desde config
-```typescript
-import { McpClient } from '@strands-agents/sdk'
-
-// Desde objeto de configuración
-const clients = await McpClient.loadServers({
-  'mi-servidor': {
-    command: 'npx',
-    args: ['tsx', './mcp-server/index.ts'],
-  },
-  'otro-servidor': {
-    url: 'http://localhost:8080/sse',
-  },
-})
-
-const agent = new Agent({
-  model,
-  tools: clients,  // Array de McpClient
-})
+const agent = new Agent({ model, tools: [mcpClient] })
 ```
 
 ---
 
-## Streaming de respuestas
+## Multi-Agent (TypeScript)
 
-```typescript
-// Async iterator
-for await (const event of agent.stream('Tu pregunta')) {
-  if (event.type === 'modelStreamUpdateEvent') {
-    // Chunk de texto parcial
-    process.stdout.write(event.data ?? '')
-  }
-}
-```
-
----
-
-## Plugins y Hooks
-
-```typescript
-import { Agent, BeforeToolCallEvent, AfterToolCallEvent } from '@strands-agents/sdk'
-import type { Plugin, LocalAgent } from '@strands-agents/sdk'
-
-class MyPlugin implements Plugin {
-  get name() { return 'my-plugin' }
-
-  initAgent(agent: LocalAgent) {
-    agent.addHook(BeforeToolCallEvent, (event) => {
-      console.log(`Calling: ${event.toolUse.name}`)
-    })
-    agent.addHook(AfterToolCallEvent, (event) => {
-      console.log(`Done: ${event.toolUse.name}`)
-    })
-  }
-}
-
-const agent = new Agent({
-  model,
-  plugins: [new MyPlugin()],
-})
-```
-
----
-
-## Multi-Agent: Patrones de orquestación
-
-### Agent-as-tool (un agente usa otro como herramienta)
+### Agent-as-tool
 ```typescript
 const researcher = new Agent({
   name: 'researcher',
@@ -269,11 +548,11 @@ const researcher = new Agent({
 const writer = new Agent({
   model,
   tools: [researcher],
-  systemPrompt: 'Usa el researcher para obtener datos y escribe un resumen.',
+  systemPrompt: 'Usa el researcher y escribe un resumen.',
 })
 ```
 
-### Graph (ejecución secuencial con dependencias)
+### Graph (pipeline secuencial)
 ```typescript
 import { Graph } from '@strands-agents/sdk/multiagent'
 
@@ -281,22 +560,21 @@ const graph = new Graph({
   nodes: [
     new Agent({ id: 'step1', model, systemPrompt: 'Paso 1...' }),
     new Agent({ id: 'step2', model, systemPrompt: 'Paso 2...' }),
-    new Agent({ id: 'step3', model, systemPrompt: 'Paso 3...' }),
   ],
-  edges: [['step1', 'step2'], ['step2', 'step3']],
+  edges: [['step1', 'step2']],
 })
 
 const result = await graph.invoke('Ejecuta el pipeline')
 ```
 
-### Swarm (routing dinámico entre agentes)
+### Swarm (routing dinámico)
 ```typescript
 import { Swarm } from '@strands-agents/sdk/multiagent'
 
 const swarm = new Swarm({
   nodes: [
     new Agent({ id: 'triage', model, systemPrompt: 'Enruta al especialista.' }),
-    new Agent({ id: 'billing', model, systemPrompt: 'Resuelve temas de facturación.' }),
+    new Agent({ id: 'billing', model, systemPrompt: 'Facturación.' }),
     new Agent({ id: 'support', model, systemPrompt: 'Soporte técnico.' }),
   ],
   start: 'triage',
@@ -305,7 +583,7 @@ const swarm = new Swarm({
 
 ---
 
-## Structured Output (respuestas tipadas)
+## Structured Output (TypeScript)
 
 ```typescript
 import { z } from 'zod'
@@ -317,16 +595,43 @@ const MovieSchema = z.object({
   summary: z.string(),
 })
 
-const result = await agent.structured_output(
-  MovieSchema,
-  'Analiza la película The Matrix'
-)
-// result está tipado como { title: string, rating: number, ... }
+const result = await agent.structured_output(MovieSchema, 'Analiza The Matrix')
 ```
 
 ---
 
-## package.json mínimo para un proyecto con Strands + Gemini
+## Otros Providers (TypeScript)
+
+```typescript
+// OpenAI
+import { OpenAIModel } from '@strands-agents/sdk/models/openai'
+const model = new OpenAIModel({ apiKey: process.env.OPENAI_API_KEY, modelId: 'gpt-4o' })
+
+// Amazon Bedrock
+import { BedrockModel } from '@strands-agents/sdk/models/bedrock'
+const model = new BedrockModel({ modelId: 'global.anthropic.claude-sonnet-4-6', region: 'us-east-1' })
+
+// Anthropic directo
+import { AnthropicModel } from '@strands-agents/sdk/models/anthropic'
+const model = new AnthropicModel({ apiKey: process.env.ANTHROPIC_API_KEY, modelId: 'claude-sonnet-4-20250514' })
+```
+
+---
+
+## Vended Tools (TypeScript)
+
+```typescript
+import { bash } from '@strands-agents/sdk/vended-tools/bash'
+import { httpRequest } from '@strands-agents/sdk/vended-tools/http-request'
+import { fileEditor } from '@strands-agents/sdk/vended-tools/file-editor'
+import { notebook } from '@strands-agents/sdk/vended-tools/notebook'
+
+const agent = new Agent({ model, tools: [bash, httpRequest, fileEditor, notebook] })
+```
+
+---
+
+## package.json mínimo (TypeScript)
 
 ```json
 {
@@ -346,15 +651,6 @@ const result = await agent.structured_output(
     "@types/node": "^22.10.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
-  }
-}
-```
-
-### Si necesitas MCP, agregar:
-```json
-{
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
   }
 }
 ```
@@ -385,371 +681,85 @@ const result = await agent.structured_output(
 ```
 
 ---
+---
 
-## Patrones de integración por tipo de proyecto
-
-### Bot de Telegram
-```
-Bot Framework (grammy/telegraf) → Strands Agent (Gemini) → Tools/MCP
-```
-
-### CLI tool
-```
-Commander/Inquirer → Strands Agent (Gemini) → Tools locales
-```
-
-### API REST/Backend
-```
-Express/Fastify endpoint → Strands Agent (Gemini) → Tools/MCP → Response
-```
-
-### IoT / Arduino / ESP32 (via bridge)
-```
-Dispositivo → MQTT/HTTP → Node.js Bridge → Strands Agent (Gemini) → Tools → Respuesta al dispositivo
-```
-
-### Cron job / Automatización
-```
-Scheduler (node-cron) → Strands Agent (Gemini) → Tools/MCP → Resultado
-```
-
-### Browser (client-side)
-```
-React/Vue/Svelte component → Strands Agent (Gemini) → Tools → UI update
-```
+# PARTE 3: PATRONES DE INTEGRACIÓN
 
 ---
 
-## Errores comunes
+## Por tipo de proyecto
+
+| Proyecto | Stack recomendado | Provider |
+|----------|------------------|----------|
+| CLI sysadmin (NAS, Docker) | Python + @tool | Gemini (barato) o Bedrock (complejo) |
+| Bot de Telegram | TypeScript + grammy | Gemini |
+| API REST/Backend | TypeScript + Express/Fastify | Gemini |
+| IoT / ESP32 (via bridge) | TypeScript + Express + MQTT | Gemini |
+| Cron job / Automatización | Python | Gemini |
+| Privacidad total | Python + Ollama | Ollama (local) |
+| Razonamiento complejo | Python + Bedrock | Bedrock + thinking |
+
+---
+
+## Errores comunes (ambos lenguajes)
 
 | Error | Causa | Solución |
 |-------|-------|----------|
-| `peer zod@"^4.1.12"` | Zod 3 instalado | `npm install zod@^4.1.12` |
-| `peerOptional @google/genai@"^2.6.0"` | Versión vieja de genai | `npm install @google/genai@^2.6.0` |
-| `GOOGLE_API_KEY not set` | Falta la variable | Setear en .env o pasarla en `apiKey` |
-| `Tool validation failed` | Schema de Zod no coincide | Verificar que el input match el schema |
-| `MCP connection refused` | Servidor MCP no corre | Verificar que el MCP server esté activo |
+| `peer zod@"^4.1.12"` (TS) | Zod 3 instalado | `npm install zod@^4.1.12` |
+| `ModuleNotFoundError: google.genai` (Py) | Falta gemini extra | `pip install 'strands-agents[gemini]'` |
+| `GOOGLE_API_KEY not set` | Falta variable | Setear en .env o shell |
+| `ModelThrottledException` | Rate limit | Esperar + reintentar |
+| `MCP connection refused` (TS) | Server no corre | Verificar que el MCP esté activo |
+| Tool no se ejecuta (Py) | Sin docstring | `@tool` NECESITA docstring |
+| Tool no se ejecuta (TS) | Mala description | Describir claramente qué hace |
 
 ---
 
 ## Notas para LLMs que lean esta skill
 
-1. **Siempre usar `type: "module"`** en package.json (imports ESM)
+### Python
+1. Instalar con `pip install 'strands-agents[gemini]'` para Gemini
+2. `@tool` decorator convierte funciones en herramientas — el docstring es la descripción
+3. Type hints definen el schema de parámetros automáticamente
+4. El return de un @tool debe ser `str`
+5. `GeminiModel` se importa de `strands.models.gemini`
+6. `BedrockModel` se importa de `strands.models.bedrock`
+7. Extended thinking se habilita via `additional_request_fields` en BedrockModel
+8. El agente se invoca como función: `result = agent("tu pregunta")`
+9. Multi-provider se resuelve con un `get_model()` que lee env vars
+
+### TypeScript
+1. Siempre usar `type: "module"` en package.json (imports ESM)
 2. **Zod 4 es obligatorio** — no usar Zod 3 con Strands SDK
-3. **GoogleModel se importa de** `@strands-agents/sdk/models/google`
-4. **McpClient se importa de** `@strands-agents/sdk` (no de otro paquete)
-5. **StdioClientTransport** se importa de `@modelcontextprotocol/sdk/client/stdio.js`
-6. **SSEClientTransport** se importa de `@modelcontextprotocol/sdk/client/sse.js`
-7. El agente maneja el **loop de tool-use automáticamente** — no necesitas implementarlo
-8. Para que el agente use herramientas, solo tienes que **describirlas bien** — Gemini decide cuándo usarlas
-9. Los resultados de tools deben ser **strings** (o serializados a string)
-10. El `systemPrompt` define el comportamiento — hazlo claro y específico
+3. `GoogleModel` se importa de `@strands-agents/sdk/models/google`
+4. `McpClient` se importa de `@strands-agents/sdk`
+5. `StdioClientTransport` de `@modelcontextprotocol/sdk/client/stdio.js`
+6. `SSEClientTransport` de `@modelcontextprotocol/sdk/client/sse.js`
+7. El agente maneja el loop de tool-use automáticamente
+8. Los resultados de tools deben ser strings (o serializados a string)
+9. El `systemPrompt` define el comportamiento — hazlo claro y específico
 
-
----
-
-## Vended Tools (herramientas built-in del SDK)
-
-El SDK incluye herramientas listas para usar:
-
-```typescript
-import { bash } from '@strands-agents/sdk/vended-tools/bash'
-import { httpRequest } from '@strands-agents/sdk/vended-tools/http-request'
-import { fileEditor } from '@strands-agents/sdk/vended-tools/file-editor'
-import { notebook } from '@strands-agents/sdk/vended-tools/notebook'
-
-const agent = new Agent({
-  model,
-  tools: [bash, httpRequest, fileEditor, notebook],
-})
-```
-
-| Tool | Qué hace |
-|------|----------|
-| `bash` | Ejecuta comandos de shell |
-| `httpRequest` | Hace HTTP requests (GET, POST, etc.) |
-| `fileEditor` | Lee, escribe y edita archivos |
-| `notebook` | Bloc de notas persistente para el agente |
-
----
-
-## Conversation Management (historial)
-
-### Acceder a mensajes previos
-```typescript
-const result = await agent.invoke('Hola')
-console.log(agent.messages) // Array de mensajes del conversation
-
-// Invocar de nuevo — mantiene contexto
-const result2 = await agent.invoke('¿Qué te dije antes?')
-```
-
-### Sliding Window (limitar contexto)
-```typescript
-const agent = new Agent({
-  model,
-  conversationManager: {
-    strategy: 'slidingWindow',
-    windowSize: 20, // Mantener últimos 20 mensajes
-  },
-})
-```
-
-### Summarization (resumir historial largo)
-```typescript
-const agent = new Agent({
-  model,
-  conversationManager: {
-    strategy: 'summarization',
-    maxMessages: 50, // Cuando supere 50, resume los viejos
-  },
-})
-```
-
-### Reiniciar conversación
-```typescript
-agent.messages = [] // Limpiar historial
-```
-
----
-
-## Session Persistence (guardar estado)
-
-### Guardar en archivo
-```typescript
-import { FileSessionStore } from '@strands-agents/sdk/sessions'
-
-const agent = new Agent({
-  model,
-  sessionStore: new FileSessionStore({ directory: './sessions' }),
-  sessionId: 'user-123', // Identificador único de la sesión
-})
-```
-
-### Guardar en S3
-```typescript
-import { S3SessionStore } from '@strands-agents/sdk/sessions'
-
-const agent = new Agent({
-  model,
-  sessionStore: new S3SessionStore({
-    bucket: 'my-agent-sessions',
-    prefix: 'sessions/',
-    region: 'us-east-1',
-  }),
-  sessionId: 'user-123',
-})
-```
-
----
-
-## Cancellation (AbortSignal)
-
-```typescript
-const controller = new AbortController()
-
-// Cancelar después de 30 segundos
-setTimeout(() => controller.abort(), 30_000)
-
-try {
-  const result = await agent.invoke('Tarea larga...', {
-    signal: controller.signal,
-  })
-} catch (error) {
-  if (error.name === 'AbortError') {
-    console.log('Invocación cancelada')
-  }
-}
-```
-
----
-
-## Error Handling
-
-```typescript
-import { ModelThrottledException } from '@strands-agents/sdk'
-
-try {
-  const result = await agent.invoke('...')
-} catch (error) {
-  if (error instanceof ModelThrottledException) {
-    // Rate limit — esperar y reintentar
-    console.log('Rate limited, esperando...')
-    await new Promise(r => setTimeout(r, 5000))
-    // Reintentar...
-  } else {
-    console.error('Error:', error.message)
-  }
-}
-```
-
-### Manejo de errores en tools
-```typescript
-const safeTool = tool({
-  name: 'safe_operation',
-  description: 'Operación que puede fallar',
-  inputSchema: z.object({ id: z.string() }),
-  callback: async (input) => {
-    try {
-      const result = await riskyOperation(input.id)
-      return JSON.stringify(result)
-    } catch (error) {
-      // Devolver error como string — el agente lo interpreta
-      return `ERROR: ${error.message}. No se pudo completar la operación.`
-    }
-  },
-})
-```
-
----
-
-## Observability (Traces & Metrics)
-
-### Acceder a métricas de ejecución
-```typescript
-const result = await agent.invoke('...')
-
-// Métricas disponibles en el resultado
-console.log(result.metrics) // { inputTokens, outputTokens, duration, toolCalls }
-```
-
-### OpenTelemetry integration
-```typescript
-import { OtelPlugin } from '@strands-agents/sdk/plugins/otel'
-
-const agent = new Agent({
-  model,
-  plugins: [new OtelPlugin({
-    serviceName: 'my-agent',
-    endpoint: 'http://localhost:4318/v1/traces',
-  })],
-})
-```
-
----
-
-## Otros Model Providers (no solo Gemini)
-
-### OpenAI / GPT
-```typescript
-import { OpenAIModel } from '@strands-agents/sdk/models/openai'
-
-const model = new OpenAIModel({
-  apiKey: process.env.OPENAI_API_KEY,
-  modelId: 'gpt-4o',  // o 'gpt-4o-mini' para más barato
-})
-```
-
-### Amazon Bedrock (Claude)
-```typescript
-import { BedrockModel } from '@strands-agents/sdk/models/bedrock'
-
-const model = new BedrockModel({
-  modelId: 'global.anthropic.claude-sonnet-4-6',
-  region: 'us-east-1',
-})
-// Requiere AWS credentials configuradas
-```
-
-### Anthropic directo
-```typescript
-import { AnthropicModel } from '@strands-agents/sdk/models/anthropic'
-
-const model = new AnthropicModel({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  modelId: 'claude-sonnet-4-20250514',
-})
-```
-
-### Comparación de providers
-| Provider | Modelo recomendado | Costo/1M input | Tool-use |
-|----------|-------------------|----------------|----------|
-| Google | gemini-2.5-flash | ~$0.15 | Excelente |
-| OpenAI | gpt-4o-mini | ~$0.15 | Excelente |
-| Bedrock | claude-sonnet-4 | ~$3.00 | El mejor |
-| Anthropic | claude-sonnet-4 | ~$3.00 | El mejor |
-
----
-
-## Patrón completo: IoT Bridge (Arduino/ESP32 → Agente)
-
-Para dispositivos que no pueden correr Node.js directamente:
-
-```typescript
-/**
- * Bridge: Dispositivo IoT envía datos via MQTT/HTTP
- * → Node.js recibe → Strands Agent procesa → Responde al dispositivo
- */
-import { Agent, tool } from '@strands-agents/sdk'
-import { GoogleModel } from '@strands-agents/sdk/models/google'
-import { z } from 'zod'
-import express from 'express'
-
-// Tool que controla el dispositivo
-const controlDevice = tool({
-  name: 'control_device',
-  description: 'Envía un comando al dispositivo IoT',
-  inputSchema: z.object({
-    deviceId: z.string(),
-    action: z.enum(['on', 'off', 'set_value']),
-    value: z.number().optional(),
-  }),
-  callback: async (input) => {
-    // Enviar comando via MQTT, HTTP, o serial
-    await sendToDevice(input.deviceId, input.action, input.value)
-    return `Comando ${input.action} enviado a ${input.deviceId}`
-  },
-})
-
-const readSensor = tool({
-  name: 'read_sensor',
-  description: 'Lee el valor actual de un sensor',
-  inputSchema: z.object({
-    sensorId: z.string(),
-  }),
-  callback: async (input) => {
-    const value = await getSensorValue(input.sensorId)
-    return `Sensor ${input.sensorId}: ${value}`
-  },
-})
-
-const model = new GoogleModel({
-  apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
-})
-
-const agent = new Agent({
-  model,
-  tools: [controlDevice, readSensor],
-  systemPrompt: 'Controlas dispositivos IoT. Responde con acciones concretas.',
-})
-
-// HTTP endpoint que recibe datos del ESP32
-const app = express()
-app.post('/iot/command', async (req, res) => {
-  const { message } = req.body // ej: "enciende la luz del salón"
-  const result = await agent.invoke(message)
-  res.json({ response: result.lastMessage })
-})
-```
-
----
-
-## Deshabilitando output de consola
-
-Por defecto Strands imprime el razonamiento en consola. Para desactivar:
-
-```typescript
-const agent = new Agent({
-  model,
-  printer: false, // Sin output a consola
-})
-```
+### General
+- Para que el agente use herramientas, solo hay que **describirlas bien**
+- El modelo decide cuándo usar cada herramienta basándose en la descripción
+- Instrucciones de razonamiento en el system prompt mejoran TODOS los providers
+- Extended thinking (solo Bedrock/Claude) permite corrección mid-stream sin loops extra
 
 ---
 
 ## Resumen de imports principales
 
+### Python
+```python
+from strands import Agent, tool
+from strands.models.gemini import GeminiModel
+from strands.models.bedrock import BedrockModel
+from strands.models.ollama import OllamaModel
+from strands.types.exceptions import ModelThrottledException
+from strands_tools import calculator, python_repl, http_request
+```
+
+### TypeScript
 ```typescript
 // Core
 import { Agent, tool, McpClient } from '@strands-agents/sdk'
@@ -772,9 +782,7 @@ import { fileEditor } from '@strands-agents/sdk/vended-tools/file-editor'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 
-// Events (para plugins)
+// Events
 import { BeforeToolCallEvent, AfterToolCallEvent } from '@strands-agents/sdk'
-
-// Types
 import type { Plugin, LocalAgent } from '@strands-agents/sdk'
 ```
