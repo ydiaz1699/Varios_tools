@@ -64,7 +64,7 @@ from strands import Agent
 from strands.models.gemini import GeminiModel
 
 model = GeminiModel(
-    model_id="gemini-2.5-flash",
+    model_id="gemini-3.1-flash-lite",  # Recomendado: 500 RPD en free tier
     client_args={"api_key": "tu-key"},  # o usa env GOOGLE_API_KEY
     params={
         "temperature": 0.3,
@@ -74,7 +74,7 @@ model = GeminiModel(
 
 agent = Agent(model=model, system_prompt="Eres un asistente experto.")
 result = agent("¿Qué hora es en Tokio?")
-print(result)
+print(str(result))  # str(result) extrae el texto de AgentResult
 ```
 
 ### Variables de entorno
@@ -83,6 +83,64 @@ export GOOGLE_API_KEY="tu-api-key"  # se lee automáticamente
 ```
 
 Obtener en: https://aistudio.google.com/apikey (tier gratuito disponible)
+
+### Modelos Gemini disponibles (julio 2026)
+
+| Modelo | model_id | RPD (free) | Recomendación |
+|--------|----------|:----------:|---------------|
+| Gemini 3.1 Flash Lite | `gemini-3.1-flash-lite` | 500 | **Recomendado** — máxima cuota gratis |
+| Gemini 3.5 Flash Lite | `gemini-3.5-flash-lite` | 500 | Alta cuota, más nuevo |
+| Gemini 3.5 Flash | `gemini-3.5-flash` | 20 | Más capaz, menos cuota |
+| Gemini 3.6 Flash | `gemini-3.6-flash` | 20 | Último disponible |
+| Gemini 3.1 Pro | `gemini-3.1-pro` | — | Razonamiento complejo |
+| Gemini 2.5 Flash | `gemini-2.5-flash` | 20 | Anterior gen |
+| Gemini 2.5 Pro | `gemini-2.5-pro` | — | Anterior gen (pro) |
+| Gemini 2.0 Flash Lite | `gemini-2.0-flash-lite` | — | Legacy |
+
+**RPD = Requests Per Day** en el tier gratuito.
+La cuota es por proyecto (compartida entre modelos de la misma familia).
+Recomendación: usar `gemini-3.1-flash-lite` (500 RPD) para desarrollo/uso personal.
+
+### Desactivar output de streaming (para renderizar con Rich)
+
+```python
+# callback_handler=None silencia el output de Strands
+# Así podés capturar el resultado y renderizarlo vos (ej: con Rich)
+agent = Agent(
+    model=model,
+    tools=[...],
+    system_prompt="...",
+    callback_handler=None,  # No imprime streaming — vos controlás el output
+)
+
+result = agent("tu pregunta")
+response_text = str(result)  # Extrae texto del AgentResult
+```
+
+### Cargar config desde archivo (.env.agent)
+
+Patrón para cargar variables desde un archivo sin dependencias extra:
+
+```python
+import os
+from pathlib import Path
+
+def load_env_file(env_path: Path):
+    """Carga key=value de un archivo al entorno."""
+    if not env_path.exists():
+        return
+    for line in env_path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" in line:
+            key, _, value = line.partition("=")
+            if key.strip() and key.strip() not in os.environ:
+                os.environ[key.strip()] = value.strip()
+
+# Cargar al inicio del programa
+load_env_file(Path("/nas-dotfiles/.env.agent"))
+```
 
 ---
 
@@ -329,16 +387,19 @@ Herramientas disponibles en `strands-agents-tools`:
 
 ## Comparación de providers (Python)
 
-| Provider | Modelo | Costo/1M tokens | Tool-use | Extended Thinking | Setup |
-|----------|--------|:---------------:|:--------:|:-----------------:|-------|
-| **Gemini** | gemini-2.5-flash | ~$0.15 | Bueno | No | Solo API key |
-| **Bedrock** | Claude Sonnet 4 | ~$3.00 | El mejor | Sí (interleaved) | AWS credentials |
-| **Ollama** | llama3.1 | Gratis | Básico | No | Ollama local |
+| Provider | Modelo | RPD (free) | Tool-use | Extended Thinking | Setup |
+|----------|--------|:----------:|:--------:|:-----------------:|-------|
+| **Gemini** | gemini-3.1-flash-lite | 500 | Bueno | No | Solo API key |
+| **Gemini** | gemini-3.5-flash | 20 | Muy bueno | No | Solo API key |
+| **Bedrock** | Claude Sonnet 4 | — | El mejor | Sí (interleaved) | AWS credentials |
+| **Ollama** | llama3.1 / gemma3:4b | ∞ | Básico | No | Ollama local |
 
 ### Recomendación por caso de uso
-- **Agente de producción (barato)**: Gemini — 20x más barato, suficiente para la mayoría
-- **Tareas complejas (razonamiento)**: Bedrock — extended thinking + mejor tool-use
-- **Privacidad total / sin internet**: Ollama — gratis, local, sin datos a la nube
+- **Máxima cuota gratis**: `gemini-3.1-flash-lite` (500 RPD) o `gemini-3.5-flash-lite` (500 RPD)
+- **Mejor calidad**: `gemini-3.5-flash` (20 RPD) o `gemini-3.6-flash` (20 RPD)
+- **Razonamiento complejo**: Bedrock — extended thinking + mejor tool-use
+- **Privacidad / sin internet**: Ollama — gratis, local, sin datos a la nube
+- **Cuota agotada**: cambiar a otro modelo (cuotas separadas por modelo)
 
 ---
 
@@ -367,11 +428,16 @@ python -m agent.mi_agent "tu pregunta"
 | Error | Causa | Solución |
 |-------|-------|----------|
 | `ModuleNotFoundError: google.genai` | Falta dependencia Gemini | `pip install 'strands-agents[gemini]'` |
-| `GOOGLE_API_KEY not set` | Falta variable | `export GOOGLE_API_KEY=...` |
+| `No module named pip` | Debian sin pip | `apt install python3-pip python3.X-venv` |
+| `GOOGLE_API_KEY not set` | Falta variable | `export GOOGLE_API_KEY=...` o poner en `.env.agent` |
+| `429 Too Many Requests` | Quota diaria agotada | Cambiar modelo (ej: `gemini-3.1-flash-lite`) o esperar |
+| `404 models/X not found` | Model ID incorrecto | Verificar ID exacto en la tabla de modelos |
 | `botocore.exceptions.NoCredentialsError` | Sin AWS config | `aws configure` |
 | `ConnectionRefusedError` (Ollama) | Ollama no corre | `ollama serve` |
-| `ModelThrottledException` | Rate limit | Esperar y reintentar, o subir tier |
+| `ModelThrottledException` | Rate limit (RPM) | Esperar 60s y reintentar |
 | Tool no se ejecuta | Docstring vacío | El @tool NECESITA docstring para que el modelo lo entienda |
+| `got an unexpected keyword argument 'printer'` | API incorrecta | Usar `callback_handler=None` (no `printer=False`) |
+| `unrecognized tool specification` | Tool wrapeada | No wrappear funciones @tool con decoradores extra |
 
 ---
 ---
@@ -414,12 +480,14 @@ GOOGLE_API_KEY=tu-api-key-de-google-ai-studio
 ```
 
 ### Modelos disponibles (recomendados)
-| Modelo | Caso de uso | Costo aprox |
-|--------|------------|-------------|
-| `gemini-2.5-flash` | Mejor balance rendimiento/costo | ~$0.15/1M input |
-| `gemini-2.5-flash-lite` | Más barato posible | Menor que flash |
-| `gemini-2.5-pro` | Razonamiento complejo | ~$1.25/1M input |
-| `gemini-2.0-flash` | Velocidad máxima | Rápido y barato |
+| Modelo | Caso de uso | RPD (free) |
+|--------|------------|:----------:|
+| `gemini-3.1-flash-lite` | Máxima cuota gratis, bueno para tool-use | 500 |
+| `gemini-3.5-flash-lite` | Alta cuota, más nuevo | 500 |
+| `gemini-3.5-flash` | Mejor balance rendimiento/cuota | 20 |
+| `gemini-3.6-flash` | Último disponible | 20 |
+| `gemini-2.5-flash` | Anterior gen | 20 |
+| `gemini-2.5-pro` | Razonamiento complejo | — |
 
 ### Import y configuración
 ```typescript
@@ -719,14 +787,20 @@ const agent = new Agent({ model, tools: [bash, httpRequest, fileEditor, notebook
 
 ### Python
 1. Instalar con `pip install 'strands-agents[gemini]'` para Gemini
-2. `@tool` decorator convierte funciones en herramientas — el docstring es la descripción
-3. Type hints definen el schema de parámetros automáticamente
-4. El return de un @tool debe ser `str`
-5. `GeminiModel` se importa de `strands.models.gemini`
-6. `BedrockModel` se importa de `strands.models.bedrock`
-7. Extended thinking se habilita via `additional_request_fields` en BedrockModel
-8. El agente se invoca como función: `result = agent("tu pregunta")`
-9. Multi-provider se resuelve con un `get_model()` que lee env vars
+2. En Debian 13+: necesita `apt install python3-pip python3.X-venv` primero
+3. `@tool` decorator convierte funciones en herramientas — el docstring es la descripción
+4. Type hints definen el schema de parámetros automáticamente
+5. El return de un @tool debe ser `str`
+6. `GeminiModel` se importa de `strands.models.gemini`
+7. `BedrockModel` se importa de `strands.models.bedrock`
+8. Extended thinking se habilita via `additional_request_fields` en BedrockModel
+9. El agente se invoca como función: `result = agent("tu pregunta")`
+10. Obtener texto de la respuesta: `str(result)` (NO `result.message`)
+11. Silenciar streaming: `callback_handler=None` (NO `printer=False`)
+12. NO wrappear funciones `@tool` con decoradores adicionales (rompe Strands)
+13. Multi-provider se resuelve con un `get_model()` que lee env vars
+14. Modelo recomendado: `gemini-3.1-flash-lite` (500 RPD en free tier)
+15. Cargar config desde archivo: leer `.env.agent` con `load_env_file()` al inicio
 
 ### TypeScript
 1. Siempre usar `type: "module"` en package.json (imports ESM)
