@@ -1,3 +1,185 @@
+# Manual de Referencia - Consul CWH15AB (15kg)
+
+> Este documento contiene TODA la informacion relevante extraida del
+> PDF oficial (Guia Rapido) y fichas tecnicas del modelo CWH15AB.
+> Sirve como referencia completa para el proyecto ESP32 sin necesidad
+> de consultar el PDF original nuevamente.
+
+## Fuente Original
+
+- PDF Guia Rapido: https://whirlpool.vteximg.com.br/arquivos/Consul_Lavadora_CWH15AB_Guia_Rapido_Versão_Digital_1.pdf
+- PDF Taqi: https://www.taqi.com.br/file/general/maquina-de-lavar-consul-com-modo-eco-15kg-branca-220-volts.pdf
+- Ficha Buscape: https://www.buscape.com.br/lavadora-roupas/lavadora-consul-15kg-cwh15ab/
+- Ficha Zoom: https://www.zoom.com.br/lavadora-roupas/lavadora-consul-15kg-cwh15ab/
+
+---
+
+## 1. IDENTIFICACION DEL PRODUCTO
+
+| Dato | Valor |
+|------|-------|
+| Marca | Consul (Whirlpool S.A.) |
+| Modelo | CWH15AB |
+| Tipo | Lavadora automatica de ropa |
+| Capacidad | 15 kg de ropa seca |
+| Color | Blanco |
+| Voltaje | 127V o 220V (NO es bivolt, hay que elegir) |
+| Potencia | 620W |
+| Consumo energetico | 0.46 kWh por ciclo |
+| Sello Procel | A (Mas Economico) |
+| Consumo agua por ciclo | ~186 litros |
+| Peso del equipo | 38 kg |
+| Dimensiones (Alto x Ancho x Prof) | 100 x 63 x 70 cm |
+| Apertura | Tapa superior (top load) |
+| Cesto/tambor | Acero inoxidable con base plastica |
+| Tipo de lavado | Agitador central |
+| Velocidad centrifugado | ~750 rpm |
+| Dispenser | Dual (jabon + suavizante) |
+
+---
+
+## 2. PANEL DE CONTROL
+
+### Tipo de Panel
+- **Display digital (Tact)**: Pantalla que muestra programa seleccionado y tiempo
+- **Boton giratorio (knob/encoder)**: Para seleccionar entre los 16 programas
+- **Botones tactiles**: Para funciones adicionales
+
+### Botones del Panel (5 en total)
+1. **Encendido/Apagado** - Enciende o apaga la lavadora
+2. **Boton giratorio (encoder)** - Gira para seleccionar programa (16 posiciones)
+3. **Nivel de Agua** - Cicla entre los 4 niveles disponibles
+4. **Mas Secas** - Activa/desactiva centrifugado extra al final
+5. **Iniciar/Pausar** - Inicia el ciclo o lo pausa
+
+### Que muestra el Display
+- Nombre del programa seleccionado (cuando esta en espera)
+- Tiempo restante estimado (durante la operacion)
+- Etapa actual: Lavado, Enjuague, Centrifugado
+- Indicacion de "LISTO" al finalizar
+- Indicacion de error si hay problema
+
+---
+
+## 3. LOS 16 PROGRAMAS DE LAVADO
+
+### Lista completa (en orden del selector giratorio)
+
+| # | Programa | Para que sirve | Nivel agua default |
+|---|---------|----------------|-------------------|
+| 1 | Ropa Blanca | Lavado intenso para blancos, quita manchas | Alto |
+| 2 | Ropa de Color | Lavado normal del dia a dia | Alto |
+| 3 | Ropa Oscura | Lavado suave, evita decoloracion | Alto |
+| 4 | Jeans | Lavado fuerte para tela denim/mezclilla | Alto |
+| 5 | Cama y Bano | Ciclo largo para sabanas, toallas, fundas | Extra |
+| 6 | Ropa Delicada | Ciclo suave y corto para telas finas/seda | Medio |
+| 7 | Ropa de Bebe | Enjuagues extra para eliminar residuos de jabon | Alto |
+| 8 | Abrigos y Buzos | Ciclo fuerte para prendas gruesas/pesadas | Extra |
+| 9 | Zapatillas | Ciclo suave para calzado deportivo | Medio |
+| 10 | Ropa Pesada | Ciclo maximo para ropa muy sucia | Extra |
+| 11 | Edredon | Ciclo suave y largo para prendas voluminosas | Extra |
+| 12 | Quita Olores | Enjuagues extra para eliminar malos olores | Alto |
+| 13 | Ciclo Rapido | Lavado corto para ropa poco sucia | Bajo |
+| 14 | Solo Enjuague | Solo enjuaga y centrifuga (sin lavado) | Medio |
+| 15 | Solo Centrifugado | Solo centrifuga (sin agua) | - |
+| 16 | Remojo | Llena de agua y deja en reposo sin agitar | Alto |
+
+### Tiempos estimados por programa (valores en el firmware)
+
+| # | Programa | Lavado | Agit. ON | Pausa | Enjuagues | T. Enjuague | Centrif. | Total aprox. |
+|---|---------|--------|----------|-------|-----------|-------------|----------|-------------|
+| 1 | Ropa Blanca | 14 min | 4s | 2s | 2x | 4 min c/u | 7 min | ~40 min |
+| 2 | Ropa de Color | 12 min | 4s | 2s | 2x | 3 min c/u | 6 min | ~35 min |
+| 3 | Ropa Oscura | 10 min | 3s | 3s | 2x | 3 min c/u | 5 min | ~30 min |
+
+### Tiempos REALES del PDF oficial
+
+| # | Programa | Tiene Molho? | Tiempo TOTAL |
+|---|---------|:---:|-------------|
+| 1 | Cama e Banho | SI | **1h 36min** (96 min) |
+| 2 | Edredom | SI | **1h 33min** (93 min) |
+| 3 | Limpeza Pesada | SI | **2h 04min** (124 min) |
+| 4 | Panos de Limpeza | NO | **2h 27min** (147 min) |
+| 5 | Tira Odores | NO | **0h 36min** (36 min) |
+| 6 | Rapido | NO | **0h 29min** (29 min) |
+| 7 | Lavagem Eco | NO | **0h 46min** (46 min) |
+| 8 | Brancas | SI | **1h 42min** (102 min) |
+| 9 | Coloridas | NO | **0h 51min** (51 min) |
+| 10 | Escuras | NO | **0h 43min** (43 min) |
+| 11 | Jeans | SI | **1h 21min** (81 min) |
+| 12 | Uniforme | SI | **1h 55min** (115 min) |
+| 13 | Roupas Intimas | NO | **1h 03min** (63 min) |
+| 14 | Roupas Leves | SI | **1h 46min** (106 min) |
+| 15 | Roupas de Bebe | SI | **2h 20min** (140 min) |
+| 16 | Limpeza da Lavadora | NO | **0h 54min** (54 min) |
+
+> Tiempos con nivel Alto. Panos de Limpeza: max 2kg. Limpeza Lavadora: SIN ropa.
+
+---
+
+### QUE DATOS MEDIR CON CRONOMETRO (8 datos por programa)
+
+| # | Dato | Como se mide | Variable en codigo |
+|---|------|-------------|-------------------|
+| 1 | Tiempo remojo | Desde que llena hasta que agita (solo Molho) | tiempoMolho (ms) |
+| 2 | Tiempo lavado | Desde que agita hasta que para | tiempoLavado (ms) |
+| 3 | Giro por dir | Segundos girando hacia un lado | tiempoAgitacion (ms) |
+| 4 | Pausa giros | Segundos quieto entre cambios | pausaAgitacion (ms) |
+| 5 | Cant enjuagues | Veces que vuelve a llenar | numEnjuagues (entero) |
+| 6 | Tiempo enjuague | Agitacion del enjuague | tiempoEnjuague (ms) |
+| 7 | Tiempo centrif | Giro rapido hasta parar | tiempoCentrifugado (ms) |
+| 8 | Tipo agitacion | Fuerte o suave | agitacionFuerte (bool) |
+
+Programas prioritarios: Coloridas (51min), Rapido (29min), Cama e Banho (96min), Limpeza Pesada (124min)
+
+**2. Ropa de Color:** El programa mas usado. Agitacion normal,
+2 enjuagues, centrifugado completo. Para uso diario.
+
+**3. Ropa Oscura:** Agitacion reducida (mas pausa entre giros)
+para evitar que la ropa oscura se decolore por friccion.
+
+**4. Jeans:** Similar a ropa pesada pero optimizado para mezclilla.
+Agitacion fuerte. El denim es resistente y necesita fuerza.
+
+**5. Cama y Bano:** Ciclo largo para sabanas, toallas, manteles.
+Nivel extra de agua porque son prendas voluminosas que absorben mucho.
+
+**6. Ropa Delicada:** Agitacion MUY suave (poco tiempo girando,
+mucha pausa). Solo 1 enjuague. Centrifugado corto para no danar.
+
+**7. Ropa de Bebe:** Lo especial es que hace 3 enjuagues (en vez de 2)
+para asegurar que no queden residuos de jabon que irriten la piel.
+
+**8. Abrigos y Buzos:** Para camperas, buzos gruesos, moletons.
+Agitacion fuerte con nivel extra de agua.
+
+**9. Zapatillas:** Agitacion suave para no deformar el calzado.
+Se recomienda usar bolsa de lavado. Centrifugado corto.
+
+**10. Ropa Pesada:** El programa mas intenso. Maximo tiempo de
+agitacion, maximo centrifugado. Para ropa de trabajo muy sucia.
+
+**11. Edredon:** Agitacion MUY suave (mucha pausa) porque el
+edredon es voluminoso. Nivel extra obligatorio. Enjuagues largos.
+
+**12. Quita Olores:** Hace 3 enjuagues para eliminar olores
+persistentes (humo, transpiración, humedad).
+
+**13. Ciclo Rapido:** Todo reducido: lavado corto, 1 enjuague corto,
+centrifugado corto. Para ropa usada una vez, poco sucia.
+
+**14. Solo Enjuague:** No lava. Solo llena, enjuaga 2 veces y
+centrifuga. Para ropa ya lavada a mano que necesita enjuague.
+
+**15. Solo Centrifugado:** No usa agua. Solo centrifuga para
+escurrir ropa que ya fue lavada/enjuagada manualmente.
+
+**16. Remojo:** Llena el tanque con agua y deja la ropa en reposo
+30 minutos sin agitar. Para manchas dificiles que necesitan
+ablandarse antes de un lavado normal.
+
+---
+
 ## 4. NIVELES DE AGUA
 
 | Nivel | Indicacion en display | Volumen aprox. | Cuando usar |
