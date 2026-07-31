@@ -33,7 +33,7 @@ Obtener en: https://aistudio.google.com/apikey
 
 ---
 
-## Modelos disponibles
+## Modelos disponibles (verificado vs. panel de cuotas, jul 2026)
 
 | Modelo | Caso de uso | RPD (free) |
 |--------|------------|:----------:|
@@ -41,8 +41,13 @@ Obtener en: https://aistudio.google.com/apikey
 | `gemini-3.5-flash-lite` | Alta cuota, más nuevo | 500 |
 | `gemini-3.5-flash` | Mejor balance rendimiento/cuota | 20 |
 | `gemini-3.6-flash` | Último disponible | 20 |
+| `gemini-3-flash` | Intermedio, buena calidad | 20 |
 | `gemini-2.5-flash` | Anterior gen | 20 |
+| `gemini-2.5-flash-lite` | Anterior gen, liviano | 20 |
 | `gemini-2.5-pro` | Razonamiento complejo | — |
+| `gemini-3.1-pro` | Razonamiento complejo (nueva gen) | — |
+
+⚠️ Estos RPD varían por cuenta/región — verificar en tu panel de Google AI Studio antes de asumirlos en producción.
 
 ---
 

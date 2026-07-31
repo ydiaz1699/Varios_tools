@@ -74,6 +74,7 @@ Antes de implementar, responde estas preguntas:
 4. **Return type:** Tools SIEMPRE retornan `str` (Python) o `string` (TypeScript)
 5. **shell=False:** NUNCA usar `shell=True` en subprocess — riesgo de inyección
 6. **Streaming:** `callback_handler=None` para desactivar output de Strands y renderizar tú
+7. **Model IDs y cuotas:** los `model_id` y valores de RPD/RPM/TPM listados en los bloques de Gemini fueron verificados contra un panel real (jul 2026), pero **cambian por cuenta y con el tiempo**. Antes de usar en producción, confirmar en el panel de cuotas de Google AI Studio. Para Bedrock/Anthropic/OpenAI, los `model_id` en esta skill NO están verificados de la misma forma — chequear siempre contra la documentación oficial del provider.
 
 ---
 
