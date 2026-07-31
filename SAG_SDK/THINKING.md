@@ -56,6 +56,8 @@ Antes de implementar, responde estas preguntas:
 | System prompt | `blocks/production/executive-mode.md` | Que el agente ACTÚE sin preguntar |
 | Core layer | `blocks/production/core-layer.md` | Separar @tool de lógica |
 | Errores comunes | `blocks/production/errors.md` | Debugging / troubleshooting |
+| Testing | `blocks/production/testing.md` | Testear el agente sin llamadas reales al LLM |
+| Deployment | `blocks/production/deployment.md` | Correr el agente en producción (systemd, cron, Docker) |
 
 ### Meta
 
@@ -98,9 +100,12 @@ Bloques a cargar:
 
 ---
 
-## Skill completa (legacy)
+## Skill completa (DEPRECADA)
 
-Si necesitas TODO en un solo archivo (para contexts que no soportan múltiples archivos):
-→ `.kiro/skills/strands-gemini-integration.md` (1182 líneas, las 4 partes completas)
+> ⚠️ El archivo `.kiro/skills/strands-gemini-integration.md` está **deprecado**.
+> Se mantiene por compatibilidad con contextos que solo soportan un archivo,
+> pero NO se actualiza activamente. La fuente de verdad son los `blocks/`.
+>
+> Si necesitas todo junto, carga todos los bloques de la categoría que necesites.
 
-Los bloques individuales son extractos organizados de esa skill para carga selectiva.
+Los bloques individuales son la fuente de verdad. El monolito puede tener datos desactualizados.

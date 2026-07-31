@@ -12,7 +12,7 @@ import { Graph, Swarm } from '@strands-agents/sdk/multiagent'
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 // --- PATRÓN 1: Agent-as-tool ---

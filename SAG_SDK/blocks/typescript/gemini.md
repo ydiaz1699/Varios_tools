@@ -1,6 +1,8 @@
 # Provider: Google Gemini + Agente Básico (TypeScript)
 
 > **Cuándo usar este bloque:** Cuando necesitas crear un agente con Strands Agents SDK en TypeScript usando Google Gemini como provider. Incluye instalación, configuración del modelo, y creación de un agente básico.
+>
+> Última verificación de datos externos: 2026-07-31
 
 ---
 

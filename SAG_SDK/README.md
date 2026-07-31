@@ -48,6 +48,8 @@ SAG_SDK/
 │   │   ├── executive-mode.md           ← System prompt ejecutivo
 │   │   ├── core-layer.md              ← tool → core → shell
 │   │   ├── errors.md                   ← 8 errores comunes + fixes
+│   │   ├── testing.md                  ← Testear sin LLM (mocks, core)
+│   │   ├── deployment.md              ← Correr en producción (systemd, cron, Docker)
 │   │   └── checklist.md                ← Checklist de producción
 │   └── meta/
 │       └── analyze-chat.md             ← Extraer patrones de chats
@@ -62,7 +64,8 @@ SAG_SDK/
 ├── prompts/
 │   └── analyze-chat.md                 ← Prompt template (versión legacy)
 ├── .kiro/skills/
-│   └── strands-gemini-integration.md   ← Skill monolítica (legacy, 1182 líneas)
+│   └── strands-gemini-integration.md   ← DEPRECADO (usar blocks/ como fuente de verdad)
+├── CHANGELOG.md                        ← Historial de cambios
 └── README.md
 ```
 
@@ -74,9 +77,10 @@ SAG_SDK/
 2. Lee solo los bloques relevantes para tu tarea
 3. Implementa
 
-### Opción 2: Skill monolítica (legacy)
+### Opción 2: Skill monolítica (DEPRECADA)
 
-Si tu contexto soporta archivos grandes, carga `.kiro/skills/strands-gemini-integration.md` completo (las 4 partes de una vez).
+> ⚠️ El monolito en `.kiro/skills/` está deprecado y puede contener datos desactualizados.
+> Se mantiene solo por compatibilidad. La fuente de verdad son los `blocks/`.
 
 ### Opción 3: Ejemplos directos
 

@@ -1,6 +1,8 @@
 # Provider: Google Gemini (Python)
 
 > **Cuándo usar este bloque:** Cuando necesitas crear un agente con Strands Agents SDK usando Google Gemini como provider. Es el provider más barato (tier gratuito disponible) y más fácil de configurar (solo API key).
+>
+> Última verificación de datos externos: 2026-07-31
 
 ---
 

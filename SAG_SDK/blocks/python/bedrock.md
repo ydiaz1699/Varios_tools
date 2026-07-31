@@ -1,6 +1,8 @@
 # Provider: Amazon Bedrock con Extended Thinking (Python)
 
 > **Cuándo usar este bloque:** Cuando necesitas el mejor razonamiento disponible (Claude via Bedrock) con capacidad de extended thinking — ideal para diagnósticos complejos, debugging profundo, o tareas que requieren corrección mid-stream.
+>
+> Última verificación de datos externos: 2026-07-31
 
 ---
 
