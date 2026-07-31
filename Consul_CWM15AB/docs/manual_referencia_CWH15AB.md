@@ -84,6 +84,95 @@
 | 15 | Solo Centrifugado | Solo centrifuga (sin agua) | - |
 | 16 | Remojo | Llena de agua y deja en reposo sin agitar | Alto |
 
+### Tiempos estimados por programa (valores en el firmware)
+
+| # | Programa | Lavado | Agit. ON | Pausa | Enjuagues | T. Enjuague | Centrif. | Total aprox. |
+|---|---------|--------|----------|-------|-----------|-------------|----------|-------------|
+| 1 | Ropa Blanca | 14 min | 4s | 2s | 2x | 4 min c/u | 7 min | ~40 min |
+| 2 | Ropa de Color | 12 min | 4s | 2s | 2x | 3 min c/u | 6 min | ~35 min |
+| 3 | Ropa Oscura | 10 min | 3s | 3s | 2x | 3 min c/u | 5 min | ~30 min |
+| 4 | Jeans | 13 min | 4s | 2s | 2x | 4 min c/u | 7 min | ~40 min |
+| 5 | Cama y Bano | 15 min | 4s | 2s | 2x | 4 min c/u | 8 min | ~45 min |
+| 6 | Delicadas | 7 min | 3s | 4s | 1x | 3 min | 3 min | ~20 min |
+| 7 | Ropa de Bebe | 12 min | 3s | 3s | 3x | 4 min c/u | 6 min | ~45 min |
+| 8 | Abrigos/Buzos | 14 min | 4s | 2s | 2x | 4 min c/u | 7 min | ~40 min |
+| 9 | Zapatillas | 10 min | 3s | 4s | 1x | 3 min | 4 min | ~25 min |
+| 10 | Ropa Pesada | 15 min | 4s | 2s | 2x | 4 min c/u | 8 min | ~45 min |
+| 11 | Edredon | 17 min | 3s | 5s | 2x | 5 min c/u | 6 min | ~50 min |
+| 12 | Quita Olores | 13 min | 4s | 2s | 3x | 4 min c/u | 6 min | ~45 min |
+| 13 | Ciclo Rapido | 5 min | 3s | 2s | 1x | 2 min | 3 min | ~15 min |
+| 14 | Solo Enjuague | 0 | - | - | 2x | 3 min c/u | 5 min | ~15 min |
+| 15 | Solo Centrif. | 0 | - | - | 0 | - | 8 min | ~8 min |
+| 16 | Remojo | 30 min reposo | - | - | 0 | - | 0 | ~32 min |
+
+> **NOTA:** Los tiempos de "Total aprox." incluyen llenado (~5-8 min) y drenaje (1.5 min)
+> sumados a las etapas activas. Son ESTIMACIONES. Debes medirlos con tu lavadora real.
+
+---
+
+### QUE DATOS DEBES MEDIR CON CRONOMETRO (placa original funcionando)
+
+Para cada programa que quieras calibrar exacto, medir estos 7 datos:
+
+| Dato a medir | Como medirlo | Donde va en el codigo |
+|-------------|-------------|----------------------|
+| **1. Tiempo de lavado total** | Desde que empieza a agitar hasta que para para drenar | `tiempoLavado` (en milisegundos) |
+| **2. Tiempo de giro en una direccion** | Contar los segundos que gira hacia un lado antes de parar | `tiempoAgitacion` (en ms) |
+| **3. Tiempo de pausa entre giros** | Contar los segundos que esta quieto antes de girar al otro lado | `pausaAgitacion` (en ms) |
+| **4. Cantidad de enjuagues** | Contar cuantas veces vuelve a llenar despues del lavado | `numEnjuagues` (entero) |
+| **5. Tiempo de cada enjuague** | Desde que empieza a agitar en el enjuague hasta que drena | `tiempoEnjuague` (en ms) |
+| **6. Tiempo de centrifugado** | Desde que empieza a girar rapido hasta que para | `tiempoCentrifugado` (en ms) |
+| **7. Tipo de agitacion** | Observar si agita fuerte (poco pausa) o suave (mucha pausa) | `agitacionFuerte` (true/false) |
+
+### Ejemplo practico de medicion:
+
+```
+Programa: ROPA DE COLOR (el mas usado)
+
+1. Presiono INICIO, la lavadora empieza a llenar (no cronometro esto,
+   el llenado depende del presostato).
+
+2. Cuando empieza a agitar, inicio cronometro.
+   -> Observo: gira 4 segundos a la derecha, para 2 segundos,
+      gira 4 segundos a la izquierda, para 2 segundos... se repite.
+   -> Anoto: tiempoAgitacion = 4000, pausaAgitacion = 2000
+
+3. Sigue agitando por... 11 minutos 45 segundos = 705 segundos
+   -> Anoto: tiempoLavado = 705000
+
+4. Para de agitar. Empieza a drenar. (el drenaje es fijo ~90 seg)
+
+5. Vuelve a llenar (primer enjuague). Agita suave por 3 minutos.
+   Drena otra vez. Vuelve a llenar (segundo enjuague). Agita 3 min.
+   -> Anoto: numEnjuagues = 2, tiempoEnjuague = 180000
+
+6. Tras el ultimo drenaje, empieza a centrifugar.
+   Centrifuga por 5 minutos 30 segundos = 330 segundos
+   -> Anoto: tiempoCentrifugado = 330000
+
+7. Para y muestra "LISTO".
+```
+
+### Donde poner los valores medidos en el codigo:
+
+En `src/main.cpp`, buscar la tabla `ciclos[]` y cambiar los valores:
+```cpp
+// Ejemplo: Si mediste para COLORIDAS:
+// lavado=705seg, agit=4s, pausa=2s, 2 enjuagues de 180s, centrif=330s
+{ 705000, 4000, 2000, 2, 180000, 330000, true, NIVEL_ALTO },
+```
+
+### Programas prioritarios para medir (los mas usados):
+1. **Ropa de Color** (programa default, el que mas se usa)
+2. **Ciclo Rapido** (para verificar que el mas corto funciona bien)
+3. **Delicadas** (para verificar que la agitacion suave es correcta)
+4. **Edredon** (el mas largo y delicado mecanicamente)
+
+Los demas programas se pueden deducir proporcionalmente si no quieres
+medir los 16 uno por uno.
+
+---
+
 ### Descripcion detallada de cada programa
 
 **1. Ropa Blanca:** Agitacion intensa y prolongada. Ideal para
