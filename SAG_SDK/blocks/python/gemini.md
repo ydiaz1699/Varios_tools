@@ -68,13 +68,6 @@ Obtener en: https://aistudio.google.com/apikey (tier gratuito disponible)
 La cuota es por proyecto (compartida entre modelos de la misma familia) **y varía según la cuenta/región** — estos valores fueron confirmados contra un panel real de Google AI Studio en jul 2026, pero conviene verificarlos en tu propio panel (`aistudio.google.com` → cuotas) antes de asumirlos, especialmente en modelos con RPD/RPM en 0 (puede significar "sin acceso habilitado", no "sin cuota").
 
 Recomendación: usar `gemini-3.1-flash-lite` (500 RPD) o `gemini-3.5-flash-lite` (500 RPD) para desarrollo/uso personal.
-| Gemini 2.5 Flash | `gemini-2.5-flash` | 20 | Anterior gen |
-| Gemini 2.5 Pro | `gemini-2.5-pro` | — | Anterior gen (pro) |
-| Gemini 2.0 Flash Lite | `gemini-2.0-flash-lite` | — | Legacy |
-
-**RPD = Requests Per Day** en el tier gratuito.
-La cuota es por proyecto (compartida entre modelos de la misma familia).
-Recomendación: usar `gemini-3.1-flash-lite` (500 RPD) para desarrollo/uso personal.
 
 ---
 
