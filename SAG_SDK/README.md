@@ -29,6 +29,10 @@ LLM necesita integrar Strands
 ```
 SAG_SDK/
 ├── THINKING.md                         ← Entry point (siempre leer primero)
+├── CHANGELOG.md                        ← Historial de cambios
+├── docs/
+│   ├── architecture.md                 ← Diagramas visuales (10 diagramas)
+│   └── stability.md                    ← Niveles de estabilidad por bloque
 ├── blocks/
 │   ├── python/
 │   │   ├── gemini.md                   ← Provider Gemini (Python)
@@ -49,11 +53,11 @@ SAG_SDK/
 │   │   ├── core-layer.md              ← tool → core → shell
 │   │   ├── errors.md                   ← 8 errores comunes + fixes
 │   │   ├── testing.md                  ← Testear sin LLM (mocks, core)
-│   │   ├── deployment.md              ← Correr en producción (systemd, cron, Docker)
+│   │   ├── deployment.md              ← Producción (systemd, cron, Docker)
 │   │   └── checklist.md                ← Checklist de producción
 │   └── meta/
 │       └── analyze-chat.md             ← Extraer patrones de chats
-├── examples/                           ← Ejemplos ejecutables
+├── examples/                           ← Ejemplos ejecutables [stable]
 │   ├── nas-agent-pattern.py
 │   ├── basic-agent.ts
 │   ├── agent-with-tools.ts

@@ -27,6 +27,8 @@ Antes de implementar, responde estas preguntas:
 
 ## Mapa de bloques
 
+> Para el nivel de estabilidad de cada bloque, ver `docs/stability.md`
+
 ### Python
 
 | Bloque | Archivo | Cuándo cargar |
