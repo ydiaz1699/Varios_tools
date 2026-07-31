@@ -84,7 +84,7 @@ export GOOGLE_API_KEY="tu-api-key"  # se lee automáticamente
 
 Obtener en: https://aistudio.google.com/apikey (tier gratuito disponible)
 
-### Modelos Gemini disponibles (julio 2026)
+### Modelos Gemini disponibles (verificado vs. panel de cuotas, jul 2026)
 
 | Modelo | model_id | RPD (free) | Recomendación |
 |--------|----------|:----------:|---------------|
@@ -92,14 +92,17 @@ Obtener en: https://aistudio.google.com/apikey (tier gratuito disponible)
 | Gemini 3.5 Flash Lite | `gemini-3.5-flash-lite` | 500 | Alta cuota, más nuevo |
 | Gemini 3.5 Flash | `gemini-3.5-flash` | 20 | Más capaz, menos cuota |
 | Gemini 3.6 Flash | `gemini-3.6-flash` | 20 | Último disponible |
-| Gemini 3.1 Pro | `gemini-3.1-pro` | — | Razonamiento complejo |
+| Gemini 3 Flash | `gemini-3-flash` | 20 | Intermedio entre 2.5 y 3.1 |
 | Gemini 2.5 Flash | `gemini-2.5-flash` | 20 | Anterior gen |
+| Gemini 2.5 Flash Lite | `gemini-2.5-flash-lite` | 20 | Anterior gen, liviano |
+| Gemini 3.1 Pro | `gemini-3.1-pro` | — | Razonamiento complejo (sin free tier en cuenta estándar) |
 | Gemini 2.5 Pro | `gemini-2.5-pro` | — | Anterior gen (pro) |
 | Gemini 2.0 Flash Lite | `gemini-2.0-flash-lite` | — | Legacy |
 
 **RPD = Requests Per Day** en el tier gratuito.
-La cuota es por proyecto (compartida entre modelos de la misma familia).
-Recomendación: usar `gemini-3.1-flash-lite` (500 RPD) para desarrollo/uso personal.
+La cuota es por proyecto (compartida entre modelos de la misma familia) **y varía según la cuenta/región** — estos valores fueron confirmados contra un panel real de Google AI Studio en jul 2026, pero conviene verificarlos en tu propio panel (`aistudio.google.com` → cuotas) antes de asumirlos.
+
+Recomendación: usar `gemini-3.1-flash-lite` (500 RPD) o `gemini-3.5-flash-lite` (500 RPD) para desarrollo/uso personal.
 
 ### Desactivar output de streaming (para renderizar con Rich)
 
