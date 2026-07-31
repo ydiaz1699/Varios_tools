@@ -132,7 +132,7 @@ const readFile = tool({
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 const agent = new Agent({

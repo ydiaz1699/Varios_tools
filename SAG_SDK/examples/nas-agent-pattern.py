@@ -154,7 +154,7 @@ def get_model():
         client_args = {"api_key": api_key} if api_key else None
 
         return GeminiModel(
-            model_id=model_id_override or "gemini-2.5-flash",
+            model_id=model_id_override or "gemini-3.1-flash-lite",
             client_args=client_args,
             params={"temperature": 0.3, "max_output_tokens": 4096},
         )

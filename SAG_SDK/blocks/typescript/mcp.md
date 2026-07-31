@@ -72,7 +72,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 // MCP server que expone herramientas de base de datos

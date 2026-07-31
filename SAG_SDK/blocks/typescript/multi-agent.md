@@ -14,7 +14,7 @@ import { GoogleModel } from '@strands-agents/sdk/models/google'
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 // Agente especializado en investigación
@@ -51,7 +51,7 @@ import { GoogleModel } from '@strands-agents/sdk/models/google'
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 const graph = new Graph({
@@ -97,7 +97,7 @@ import { GoogleModel } from '@strands-agents/sdk/models/google'
 
 const model = new GoogleModel({
   apiKey: process.env.GOOGLE_API_KEY,
-  modelId: 'gemini-2.5-flash',
+  modelId: 'gemini-3.1-flash-lite',
 })
 
 const swarm = new Swarm({

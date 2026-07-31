@@ -22,7 +22,7 @@ def get_model():
     if proveedor == "gemini":
         from strands.models.gemini import GeminiModel
         return GeminiModel(
-            model_id=model_id_override or "gemini-2.5-flash",
+            model_id=model_id_override or "gemini-3.1-flash-lite",
             client_args={"api_key": os.environ.get("GOOGLE_API_KEY")} if os.environ.get("GOOGLE_API_KEY") else None,
             params={"temperature": 0.3, "max_output_tokens": 4096},
         )
