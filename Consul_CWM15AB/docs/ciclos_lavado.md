@@ -1,145 +1,262 @@
-# Ciclos de Lavado - Consul CWM15AB
+# Ciclos de Lavado - Consul CWH15AB (16 Programas)
 
 ## Importante: Calibracion
 
 > **ANTES de reemplazar la placa original**, ejecutar CADA programa con un
-> cronometro y documentar los tiempos exactos en la tabla de abajo.
-> Los valores aqui son aproximados basados en lavadoras Consul similares.
+> cronometro y documentar los tiempos exactos. Los valores aqui son
+> aproximados basados en las especificaciones del modelo CWH15AB.
 
-## Secuencia General de un Ciclo Completo
+## Especificaciones del Modelo
+
+| Dato | Valor |
+|------|-------|
+| Modelo | CWH15AB |
+| Capacidad | 15 kg |
+| Programas | 16 |
+| Niveles de agua | 4 (Baixo, Medio, Alto, Extra) |
+| Panel | Digital (Tact) + Boton giratorio |
+| Potencia | 620W |
+| Centrifugacion | ~750 rpm |
+| Eficiencia | Classe A (Procel) |
+| Consumo agua/ciclo | ~186 L |
+| Dispenser | Dual (Sabao + Amaciante) |
+
+## Secuencia General de un Ciclo
 
 ```
-[INICIO] -> [LLENADO] -> [LAVADO/AGITACION] -> [DRENAJE]
-    -> [LLENADO ENJUAGUE] -> [ENJUAGUE] -> [DRENAJE]
-    -> (repetir enjuague si hay mas de 1)
-    -> [CENTRIFUGADO + DRENAJE] -> [FIN]
+[INICIO] -> [ENCHIMENTO] -> [LAVAGEM/AGITACAO] -> [DRENAGEM]
+    -> [ENCHIMENTO ENXAGUE] -> [ENXAGUE] -> [DRENAGEM]
+    -> (repetir enxague si hay mas de 1)
+    -> [CENTRIFUGACAO + DRENAGEM] -> [MAIS SECAS opcional]
+    -> [PRONTO]
 ```
 
-## Detalle de Cada Etapa
+## Los 16 Programas
 
-### 1. Llenado
-- Se abre la valvula solenoide de entrada de agua
-- El presostato detecta cuando se alcanza el nivel seleccionado
-- Se cierra la valvula
-- **Timeout de seguridad:** 15 minutos (si no llena, corta y da error)
+### 1. Roupas Brancas
+Ciclo intenso para ropa blanca con agitacion fuerte.
 
-### 2. Lavado (Agitacion)
-- El motor de agitacion gira alternadamente en ambas direcciones
-- Patron: X segundos Dir.A -> pausa -> X segundos Dir.B -> pausa
-- La intensidad y tiempo dependen del programa seleccionado
-- **NUNCA** cambiar direccion sin pausa (protege el motor y transmision)
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 14 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 4 min |
+| Centrifugado | 7 min |
+| Nivel default | Alto |
 
-### 3. Drenaje
-- Se activa la bomba de drenaje
-- Tiempo fijo de 90 segundos (asegura vaciado completo)
+### 2. Roupas Coloridas
+Ciclo normal para ropa de colores, uso diario.
 
-### 4. Enjuague
-- Similar a lavado pero con agitacion mas suave
-- Menos tiempo de agitacion, mas pausa
-- Se repite segun el programa (1 o 2 veces)
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 12 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 3 min |
+| Centrifugado | 6 min |
+| Nivel default | Alto |
 
-### 5. Centrifugado
-- Drenaje activo + motor de centrifugado
-- Velocidad unica (la transmision mecanica determina RPM)
-- **INTERLOCK:** Se detiene si la tapa se abre
+### 3. Roupas Escuras
+Ciclo suave para evitar decoloracion de ropa oscura.
 
-## Tabla de Parametros por Programa
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 10 min |
+| Agitacion | 3s/dir, pausa 3s (suave) |
+| Enjuagues | 2x 3 min |
+| Centrifugado | 5 min |
+| Nivel default | Alto |
 
-### PESADO (Roupas Pesadas)
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 15 min | Agitacion fuerte |
-| Dir. agitacion | 4 seg | Cada direccion |
-| Pausa agitacion | 2 seg | Entre cambios |
-| Enjuagues | 2 | |
-| Tiempo c/ enjuague | 4 min | Agitacion suave |
-| Centrifugado | 7 min | Velocidad maxima |
+### 4. Jeans
+Ciclo fuerte para tela denim pesada.
 
-### NORMAL
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 12 min | Agitacion fuerte |
-| Dir. agitacion | 4 seg | Cada direccion |
-| Pausa agitacion | 2 seg | Entre cambios |
-| Enjuagues | 2 | |
-| Tiempo c/ enjuague | 3 min | Agitacion suave |
-| Centrifugado | 5 min | Velocidad maxima |
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 13 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 4 min |
+| Centrifugado | 7 min |
+| Nivel default | Alto |
 
-### DELICADO (Roupas Delicadas)
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 7 min | Agitacion suave |
-| Dir. agitacion | 3 seg | Cada direccion |
-| Pausa agitacion | 4 seg | Pausa larga = suave |
-| Enjuagues | 1 | |
-| Tiempo c/ enjuague | 3 min | Agitacion suave |
-| Centrifugado | 3 min | Menor tiempo |
+### 5. Cama e Banho
+Ciclo largo para sabanas, toallas, fundas.
 
-### RAPIDO
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 5 min | Agitacion fuerte |
-| Dir. agitacion | 3 seg | Cada direccion |
-| Pausa agitacion | 2 seg | |
-| Enjuagues | 1 | |
-| Tiempo c/ enjuague | 2 min | |
-| Centrifugado | 3 min | |
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 15 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 4 min |
+| Centrifugado | 8 min |
+| Nivel default | Extra |
 
-### SOLO CENTRIFUGADO
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 0 | No hay lavado |
-| Enjuagues | 0 | No hay enjuague |
-| Centrifugado | 7 min | Directo al centrifugado |
+### 6. Roupas Delicadas
+Ciclo suave y corto para telas finas.
 
-### SOLO ENJUAGUE
-| Parametro | Valor | Notas |
-|-----------|-------|-------|
-| Tiempo lavado | 0 | No hay lavado |
-| Enjuagues | 2 | |
-| Tiempo c/ enjuague | 3 min | |
-| Centrifugado | 3 min | |
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 7 min |
+| Agitacion | 3s/dir, pausa 4s (muy suave) |
+| Enjuagues | 1x 3 min |
+| Centrifugado | 3 min |
+| Nivel default | Medio |
+
+### 7. Roupas de Bebe
+Ciclo suave con enjuagues extra para eliminar residuos.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 12 min |
+| Agitacion | 3s/dir, pausa 3s (suave) |
+| Enjuagues | 3x 4 min (triple!) |
+| Centrifugado | 6 min |
+| Nivel default | Alto |
+
+### 8. Casacos e Moletons
+Ciclo fuerte largo para prendas pesadas gruesas.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 14 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 4 min |
+| Centrifugado | 7 min |
+| Nivel default | Extra |
+
+### 9. Tenis
+Ciclo suave para zapatillas (evita dano mecanico).
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 10 min |
+| Agitacion | 3s/dir, pausa 4s (suave) |
+| Enjuagues | 1x 3 min |
+| Centrifugado | 4 min |
+| Nivel default | Medio |
+
+### 10. Roupas Pesadas
+Ciclo maximo para ropa muy sucia/pesada.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 15 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 2x 4 min |
+| Centrifugado | 8 min |
+| Nivel default | Extra |
+
+### 11. Edredom
+Ciclo suave muy largo para edredones voluminosos.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 17 min |
+| Agitacion | 3s/dir, pausa 5s (muy suave) |
+| Enjuagues | 2x 5 min |
+| Centrifugado | 6 min |
+| Nivel default | Extra |
+
+### 12. Tira Odores
+Ciclo con extra enjuagues para eliminar malos olores.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 13 min |
+| Agitacion | 4s/dir, pausa 2s |
+| Enjuagues | 3x 4 min (triple!) |
+| Centrifugado | 6 min |
+| Nivel default | Alto |
+
+### 13. Ciclo Rapido
+Ciclo corto para ropa poco sucia.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 5 min |
+| Agitacion | 3s/dir, pausa 2s |
+| Enjuagues | 1x 2 min |
+| Centrifugado | 3 min |
+| Nivel default | Baixo |
+
+### 14. Enxague (Solo Enjuague)
+Solo enjuague + centrifugado, sin lavado.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 0 (no hay) |
+| Enjuagues | 2x 3 min |
+| Centrifugado | 5 min |
+| Nivel default | Medio |
+
+### 15. Centrifugacao (Solo Centrifugado)
+Solo centrifugado, sin agua.
+
+| Parametro | Valor |
+|-----------|-------|
+| Lavado | 0 |
+| Enjuagues | 0 |
+| Centrifugado | 8 min |
+| Nivel default | - |
+
+### 16. Molho (Remojo)
+Solo llena y deja en reposo sin agitacion.
+
+| Parametro | Valor |
+|-----------|-------|
+| Tiempo remojo | 30 min |
+| Agitacion | Ninguna |
+| Enjuagues | 0 |
+| Centrifugado | 0 |
+| Nivel default | Alto |
+
+## Funcion Especial: Mais Secas
+
+Cuando esta activada, agrega **5 minutos extra** de centrifugado
+al final de cualquier programa. Util para dejar la ropa menos
+humeda y que seque mas rapido en el tendedero.
 
 ## Niveles de Agua
 
-| Nivel | Presostato | Uso Tipico |
-|-------|-----------|-----------|
-| Bajo | Solo sensor bajo | Pocas prendas |
-| Medio | Solo sensor bajo | Carga normal |
-| Alto | Sensor alto | Carga completa |
-| Extra | Sensor alto + tiempo | Edredones/voluminosos |
+| Nivel | Sensor | Uso tipico |
+|-------|--------|-----------|
+| Baixo | Presostato bajo | Pocas prendas, ciclo rapido |
+| Medio | Presostato bajo | Carga media, delicadas |
+| Alto | Presostato alto | Carga completa |
+| Extra | Presostato alto | Edredom, cama/banho, pesadas |
 
-## Plantilla para Medicion (llenar con placa original)
+## Plantilla de Medicion (completar con placa original)
 
 ```
-Fecha de medicion: ___/___/______
-Modelo exacto: Consul CWM15AB ___V
+Fecha: ___/___/______
+Modelo: Consul CWH15AB ___V
 
-PROGRAMA PESADO:
-  - Tiempo llenado (nivel alto): ___ min ___ seg
-  - Tiempo agitacion total: ___ min ___ seg
-  - Segundos en cada direccion: ___ seg
-  - Pausa entre direcciones: ___ seg
-  - Tiempo drenaje: ___ min ___ seg
-  - Numero de enjuagues: ___
-  - Tiempo cada enjuague: ___ min ___ seg
-  - Tiempo centrifugado: ___ min ___ seg
-  - Tiempo TOTAL del ciclo: ___ min
+ROUPAS COLORIDAS (programa mas usado):
+  Llenado hasta nivel Alto: ___ min ___ seg
+  Agitacion total: ___ min ___ seg
+  Segundos en cada dir: ___ seg
+  Pausa entre dir: ___ seg
+  Tiempo drenaje: ___ min ___ seg
+  Enjuagues: ___ veces
+  Tiempo cada enjuague: ___ min ___ seg
+  Centrifugado: ___ min ___ seg
+  TOTAL ciclo: ___ min
 
-PROGRAMA NORMAL:
-  - Tiempo llenado (nivel medio): ___ min ___ seg
-  - Tiempo agitacion total: ___ min ___ seg
-  - Segundos en cada direccion: ___ seg
-  - Pausa entre direcciones: ___ seg
-  - Tiempo drenaje: ___ min ___ seg
-  - Numero de enjuagues: ___
-  - Tiempo cada enjuague: ___ min ___ seg
-  - Tiempo centrifugado: ___ min ___ seg
-  - Tiempo TOTAL del ciclo: ___ min
+CICLO RAPIDO:
+  Llenado: ___ min ___ seg
+  Agitacion total: ___ min ___ seg
+  Enjuagues: ___
+  Centrifugado: ___ min ___ seg
+  TOTAL: ___ min
 
-PROGRAMA DELICADO:
-  (completar igual)
+EDREDOM:
+  Llenado (Extra): ___ min ___ seg
+  Agitacion total: ___ min ___ seg
+  Patron agitacion (suave): ___ seg ON / ___ seg OFF
+  Enjuagues: ___
+  TOTAL: ___ min
 
-PROGRAMA RAPIDO:
-  (completar igual)
+DELICADAS:
+  Llenado (Medio): ___ min ___ seg
+  Agitacion total: ___ min ___ seg
+  Enjuagues: ___
+  Centrifugado: ___ min ___ seg
+  TOTAL: ___ min
 ```
