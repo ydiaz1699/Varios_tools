@@ -67,6 +67,15 @@ SAG_SDK/
 - Resumen de imports (Python + TypeScript)
 - Notas para LLMs que lean la skill
 
+### Patrones de producción (PARTE 4) — NUEVO
+- Protección de credenciales (3 capas: export, read, scan)
+- Sesión persistente entre invocaciones CLI (FileSessionManager)
+- System prompt en modo ejecutivo (actuar, no sugerir)
+- Core layer: separar @tool de la lógica de negocio
+- ToolResult estructurado (no strings crudos)
+- 8 errores comunes con Strands y cómo evitarlos
+- Checklist para agente en producción
+
 ## Para qué sirve
 
 - **En Kiro/Claude Desktop/Cursor:** El LLM lee la skill y sabe exactamente cómo agregar Strands
