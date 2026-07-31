@@ -1,16 +1,21 @@
 // ============================================
-// Consul CWM15AB - ESP32 Controller
+// Consul CWH15AB - ESP32 Controller
 // Replica la logica de lavado de fabrica
+// 16 programas + encoder rotativo + display
 // ============================================
 //
 // Autor: ydiaz1699
 // Fecha: 2026
-// Descripcion: Firmware para reemplazar la placa original
-//              de la lavadora Consul CWM15AB con ESP32,
-//              manteniendo panel de botones/LEDs y ciclos originales.
+// Modelo base: Consul CWH15AB (15kg, 16 programas)
+// Panel: Display Digital + Boton giratorio (encoder)
 // ============================================
 
 #include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+
+// ─── DISPLAY LCD I2C (16x2) ─────────────────────────────
+// Usa LCD 16x2 con modulo I2C para replicar display digital
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // ─── PINES DE SALIDA (ACTUADORES) ────────────────────────
 #define PIN_VALVULA_AGUA    25   // Solenoide entrada de agua
@@ -21,106 +26,175 @@
 #define PIN_TRAVA_TAPA      14   // Electroiman trava de tapa
 
 // ─── PINES DE ENTRADA (SENSORES) ─────────────────────────
-#define PIN_PRESOSTATO_BAJO  34  // Nivel bajo alcanzado (activo LOW)
-#define PIN_PRESOSTATO_ALTO  35  // Nivel alto alcanzado (activo LOW)
+#define PIN_PRESOSTATO_BAJO  34  // Nivel bajo (activo LOW)
+#define PIN_PRESOSTATO_ALTO  35  // Nivel alto (activo LOW)
 #define PIN_TAPA_CERRADA     36  // Microswitch tapa (activo LOW)
 
-// ─── PINES DEL PANEL DE USUARIO ──────────────────────────
-// Botones (activo LOW con pull-up)
-#define PIN_BTN_POWER        4   // Encender/Apagar
-#define PIN_BTN_PROGRAMA     16  // Seleccionar programa
-#define PIN_BTN_NIVEL        17  // Seleccionar nivel de agua
-#define PIN_BTN_INICIO       5   // Iniciar/Pausar ciclo
+// ─── ENCODER ROTATIVO (selector de programa) ─────────────
+#define PIN_ENCODER_CLK      18  // Clock del encoder
+#define PIN_ENCODER_DT       19  // Data del encoder
+#define PIN_ENCODER_SW       21  // Boton push del encoder
 
-// LEDs indicadores (activo HIGH)
-#define PIN_LED_PESADO       18  // LED programa pesado
-#define PIN_LED_NORMAL       19  // LED programa normal
-#define PIN_LED_DELICADO     21  // LED programa delicado
-#define PIN_LED_RAPIDO       22  // LED programa rapido
-#define PIN_LED_LAVANDO      23  // LED etapa lavado
-#define PIN_LED_ENJUAGUE     13  // LED etapa enjuague
-#define PIN_LED_CENTRIFUGADO 12  // LED etapa centrifugado
+// ─── BOTONES DEL PANEL ───────────────────────────────────
+#define PIN_BTN_POWER         4  // Encender/Apagar
+#define PIN_BTN_INICIO        5  // Iniciar/Pausar ciclo
+#define PIN_BTN_NIVEL        16  // Seleccionar nivel de agua
+#define PIN_BTN_MAIS_SECAS   17  // Funcion Mais Secas (extra spin)
+
+// ─── LED INDICADOR ───────────────────────────────────────
+#define PIN_LED_STATUS       23  // LED de estado general
+
 
 // ─── CONSTANTES DE SEGURIDAD ─────────────────────────────
-#define TIMEOUT_LLENADO_MS   900000   // 15 minutos max para llenar
-#define TIEMPO_DRENAJE_MS    90000    // 90 segundos para drenar
-#define DEBOUNCE_MS          200      // Debounce de botones
+#define TIMEOUT_LLENADO_MS   900000   // 15 min max para llenar
+#define TIEMPO_DRENAJE_MS    90000    // 90 seg para drenar
+#define DEBOUNCE_MS          200      // Debounce botones
+#define ENCODER_DEBOUNCE_MS  5        // Debounce encoder
 
-// ─── ESTADOS DE LA MAQUINA DE ESTADOS ────────────────────
+// ─── ESTADOS DE LA MAQUINA ───────────────────────────────
 enum EstadoMaquina {
   APAGADA,
-  IDLE,               // Encendida, esperando seleccion e inicio
-  LLENADO,            // Llenando tanque
-  LAVADO,             // Agitacion (lavado)
-  DRENAJE_LAVADO,     // Drenando agua de lavado
-  LLENADO_ENJUAGUE,   // Llenando para enjuague
-  ENJUAGUE,           // Agitacion suave (enjuague)
-  DRENAJE_ENJUAGUE,   // Drenando agua de enjuague
-  CENTRIFUGADO,       // Centrifugado final
-  FINALIZADO,         // Ciclo completado
-  ERROR_TIMEOUT       // Error por timeout
+  IDLE,
+  MOLHO,              // Remojo (solo llena y deja en reposo)
+  LLENADO,
+  LAVADO,
+  DRENAJE_LAVADO,
+  LLENADO_ENJUAGUE,
+  ENJUAGUE,
+  DRENAJE_ENJUAGUE,
+  CENTRIFUGADO,
+  CENTRIFUGADO_EXTRA, // Mais Secas
+  FINALIZADO,
+  ERROR_TIMEOUT
 };
 
-// ─── PROGRAMAS DISPONIBLES ───────────────────────────────
+// ─── 16 PROGRAMAS DE LAVADO (CWH15AB) ───────────────────
 enum Programa {
-  PESADO = 0,
-  NORMAL,
-  DELICADO,
-  RAPIDO,
-  SOLO_CENTRIFUGADO,
-  SOLO_ENJUAGUE,
-  NUM_PROGRAMAS       // Contador
+  PROG_BRANCAS = 0,       // 1. Roupas Brancas
+  PROG_COLORIDAS,         // 2. Roupas Coloridas
+  PROG_ESCURAS,           // 3. Roupas Escuras
+  PROG_JEANS,             // 4. Jeans
+  PROG_CAMA_BANHO,        // 5. Cama e Banho
+  PROG_DELICADAS,         // 6. Roupas Delicadas
+  PROG_BEBE,             // 7. Roupas de Bebe
+  PROG_CASACOS,           // 8. Casacos e Moletons
+  PROG_TENIS,             // 9. Tenis
+  PROG_PESADAS,           // 10. Roupas Pesadas
+  PROG_EDREDOM,           // 11. Edredom
+  PROG_TIRA_ODORES,       // 12. Tira Odores
+  PROG_RAPIDO,            // 13. Ciclo Rapido
+  PROG_ENXAGUE,           // 14. Enxague (solo enjuague)
+  PROG_CENTRIFUGACAO,     // 15. Centrifugacao (solo centrif.)
+  PROG_MOLHO,             // 16. Molho (remojo)
+  NUM_PROGRAMAS
+};
+
+
+// Nombres para display (max 16 chars)
+const char* nombrePrograma[NUM_PROGRAMAS] = {
+  "Brancas",
+  "Coloridas",
+  "Escuras",
+  "Jeans",
+  "Cama e Banho",
+  "Delicadas",
+  "Roupas Bebe",
+  "Casacos",
+  "Tenis",
+  "Pesadas",
+  "Edredom",
+  "Tira Odores",
+  "Rapido",
+  "Enxague",
+  "Centrifugacao",
+  "Molho"
 };
 
 // ─── NIVELES DE AGUA ─────────────────────────────────────
 enum NivelAgua {
-  NIVEL_BAJO = 0,
-  NIVEL_MEDIO,
-  NIVEL_ALTO,
-  NIVEL_EXTRA,
-  NUM_NIVELES         // Contador
+  NIVEL_BAIXO = 0,    // Bajo
+  NIVEL_MEDIO,        // Medio
+  NIVEL_ALTO,         // Alto
+  NIVEL_EXTRA,        // Extra alto
+  NUM_NIVELES
 };
+
+const char* nombreNivel[NUM_NIVELES] = {
+  "Baixo", "Medio", "Alto", "Extra"
+};
+
 
 // ─── PARAMETROS DE CADA CICLO ────────────────────────────
-// Tiempos calibrados segun la maquina original.
-// IMPORTANTE: Ajustar estos valores midiendo con cronometro
-//             los tiempos reales de la placa original antes
-//             de reemplazarla.
+// IMPORTANTE: Ajustar estos valores con cronometro midiendo
+//             la placa original ANTES de reemplazarla.
 struct ParametrosCiclo {
-  unsigned long tiempoLavado;       // Tiempo total de agitacion (ms)
-  unsigned long tiempoAgitacion;    // Duracion agitacion en una direccion (ms)
-  unsigned long pausaAgitacion;     // Pausa entre cambio de direccion (ms)
-  int           numEnjuagues;       // Cantidad de ciclos de enjuague
-  unsigned long tiempoEnjuague;     // Duracion de cada enjuague (ms)
-  unsigned long tiempoCentrifugado; // Duracion centrifugado final (ms)
-  bool          agitacionFuerte;    // true=rapida/fuerte, false=suave
+  unsigned long tiempoLavado;       // Tiempo agitacion total (ms)
+  unsigned long tiempoAgitacion;    // Duracion en una direccion (ms)
+  unsigned long pausaAgitacion;     // Pausa entre cambios dir (ms)
+  int           numEnjuagues;       // Cantidad de enjuagues
+  unsigned long tiempoEnjuague;     // Duracion cada enjuague (ms)
+  unsigned long tiempoCentrifugado; // Centrifugado final (ms)
+  bool          agitacionFuerte;    // true = fuerte, false = suave
+  NivelAgua     nivelDefault;       // Nivel de agua por defecto
 };
 
-// Tabla de ciclos - AJUSTAR SEGUN MEDICIONES REALES
+// Tabla de 16 ciclos - AJUSTAR CON MEDICIONES REALES
 const ParametrosCiclo ciclos[NUM_PROGRAMAS] = {
-  // PESADO:  lavado 15min, agit 4s/dir, pausa 2s, 2 enjuagues 4min, centrif 7min
-  { 900000, 4000, 2000, 2, 240000, 420000, true },
-  // NORMAL:  lavado 12min, agit 4s/dir, pausa 2s, 2 enjuagues 3min, centrif 5min
-  { 720000, 4000, 2000, 2, 180000, 300000, true },
-  // DELICADO: lavado 7min, agit 3s/dir, pausa 4s, 1 enjuague 3min, centrif 3min
-  { 420000, 3000, 4000, 1, 180000, 180000, false },
-  // RAPIDO:  lavado 5min, agit 3s/dir, pausa 2s, 1 enjuague 2min, centrif 3min
-  { 300000, 3000, 2000, 1, 120000, 180000, true },
-  // SOLO_CENTRIFUGADO: sin lavado, sin enjuague, centrif 7min
-  { 0, 0, 0, 0, 0, 420000, true },
-  // SOLO_ENJUAGUE: sin lavado, 2 enjuagues 3min, centrif 3min
-  { 0, 0, 0, 2, 180000, 180000, true },
+  // 1. BRANCAS: lavado intenso, 2 enjuagues, centrif largo
+  { 840000, 4000, 2000, 2, 240000, 420000, true,  NIVEL_ALTO },
+  // 2. COLORIDAS: lavado normal, 2 enjuagues
+  { 720000, 4000, 2000, 2, 180000, 360000, true,  NIVEL_ALTO },
+  // 3. ESCURAS: lavado suave, 2 enjuagues, centrif corto
+  { 600000, 3000, 3000, 2, 180000, 300000, false, NIVEL_ALTO },
+  // 4. JEANS: lavado fuerte, 2 enjuagues
+  { 780000, 4000, 2000, 2, 240000, 420000, true,  NIVEL_ALTO },
+  // 5. CAMA E BANHO: lavado largo, 2 enjuagues, centrif largo
+  { 900000, 4000, 2000, 2, 240000, 480000, true,  NIVEL_EXTRA },
+  // 6. DELICADAS: lavado suave corto, 1 enjuague, centrif corto
+  { 420000, 3000, 4000, 1, 180000, 180000, false, NIVEL_MEDIO },
+  // 7. BEBE: lavado largo suave, 3 enjuagues (extra enjuague)
+  { 720000, 3000, 3000, 3, 240000, 360000, false, NIVEL_ALTO },
+  // 8. CASACOS: lavado fuerte largo, 2 enjuagues
+  { 840000, 4000, 2000, 2, 240000, 420000, true,  NIVEL_EXTRA },
+  // 9. TENIS: lavado suave, 1 enjuague, centrif corto
+  { 600000, 3000, 4000, 1, 180000, 240000, false, NIVEL_MEDIO },
+  // 10. PESADAS: lavado intenso largo, 2 enjuagues, centrif max
+  { 900000, 4000, 2000, 2, 240000, 480000, true,  NIVEL_EXTRA },
+  // 11. EDREDOM: lavado suave muy largo, 2 enjuagues, centrif suave
+  { 1020000, 3000, 5000, 2, 300000, 360000, false, NIVEL_EXTRA },
+  // 12. TIRA ODORES: lavado largo, 3 enjuagues
+  { 780000, 4000, 2000, 3, 240000, 360000, true,  NIVEL_ALTO },
+  // 13. RAPIDO: lavado corto, 1 enjuague, centrif corto
+  { 300000, 3000, 2000, 1, 120000, 180000, true,  NIVEL_BAIXO },
+  // 14. ENXAGUE: sin lavado, 2 enjuagues, centrif normal
+  { 0, 0, 0, 2, 180000, 300000, true,  NIVEL_MEDIO },
+  // 15. CENTRIFUGACAO: solo centrifugado
+  { 0, 0, 0, 0, 0, 480000, true,  NIVEL_BAIXO },
+  // 16. MOLHO: solo llena y deja en reposo (30 min)
+  { 1800000, 0, 0, 0, 0, 0, false, NIVEL_ALTO },
 };
+
 
 // ─── VARIABLES GLOBALES ──────────────────────────────────
 EstadoMaquina estadoActual = APAGADA;
-Programa programaSeleccionado = NORMAL;
-NivelAgua nivelSeleccionado = NIVEL_MEDIO;
+Programa programaSeleccionado = PROG_COLORIDAS;
+NivelAgua nivelSeleccionado = NIVEL_ALTO;
+bool maisSeca = false;          // Funcion "Mais Secas" activada
 int enjuagueActual = 0;
 unsigned long tiempoInicioEtapa = 0;
 bool direccionMotor = false;
 unsigned long ultimoCambioDir = 0;
 unsigned long ultimoDebounce = 0;
+
+// Encoder
+volatile int encoderPos = 1;    // Posicion encoder (0-15)
+int lastEncoderPos = 1;
+volatile unsigned long lastEncoderTime = 0;
+int lastCLK = HIGH;
+
+// Display
+unsigned long ultimoUpdateDisplay = 0;
+#define DISPLAY_UPDATE_MS 250
 
 // ─── FUNCIONES DE ACTUADORES ─────────────────────────────
 
@@ -132,16 +206,11 @@ void apagarTodo() {
   digitalWrite(PIN_BOMBA_DRENAJE, LOW);
 }
 
-void abrirAgua() {
-  digitalWrite(PIN_VALVULA_AGUA, HIGH);
-}
+void abrirAgua() { digitalWrite(PIN_VALVULA_AGUA, HIGH); }
+void cerrarAgua() { digitalWrite(PIN_VALVULA_AGUA, LOW); }
 
-void cerrarAgua() {
-  digitalWrite(PIN_VALVULA_AGUA, LOW);
-}
-
-void agitar(bool direccion) {
-  if (direccion) {
+void agitar(bool dir) {
+  if (dir) {
     digitalWrite(PIN_MOTOR_DIR_A, HIGH);
     digitalWrite(PIN_MOTOR_DIR_B, LOW);
   } else {
@@ -155,41 +224,22 @@ void pararAgitacion() {
   digitalWrite(PIN_MOTOR_DIR_B, LOW);
 }
 
-void iniciarCentrifugado() {
-  digitalWrite(PIN_CENTRIFUGADO, HIGH);
-}
+void iniciarCentrifugado() { digitalWrite(PIN_CENTRIFUGADO, HIGH); }
+void pararCentrifugado() { digitalWrite(PIN_CENTRIFUGADO, LOW); }
+void iniciarDrenaje() { digitalWrite(PIN_BOMBA_DRENAJE, HIGH); }
+void pararDrenaje() { digitalWrite(PIN_BOMBA_DRENAJE, LOW); }
+void travarTapa() { digitalWrite(PIN_TRAVA_TAPA, HIGH); }
+void destravarTapa() { digitalWrite(PIN_TRAVA_TAPA, LOW); }
 
-void pararCentrifugado() {
-  digitalWrite(PIN_CENTRIFUGADO, LOW);
-}
-
-void iniciarDrenaje() {
-  digitalWrite(PIN_BOMBA_DRENAJE, HIGH);
-}
-
-void pararDrenaje() {
-  digitalWrite(PIN_BOMBA_DRENAJE, LOW);
-}
-
-void travarTapa() {
-  digitalWrite(PIN_TRAVA_TAPA, HIGH);
-}
-
-void destravarTapa() {
-  digitalWrite(PIN_TRAVA_TAPA, LOW);
-}
 
 // ─── FUNCIONES DE SENSORES ───────────────────────────────
 
 bool nivelAlcanzado() {
-  // El presostato se activa en LOW cuando el nivel es alcanzado
   switch (nivelSeleccionado) {
-    case NIVEL_BAJO:
-      return digitalRead(PIN_PRESOSTATO_BAJO) == LOW;
+    case NIVEL_BAIXO:
     case NIVEL_MEDIO:
       return digitalRead(PIN_PRESOSTATO_BAJO) == LOW;
     case NIVEL_ALTO:
-      return digitalRead(PIN_PRESOSTATO_ALTO) == LOW;
     case NIVEL_EXTRA:
       return digitalRead(PIN_PRESOSTATO_ALTO) == LOW;
     default:
@@ -198,34 +248,121 @@ bool nivelAlcanzado() {
 }
 
 bool tapaCerrada() {
-  return digitalRead(PIN_TAPA_CERRADA) == LOW;  // Activo bajo
+  return digitalRead(PIN_TAPA_CERRADA) == LOW;
 }
 
-// ─── ACTUALIZACION DE LEDs DEL PANEL ─────────────────────
+// ─── ENCODER ROTATIVO ────────────────────────────────────
 
-void actualizarLEDs() {
-  // LEDs de programa seleccionado
-  digitalWrite(PIN_LED_PESADO,   programaSeleccionado == PESADO);
-  digitalWrite(PIN_LED_NORMAL,   programaSeleccionado == NORMAL);
-  digitalWrite(PIN_LED_DELICADO, programaSeleccionado == DELICADO);
-  digitalWrite(PIN_LED_RAPIDO,   programaSeleccionado == RAPIDO);
+void IRAM_ATTR encoderISR() {
+  if (millis() - lastEncoderTime < ENCODER_DEBOUNCE_MS) return;
+  lastEncoderTime = millis();
 
-  // LEDs de etapa actual
-  digitalWrite(PIN_LED_LAVANDO,
-    estadoActual == LLENADO || estadoActual == LAVADO);
-  digitalWrite(PIN_LED_ENJUAGUE,
-    estadoActual == LLENADO_ENJUAGUE || estadoActual == ENJUAGUE);
-  digitalWrite(PIN_LED_CENTRIFUGADO,
-    estadoActual == CENTRIFUGADO);
+  int clk = digitalRead(PIN_ENCODER_CLK);
+  int dt = digitalRead(PIN_ENCODER_DT);
 
-  // Parpadeo en FINALIZADO (indicar que termino)
-  if (estadoActual == FINALIZADO) {
-    bool parpadeo = (millis() / 500) % 2;
-    digitalWrite(PIN_LED_LAVANDO, parpadeo);
-    digitalWrite(PIN_LED_ENJUAGUE, parpadeo);
-    digitalWrite(PIN_LED_CENTRIFUGADO, parpadeo);
+  if (clk != lastCLK && clk == LOW) {
+    if (dt != clk) {
+      encoderPos++;
+      if (encoderPos >= NUM_PROGRAMAS) encoderPos = 0;
+    } else {
+      encoderPos--;
+      if (encoderPos < 0) encoderPos = NUM_PROGRAMAS - 1;
+    }
+  }
+  lastCLK = clk;
+}
+
+
+// ─── DISPLAY LCD ─────────────────────────────────────────
+
+void mostrarProgramaSeleccionado() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(nombrePrograma[programaSeleccionado]);
+  lcd.setCursor(0, 1);
+  lcd.print("Niv:");
+  lcd.print(nombreNivel[nivelSeleccionado]);
+  if (maisSeca) {
+    lcd.setCursor(11, 1);
+    lcd.print("+SEC");
   }
 }
+
+void mostrarEstado() {
+  if (millis() - ultimoUpdateDisplay < DISPLAY_UPDATE_MS) return;
+  ultimoUpdateDisplay = millis();
+
+  lcd.setCursor(0, 0);
+  unsigned long tiempoEnEtapa = millis() - tiempoInicioEtapa;
+  unsigned long tiempoRestante = 0;
+  const ParametrosCiclo &p = ciclos[programaSeleccionado];
+
+  switch (estadoActual) {
+    case LLENADO:
+    case LLENADO_ENJUAGUE:
+      lcd.clear();
+      lcd.print("Enchendo...");
+      lcd.setCursor(0, 1);
+      lcd.print(nombrePrograma[programaSeleccionado]);
+      break;
+    case LAVADO:
+      lcd.clear();
+      lcd.print("Lavando");
+      tiempoRestante = (p.tiempoLavado > tiempoEnEtapa) ?
+        (p.tiempoLavado - tiempoEnEtapa) / 60000 : 0;
+      lcd.setCursor(0, 1);
+      lcd.print(tiempoRestante);
+      lcd.print(" min restam");
+      break;
+    case MOLHO:
+      lcd.clear();
+      lcd.print("Molho");
+      tiempoRestante = (p.tiempoLavado > tiempoEnEtapa) ?
+        (p.tiempoLavado - tiempoEnEtapa) / 60000 : 0;
+      lcd.setCursor(0, 1);
+      lcd.print(tiempoRestante);
+      lcd.print(" min restam");
+      break;
+    case ENJUAGUE:
+      lcd.clear();
+      lcd.print("Enxaguando");
+      lcd.setCursor(0, 1);
+      lcd.print(enjuagueActual + 1);
+      lcd.print("/");
+      lcd.print(p.numEnjuagues);
+      break;
+    case DRENAJE_LAVADO:
+    case DRENAJE_ENJUAGUE:
+      lcd.clear();
+      lcd.print("Drenando...");
+      break;
+    case CENTRIFUGADO:
+    case CENTRIFUGADO_EXTRA:
+      lcd.clear();
+      lcd.print("Centrifugando");
+      tiempoRestante = (p.tiempoCentrifugado > tiempoEnEtapa) ?
+        (p.tiempoCentrifugado - tiempoEnEtapa) / 60000 : 0;
+      lcd.setCursor(0, 1);
+      lcd.print(tiempoRestante);
+      lcd.print(" min restam");
+      break;
+    case FINALIZADO:
+      lcd.clear();
+      lcd.print("** PRONTO! **");
+      lcd.setCursor(0, 1);
+      lcd.print("Retire as roupas");
+      break;
+    case ERROR_TIMEOUT:
+      lcd.clear();
+      lcd.print("!! ERRO !!");
+      lcd.setCursor(0, 1);
+      lcd.print("Timeout enchim.");
+      break;
+    default:
+      break;
+  }
+}
+
 
 // ─── MAQUINA DE ESTADOS PRINCIPAL ────────────────────────
 
@@ -235,12 +372,27 @@ void ejecutarCiclo() {
 
   switch (estadoActual) {
 
+    // ── MOLHO (REMOJO) ───────────────────────────────────
+    case MOLHO:
+      // Solo deja el agua quieta por el tiempo configurado
+      if (tiempoEnEtapa >= params.tiempoLavado) {
+        // Fin del remojo, drenar
+        iniciarDrenaje();
+        estadoActual = DRENAJE_LAVADO;
+        tiempoInicioEtapa = millis();
+        Serial.println("Molho finalizado -> Drenaje");
+      }
+      break;
+
     // ── LLENADO ──────────────────────────────────────────
     case LLENADO:
       abrirAgua();
       if (nivelAlcanzado()) {
         cerrarAgua();
-        if (params.tiempoLavado > 0) {
+        // Programa MOLHO: solo remojo, no agita
+        if (programaSeleccionado == PROG_MOLHO) {
+          estadoActual = MOLHO;
+        } else if (params.tiempoLavado > 0) {
           estadoActual = LAVADO;
           ultimoCambioDir = millis();
         } else if (params.numEnjuagues > 0) {
@@ -252,43 +404,40 @@ void ejecutarCiclo() {
         }
         tiempoInicioEtapa = millis();
       }
-      // Seguridad: timeout de llenado
       if (tiempoEnEtapa > TIMEOUT_LLENADO_MS) {
         cerrarAgua();
         apagarTodo();
         destravarTapa();
         estadoActual = ERROR_TIMEOUT;
-        Serial.println("ERROR: Timeout de llenado!");
+        Serial.println("ERROR: Timeout llenado!");
       }
       break;
 
     // ── LAVADO (AGITACION) ───────────────────────────────
     case LAVADO: {
-      unsigned long cicloAgitacion = params.tiempoAgitacion + params.pausaAgitacion;
+      unsigned long cicloAgit = params.tiempoAgitacion + params.pausaAgitacion;
 
-      // Alternar direccion del motor
-      if (millis() - ultimoCambioDir >= cicloAgitacion) {
+      if (millis() - ultimoCambioDir >= cicloAgit) {
         direccionMotor = !direccionMotor;
         ultimoCambioDir = millis();
       }
 
-      // Agitar o pausar segun momento del ciclo
       if (millis() - ultimoCambioDir < params.tiempoAgitacion) {
         agitar(direccionMotor);
       } else {
-        pararAgitacion();  // Pausa entre cambios de direccion
+        pararAgitacion();
       }
 
-      // Fin del tiempo de lavado
       if (tiempoEnEtapa >= params.tiempoLavado) {
         pararAgitacion();
         iniciarDrenaje();
         estadoActual = DRENAJE_LAVADO;
         tiempoInicioEtapa = millis();
-        Serial.println("Lavado completado -> Drenaje");
+        Serial.println("Lavado -> Drenaje");
       }
       break;
     }
+
 
     // ── DRENAJE POST-LAVADO ──────────────────────────────
     case DRENAJE_LAVADO:
@@ -297,11 +446,13 @@ void ejecutarCiclo() {
         if (params.numEnjuagues > 0) {
           enjuagueActual = 0;
           estadoActual = LLENADO_ENJUAGUE;
-        } else {
+        } else if (params.tiempoCentrifugado > 0) {
           estadoActual = CENTRIFUGADO;
+        } else {
+          estadoActual = FINALIZADO;
+          destravarTapa();
         }
         tiempoInicioEtapa = millis();
-        Serial.println("Drenaje completado");
       }
       break;
 
@@ -313,10 +464,9 @@ void ejecutarCiclo() {
         estadoActual = ENJUAGUE;
         tiempoInicioEtapa = millis();
         ultimoCambioDir = millis();
-        Serial.printf("Enjuague %d/%d iniciado\n",
+        Serial.printf("Enxague %d/%d\n",
                       enjuagueActual + 1, params.numEnjuagues);
       }
-      // Timeout de seguridad
       if (tiempoEnEtapa > TIMEOUT_LLENADO_MS) {
         cerrarAgua();
         apagarTodo();
@@ -325,11 +475,11 @@ void ejecutarCiclo() {
       }
       break;
 
-    // ── ENJUAGUE (AGITACION SUAVE) ───────────────────────
+    // ── ENJUAGUE ─────────────────────────────────────────
     case ENJUAGUE: {
-      // Agitacion mas suave que en lavado (3s on / 3s off)
-      unsigned long cicloEnjuague = 3000 + 3000;
-      if (millis() - ultimoCambioDir >= cicloEnjuague) {
+      // Agitacion suave: 3s cada dir, 3s pausa
+      unsigned long cicloEnj = 6000;
+      if (millis() - ultimoCambioDir >= cicloEnj) {
         direccionMotor = !direccionMotor;
         ultimoCambioDir = millis();
       }
@@ -339,7 +489,6 @@ void ejecutarCiclo() {
         pararAgitacion();
       }
 
-      // Fin del enjuague
       if (tiempoEnEtapa >= params.tiempoEnjuague) {
         pararAgitacion();
         iniciarDrenaje();
@@ -355,38 +504,65 @@ void ejecutarCiclo() {
         pararDrenaje();
         enjuagueActual++;
         if (enjuagueActual < params.numEnjuagues) {
-          // Mas enjuagues pendientes
           estadoActual = LLENADO_ENJUAGUE;
-        } else {
-          // Todos los enjuagues completados
+        } else if (params.tiempoCentrifugado > 0) {
           estadoActual = CENTRIFUGADO;
+        } else {
+          estadoActual = FINALIZADO;
+          destravarTapa();
         }
         tiempoInicioEtapa = millis();
       }
       break;
 
+
     // ── CENTRIFUGADO ─────────────────────────────────────
     case CENTRIFUGADO:
-      // Mantener drenaje abierto durante centrifugado
       iniciarDrenaje();
       iniciarCentrifugado();
 
-      // Seguridad: si abren la tapa, parar inmediatamente
+      // Seguridad: tapa abierta
       if (!tapaCerrada()) {
         pararCentrifugado();
         pararDrenaje();
-        Serial.println("ALERTA: Tapa abierta durante centrifugado!");
-        // Esperar a que cierren la tapa para continuar
-        // (no cambia de estado, se reanuda al cerrar)
+        Serial.println("ALERTA: Tapa abierta!");
         break;
       }
 
       if (tiempoEnEtapa >= params.tiempoCentrifugado) {
         pararCentrifugado();
         pararDrenaje();
+        // Si "Mais Secas" esta activado, hacer centrifugado extra
+        if (maisSeca) {
+          estadoActual = CENTRIFUGADO_EXTRA;
+          tiempoInicioEtapa = millis();
+          Serial.println("Centrifugado extra (Mais Secas)");
+        } else {
+          destravarTapa();
+          estadoActual = FINALIZADO;
+          Serial.println("=== CICLO PRONTO ===");
+        }
+      }
+      break;
+
+    // ── CENTRIFUGADO EXTRA (MAIS SECAS) ──────────────────
+    case CENTRIFUGADO_EXTRA:
+      iniciarDrenaje();
+      iniciarCentrifugado();
+
+      if (!tapaCerrada()) {
+        pararCentrifugado();
+        pararDrenaje();
+        break;
+      }
+
+      // 5 minutos extra de centrifugado
+      if (tiempoEnEtapa >= 300000) {
+        pararCentrifugado();
+        pararDrenaje();
         destravarTapa();
         estadoActual = FINALIZADO;
-        Serial.println("=== CICLO FINALIZADO ===");
+        Serial.println("=== CICLO PRONTO ===");
       }
       break;
 
@@ -394,20 +570,12 @@ void ejecutarCiclo() {
     case FINALIZADO:
       apagarTodo();
       destravarTapa();
-      // Los LEDs parpadean (manejado en actualizarLEDs)
       break;
 
     // ── ERROR ────────────────────────────────────────────
     case ERROR_TIMEOUT:
       apagarTodo();
       destravarTapa();
-      // Parpadeo rapido de todos los LEDs indica error
-      {
-        bool errorBlink = (millis() / 200) % 2;
-        digitalWrite(PIN_LED_LAVANDO, errorBlink);
-        digitalWrite(PIN_LED_ENJUAGUE, errorBlink);
-        digitalWrite(PIN_LED_CENTRIFUGADO, errorBlink);
-      }
       break;
 
     default:
@@ -415,7 +583,8 @@ void ejecutarCiclo() {
   }
 }
 
-// ─── MANEJO DE BOTONES DEL PANEL ─────────────────────────
+
+// ─── MANEJO DE BOTONES ───────────────────────────────────
 
 void leerBotones() {
   if (millis() - ultimoDebounce < DEBOUNCE_MS) return;
@@ -425,58 +594,53 @@ void leerBotones() {
     ultimoDebounce = millis();
     if (estadoActual == APAGADA) {
       estadoActual = IDLE;
-      programaSeleccionado = NORMAL;
-      nivelSeleccionado = NIVEL_MEDIO;
-      Serial.println("Encendida - Modo IDLE");
+      programaSeleccionado = PROG_COLORIDAS;
+      nivelSeleccionado = NIVEL_ALTO;
+      maisSeca = false;
+      encoderPos = PROG_COLORIDAS;
+      lcd.backlight();
+      mostrarProgramaSeleccionado();
+      Serial.println("Ligada - IDLE");
     } else {
-      // Apagar: detener todo
       apagarTodo();
       destravarTapa();
       estadoActual = APAGADA;
-      // Apagar todos los LEDs
-      digitalWrite(PIN_LED_PESADO, LOW);
-      digitalWrite(PIN_LED_NORMAL, LOW);
-      digitalWrite(PIN_LED_DELICADO, LOW);
-      digitalWrite(PIN_LED_RAPIDO, LOW);
-      digitalWrite(PIN_LED_LAVANDO, LOW);
-      digitalWrite(PIN_LED_ENJUAGUE, LOW);
-      digitalWrite(PIN_LED_CENTRIFUGADO, LOW);
-      Serial.println("Apagada");
+      lcd.noBacklight();
+      lcd.clear();
+      Serial.println("Desligada");
     }
     return;
   }
 
-  // Solo procesar otros botones si esta en IDLE
+  // Solo en IDLE
   if (estadoActual != IDLE) return;
 
-  // ── BOTON PROGRAMA ──
-  if (digitalRead(PIN_BTN_PROGRAMA) == LOW) {
-    ultimoDebounce = millis();
-    programaSeleccionado = (Programa)((programaSeleccionado + 1) % NUM_PROGRAMAS);
-    Serial.printf("Programa: %d\n", programaSeleccionado);
-  }
-
-  // ── BOTON NIVEL DE AGUA ──
+  // ── BOTON NIVEL AGUA ──
   if (digitalRead(PIN_BTN_NIVEL) == LOW) {
     ultimoDebounce = millis();
     nivelSeleccionado = (NivelAgua)((nivelSeleccionado + 1) % NUM_NIVELES);
-    Serial.printf("Nivel agua: %d\n", nivelSeleccionado);
+    mostrarProgramaSeleccionado();
+    Serial.printf("Nivel: %s\n", nombreNivel[nivelSeleccionado]);
+  }
+
+  // ── BOTON MAIS SECAS ──
+  if (digitalRead(PIN_BTN_MAIS_SECAS) == LOW) {
+    ultimoDebounce = millis();
+    maisSeca = !maisSeca;
+    mostrarProgramaSeleccionado();
+    Serial.printf("Mais Secas: %s\n", maisSeca ? "ON" : "OFF");
   }
 
   // ── BOTON INICIO ──
   if (digitalRead(PIN_BTN_INICIO) == LOW) {
     ultimoDebounce = millis();
 
-    // Verificar tapa cerrada antes de iniciar
     if (!tapaCerrada()) {
-      Serial.println("No se puede iniciar: tapa abierta!");
-      // Parpadear LED como aviso
-      for (int i = 0; i < 5; i++) {
-        digitalWrite(PIN_LED_LAVANDO, HIGH);
-        delay(100);
-        digitalWrite(PIN_LED_LAVANDO, LOW);
-        delay(100);
-      }
+      Serial.println("Tampa aberta! Nao inicia.");
+      lcd.clear();
+      lcd.print("Feche a tampa!");
+      delay(2000);
+      mostrarProgramaSeleccionado();
       return;
     }
 
@@ -489,14 +653,34 @@ void leerBotones() {
 
     const ParametrosCiclo &params = ciclos[programaSeleccionado];
 
-    if (params.tiempoLavado > 0 || params.numEnjuagues > 0) {
-      estadoActual = LLENADO;
-      Serial.println("=== CICLO INICIADO: Llenado ===");
-    } else {
-      // Solo centrifugado: no necesita agua
+    // Determinar estado inicial segun programa
+    if (programaSeleccionado == PROG_CENTRIFUGACAO) {
       estadoActual = CENTRIFUGADO;
-      Serial.println("=== CICLO INICIADO: Solo centrifugado ===");
+      Serial.println("=== INICIO: Centrifugacao ===");
+    } else if (programaSeleccionado == PROG_ENXAGUE) {
+      estadoActual = LLENADO_ENJUAGUE;
+      Serial.println("=== INICIO: Enxague ===");
+    } else {
+      estadoActual = LLENADO;
+      Serial.println("=== INICIO: Enchendo ===");
     }
+  }
+}
+
+
+// ─── LEER ENCODER ────────────────────────────────────────
+
+void leerEncoder() {
+  if (estadoActual != IDLE) return;
+
+  if (encoderPos != lastEncoderPos) {
+    lastEncoderPos = encoderPos;
+    programaSeleccionado = (Programa)encoderPos;
+    // Ajustar nivel default del programa
+    nivelSeleccionado = ciclos[programaSeleccionado].nivelDefault;
+    mostrarProgramaSeleccionado();
+    Serial.printf("Programa: %s\n",
+                  nombrePrograma[programaSeleccionado]);
   }
 }
 
@@ -505,53 +689,64 @@ void leerBotones() {
 void setup() {
   Serial.begin(115200);
   Serial.println("\n====================================");
-  Serial.println("  Consul CWM15AB - ESP32 Controller");
+  Serial.println("  Consul CWH15AB - ESP32 Controller");
+  Serial.println("  16 Programas - Panel Digital");
   Serial.println("====================================\n");
 
-  // Configurar pines de salida (actuadores)
+  // Configurar pines de salida
   const int pinesSalida[] = {
     PIN_VALVULA_AGUA, PIN_MOTOR_DIR_A, PIN_MOTOR_DIR_B,
     PIN_CENTRIFUGADO, PIN_BOMBA_DRENAJE, PIN_TRAVA_TAPA,
-    PIN_LED_PESADO, PIN_LED_NORMAL, PIN_LED_DELICADO,
-    PIN_LED_RAPIDO, PIN_LED_LAVANDO, PIN_LED_ENJUAGUE,
-    PIN_LED_CENTRIFUGADO
+    PIN_LED_STATUS
   };
   for (int pin : pinesSalida) {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
   }
 
-  // Configurar pines de entrada con pull-up interno
+  // Configurar pines de entrada
   const int pinesEntrada[] = {
     PIN_PRESOSTATO_BAJO, PIN_PRESOSTATO_ALTO,
-    PIN_TAPA_CERRADA,
-    PIN_BTN_POWER, PIN_BTN_PROGRAMA,
-    PIN_BTN_NIVEL, PIN_BTN_INICIO
+    PIN_TAPA_CERRADA, PIN_BTN_POWER, PIN_BTN_INICIO,
+    PIN_BTN_NIVEL, PIN_BTN_MAIS_SECAS, PIN_ENCODER_SW
   };
   for (int pin : pinesEntrada) {
     pinMode(pin, INPUT_PULLUP);
   }
 
+  // Encoder rotativo
+  pinMode(PIN_ENCODER_CLK, INPUT_PULLUP);
+  pinMode(PIN_ENCODER_DT, INPUT_PULLUP);
+  lastCLK = digitalRead(PIN_ENCODER_CLK);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_CLK),
+                  encoderISR, CHANGE);
+
+  // Inicializar LCD
+  lcd.init();
+  lcd.noBacklight();  // Apagado hasta que enciendan
+
   estadoActual = APAGADA;
-  Serial.println("Sistema listo. Presione POWER para encender.");
+  Serial.println("Sistema pronto. Pressione POWER.");
 }
 
 // ─── LOOP PRINCIPAL ──────────────────────────────────────
 
 void loop() {
-  // 1. Leer botones del panel
   leerBotones();
+  leerEncoder();
 
-  // 2. Ejecutar logica del ciclo si esta activo
   if (estadoActual != APAGADA && estadoActual != IDLE) {
     ejecutarCiclo();
+    mostrarEstado();
+
+    // LED status parpadea durante operacion
+    digitalWrite(PIN_LED_STATUS, (millis() / 1000) % 2);
   }
 
-  // 3. Actualizar LEDs del panel
-  if (estadoActual != APAGADA) {
-    actualizarLEDs();
+  // LED status fijo en FINALIZADO
+  if (estadoActual == FINALIZADO) {
+    digitalWrite(PIN_LED_STATUS, (millis() / 300) % 2);
   }
 
-  // Pequena pausa para estabilidad
   delay(10);
 }
