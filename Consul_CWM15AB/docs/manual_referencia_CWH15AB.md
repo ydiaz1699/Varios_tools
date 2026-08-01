@@ -375,3 +375,368 @@ const ProgramaLavado prog_coloridas = {
 ---
 
 *Documento generado el 31 de julio de 2026. Fusiona datos del PDF oficial (Guia Rapida Consul CWH15AB) con especificaciones tecnicas para implementacion con ESP32.*
+
+
+
+---
+
+## 4. NIVELES DE AGUA
+
+| Nivel | Barras en display | Volumen aprox. | Uso recomendado |
+| --- | --- | --- | --- |
+| 1 | 1 barra | ~80 litros | Pocas prendas ligeras, ciclo rapido |
+| 2 | 2 barras | ~120 litros | Carga media, ropa delicada |
+| 3 | 3 barras | ~155 litros | Carga normal / completa |
+| 4 | 4 barras | ~186 litros | Edredon, sabanas, ropa pesada voluminosa |
+
+### Regla de Nivel Facil
+
+Dentro del cesto hay una **regla marcada** visible al abrir la tapa. Indica visualmente la altura que alcanzan las ropas y permite verificar si el nivel de agua seleccionado es adecuado.
+
+---
+
+## 5. NIVELES DE SUCIEDAD
+
+| Nivel | Descripcion | Comportamiento del agitador |
+| --- | --- | --- |
+| **Pouco** (Poco) | Ropa usada 1 vez, sin manchas (ej. con sudor) | Agitacion mas lenta. Pausas largas. Cuidado especial. |
+| **Sujas** (Sucias) | Ropa usada mas de 1 vez, sin manchas | Movimiento normal. Balance estandar. |
+| **Muito** (Muy sucias) | Ropa usada mucho tiempo o con manchas (ej. ropa de cama) | Mayor movimiento. Agitacion intensa. |
+
+---
+
+## 6. TIPOS DE ENJUAGUE
+
+| Modo | Descripcion |
+| --- | --- |
+| **Unico** | 1 enjuague |
+| **Duplo** | 2 enjuagues |
+| **Unico + Eco** | 1 enjuague con 10% menos de agua |
+| **Duplo + Eco** | 2 enjuagues con 10% menos de agua |
+
+> Los programas tienen enjuagues predefinidos, pero el usuario puede aumentar, reducir o cambiar el tipo antes de iniciar.
+
+---
+
+## 7. USO DEL DISPENSER "LIMPA FACIL"
+
+Dispensador dual fijo con 2 compartimentos que distribuyen productos automaticamente durante el ciclo.
+
+### Compartimento A - Jabon en Polvo
+
+- Usar el **vaso dosificador** incluido.
+- La cantidad depende del **nivel de agua** y del **nivel de suciedad** seleccionados.
+- Solo jabon en polvo y/o blanqueador en polvo.
+- **Cantidad maxima:** 240 ml (aprox. 170 g).
+- **Nunca** verter jabon directamente sobre la ropa.
+- Para jabon liquido, seguir recomendacion del fabricante del jabon.
+
+### Compartimento B - Suavizante
+
+- Uso **opcional**.
+- Si es muy espeso, diluir con un poco de agua antes de usar.
+- **No exceder el nivel maximo (MAX)**. El sifon podria dispensar antes de tiempo y manchar la ropa.
+- El nivel maximo esta calibrado para **nivel 4 de agua**; reducir para otros niveles.
+- **No usar suavizante** en el ciclo "Panos de Limpieza".
+
+### Tira Manchas
+
+- **Liquido:** Verter en el recipiente indicado en el contorno del cesto (usar recipiente con pico).
+- **En polvo:** Usar el compartimento de jabon (A).
+- **Agua sanitaria (blanqueador con cloro):** Solo para ropa blanca. Para colores, usar tira manchas sin cloro.
+
+---
+
+## 8. SECUENCIA DE OPERACION (uso normal)
+
+1. Enchufar (verificar voltaje correcto: 127 V o 220 V).
+2. Abrir la llave de paso de agua fria.
+3. Colocar la ropa en el cesto (respetar limite de 15 kg).
+4. Agregar jabon en el compartimento A (y suavizante en B si se desea).
+5. Cerrar la tapa.
+6. Presionar el boton de encendido.
+7. Girar el selector para elegir el programa.
+8. Ajustar nivel de agua, suciedad y enjuague si es necesario.
+9. Presionar **INICIAR**.
+10. Esperar a que termine (display muestra tiempo restante -> "LISTO").
+11. Abrir la tapa y retirar la ropa.
+
+### Pausar durante el ciclo
+
+- Presionar **Iniciar/Desligar**.
+- La traba de la tapa se libera despues de unos segundos.
+- Se puede agregar o sacar prendas.
+- Cerrar la tapa y presionar Iniciar para continuar.
+- **No se puede pausar durante el centrifugado** por seguridad.
+
+### Reutilizacion de agua (Lavagem Eco)
+
+- Durante el lavado, la luz de la etapa de lavado parpadeara indicando que el agua esta lista para reutilizar.
+- El usuario saca la manguera de salida del desague y la dirige a un balde.
+- Si no se reutiliza, el agua se drenara automaticamente despues de **35 minutos** y el ciclo continuara normalmente.
+- Para cancelar el reuso: presionar **2 veces** el boton "Avancar Etapas".
+
+---
+
+## 9. INSTALACION
+
+### Requisitos electricos
+
+| Voltaje | Disyuntor | Seccion cable | Distancia maxima |
+| --- | --- | --- | --- |
+| 127 V | Exclusivo | 2,5 mm2 | Hasta 29 m |
+| 127 V | Exclusivo | 4,0 mm2 | 30 a 48 m |
+| 220 V | Exclusivo | 2,5 mm2 | Hasta 70 m |
+| 220 V | Exclusivo | 4,0 mm2 | 71 a 116 m |
+
+**Obligatorio:**
+
+- Toma con tierra (3 patas).
+- Circuito electrico exclusivo (no compartir con otros aparatos).
+- NO usar adaptadores, zapatillas, extensiones ni "T".
+- Si el cable esta danado, solo el servicio autorizado puede cambiarlo.
+
+### Requisitos de agua
+
+- Canilla exclusiva con rosca de 3/4 pulgada.
+- Presion: 20 a 800 kPa (2 a 80 m de columna).
+- Solo agua fria (5C a 30C).
+- NO usar agua caliente ni de calefaccion central.
+- NO usar cinta teflon / veda-rosca en las conexiones de manguera.
+
+### Manguera de entrada
+
+- Roscar en la canilla; apretar lo suficiente para que no gotee.
+- Si gotea, reapretar (no usar teflon).
+- Usar SIEMPRE las mangueras nuevas del equipo.
+
+### Manguera de salida (desague)
+
+- La punta debe estar entre **0,85 m y 1,20 m** de altura.
+- Por debajo de 0,85 m: no completa el nivel de agua.
+- Por encima de 1,20 m: no logra evacuar el agua.
+- Diametro minimo del cano de desague: 5 cm.
+- NO soltar la manguera de la abrazadera fijada al gabinete.
+- Si no alcanza: pedir manguera de 2,30 m al servicio autorizado.
+
+### Posicionamiento
+
+- Superficie plana y nivelada.
+- Minimo 10 cm separada de paredes u otros muebles (por todos los lados).
+- Los 4 pies deben estar apoyados en el piso.
+- Para nivelar: girar pies a la derecha = sube, izquierda = baja.
+- NO instalar sobre alfombra, telgopor / isopor.
+- NO exponer a sol directo ni lluvia.
+- NO instalar cerca de fuentes de calor.
+
+---
+
+## 10. FUNCIONES Y SISTEMAS ESPECIALES
+
+### Spray de agua
+
+Durante el llenado, un chorro de agua se activa para mojar mejor la ropa, mejorando el cuidado de los tejidos. Al finalizar el llenado, el spray puede seguir goteando unos segundos para vaciar el sistema; esto es normal.
+
+### Sistema Anti-Desbalanceo
+
+- Identifica desbalanceo excesivo durante la centrifugacion.
+- Si ocurre: realiza un nuevo llenado y agitacion para reacomodar la ropa.
+- Si persiste: **interrumpe la centrifugacion**.
+- Solucion: presionar Iniciar/Desligar, abrir la tapa, redistribuir la ropa uniformemente, cerrar y avanzar a la etapa de centrifugacion.
+
+### Centrifugado extra ("Mas Secas")
+
+- Agrega aproximadamente 5 minutos mas de centrifugado al final del ciclo.
+- La ropa sale con menos humedad.
+- Se activa antes de iniciar el ciclo.
+
+### Autolimpieza
+
+- Ciclo especial (programa 16) para limpiar el interior de la maquina.
+- Elimina residuos acumulados, moho y malos olores.
+- Ejecutar 1 vez por mes **SIN ropa**, con 1/2 litro de blanqueador en el cesto.
+- Alternativa: ciclo vacio con un poco de lavandina diluida.
+
+### Dosificacion Economica
+
+- Sistema que promete ahorro de hasta 70% de jabon.
+- Incluye vaso medidor exclusivo (copo dosador).
+- Medir cantidad exacta segun la carga.
+- El exceso de jabon NO lava mejor; causa espuma excesiva y residuos.
+
+---
+
+## 11. MANTENIMIENTO Y LIMPIEZA
+
+### Filtro de pelusas
+
+- Ubicacion: parte superior del agitador central.
+- Limpiar despues de cada lavado (recomendado).
+- Lavar con agua corriente.
+- Volver a colocar antes del siguiente uso.
+
+### Limpieza del cesto / tambor
+
+- Ejecutar ciclo de Autolimpieza 1 vez por mes.
+- Secar con un pano al terminar.
+- Dejar la tapa abierta un rato para ventilar y evitar moho.
+
+### Limpieza del dispenser
+
+- Retirar la moldura de los compartimentos y lavar con agua corriente.
+- Limpiar el interior con esponja.
+- Retirar el sifon del compartimento de suavizante, lavarlo y recolocarlo.
+- Es normal que quede algo de agua acumulada en el dispenser al final del ciclo (no afecta la vida util).
+
+### Limpieza del gabinete (exterior)
+
+- Limpiar con pano humedo y detergente neutro.
+- NO usar productos abrasivos, virulana / esponja de acero ni solventes.
+- NO echar agua directamente sobre el panel de control.
+
+---
+
+## 12. DIAGNOSTICO DE PROBLEMAS
+
+| Problema | Causa probable | Solucion |
+| --- | --- | --- |
+| No enciende | Sin energia, enchufe flojo, disyuntor cortado | Verificar toma, disyuntor, enchufe |
+| No llena de agua | Canilla cerrada, manguera doblada u obstruida | Abrir canilla, revisar manguera |
+| No centrifuga | Tapa abierta, carga desbalanceada | Cerrar tapa, redistribuir ropa |
+| Pierde agua | Mangueras mal conectadas, abrazadera suelta | Reapretar conexiones |
+| Vibra mucho | Mal nivelada, carga desbalanceada, piso irregular | Nivelar pies, redistribuir ropa |
+| Ropa queda sucia | Programa inadecuado, exceso de ropa, poco jabon | Usar programa correcto, menos carga |
+| Mucha espuma | Exceso de jabon | Reducir cantidad (usar dosificador) |
+| No drena / desagota | Manguera de salida obstruida o muy alta (>1,20 m) | Desobstruir, verificar altura |
+| Manchas en la ropa | Contacto directo con jabon/suavizante sin diluir | Usar dispenser correctamente |
+| Se detiene a mitad | Tapa se abrio, falta presion de agua, corte electrico | Verificar tapa, canilla, disyuntor |
+| Ruido fuerte | Objeto metalico en cesto, carga desequilibrada | Revisar bolsillos, redistribuir |
+
+---
+
+## 13. DATOS TECNICOS PARA PROYECTO ESP32
+
+### Actuadores controlados por la placa electronica
+
+| Componente | Tipo de carga | Voltaje | Corriente estimada |
+| --- | --- | --- | --- |
+| Valvula solenoide (entrada de agua) | AC | 127/220 V | ~300 mA |
+| Motor de agitacion (bidireccional) | AC | 127/220 V | 2-3 A |
+| Motor de centrifugado | AC | 127/220 V | 3-4 A |
+| Bomba de drenaje | AC | 127/220 V | ~500 mA |
+| Traba de tapa (electroiman) | DC o AC | 12-24 V | ~200 mA |
+
+**Nota sobre el motor:** En muchos modelos Consul, el motor de agitacion y centrifugado es el **mismo motor fisico**, pero con diferentes conexiones electricas (bobinados). La transmision mecanica cambia el modo:
+
+- **Agitacion:** motor gira lento, transmision convierte en vaiven.
+- **Centrifugado:** motor gira rapido, transmision conecta directo al cesto.
+
+Esto implica que podrian necesitarse solo 3 reles para el motor:
+
+- Comun
+- Bobinado agitacion direccion A (1 rele)
+- Bobinado agitacion direccion B (1 rele)
+- Bobinado centrifugado (1 rele)
+
+### Sensores que lee la placa
+
+| Sensor | Tipo fisico | Senal electrica | Comportamiento |
+| --- | --- | --- | --- |
+| Presostato (nivel de agua) | Switch de presion | Digital NO/NC | Se cierra al alcanzar el nivel |
+| Microswitch de tapa | Mecanico | Digital NO | Se cierra cuando la tapa esta cerrada |
+
+**Sobre el presostato:** Es un sensor de presion de aire conectado al fondo del tanque mediante una manguerita. A medida que sube el agua, aumenta la presion de aire y el switch cambia de estado. Puede tener 1 o 2 niveles de conmutacion segun el modelo.
+
+### Conectores de la placa original (genericos)
+
+| Conector | Cables | Funcion |
+| --- | --- | --- |
+| CN1 | 3 cables | Alimentacion AC (Fase, Neutro, Tierra) |
+| CN2 | 4-5 cables | Motor (Comun, Dir A, Dir B, Centrifuga) |
+| CN3 | 4 cables | Valvula de agua + Bomba de drenaje |
+| CN4 | Flat cable | Panel completo (botones + display) |
+| CN5 | 2-3 cables | Sensores (presostato + switch de tapa) |
+| CN6 | 2 cables | Traba de tapa (electroiman) |
+
+> **IMPORTANTE:** Antes de desconectar la placa original, **FOTOGRAFIAR** cada conector con su color de cable y posicion. Anotar que funcion cumple cada uno midiendo con multimetro.
+
+### Secuencia interna de operacion (logica de firmware)
+
+```
+1. Usuario selecciona programa y presiona INICIAR
+2. Traba la tapa (activa electroiman)
+3. Abre valvula solenoide -> llena hasta que el presostato corta
+4. Cierra valvula
+5. Inicia agitacion:
+   - Motor gira DIRECCION A por X segundos
+   - PAUSA de Y segundos (OBLIGATORIA - protege transmision)
+   - Motor gira DIRECCION B por X segundos
+   - PAUSA de Y segundos
+   - Repite hasta completar tiempo total de lavado
+6. Detiene el motor
+7. Enciende bomba de drenaje -> drena durante ~90 segundos
+8. Apaga bomba
+9. SI hay enjuagues pendientes: vuelve al paso 3
+   (repite llenado + agitacion suave + drenaje por cada enjuague)
+10. Enciende bomba de drenaje + motor en modo centrifugado
+    - Si se abre la tapa: PARA TODO INMEDIATAMENTE
+11. Tras el tiempo de centrifugado: apaga todo
+12. Destraba la tapa (desactiva electroiman)
+13. Muestra "LISTO" en display / emite senal sonora
+```
+
+### Protecciones de seguridad (REPLICAR en ESP32)
+
+1. **Tapa abierta durante centrifugado** -> PARAR motor de inmediato.
+2. **Timeout de llenado** (15 minutos) -> ERROR, apagar todo, destrabar tapa.
+3. **NUNCA cambiar direccion del motor sin pausa** -> Protege motor y transmision.
+4. **Verificar tapa cerrada antes de iniciar** -> NO arrancar si esta abierta.
+5. **Corte de energia** -> Al volver, ir a estado APAGADO (no retomar ciclo).
+6. **Sobrecarga del motor** -> Si se bloquea, debe cortarse (fusible / proteccion termica).
+
+### Tiempos tipicos de cada etapa (aproximados - MEDIR con placa original)
+
+| Etapa | Tiempo tipico | Notas |
+| --- | --- | --- |
+| Llenado (nivel alto) | 5-10 min | Depende de la presion de agua |
+| Agitacion fuerte | 4 s giro + 2 s pausa | Patron repetitivo |
+| Agitacion suave | 3 s giro + 4 s pausa | Mas pausa = mas suave |
+| Drenaje | ~90 segundos | Tiempo fijo |
+| Enjuague | 3-5 min agitacion suave | Depende del programa |
+| Centrifugado | 3-8 min | Depende del programa |
+| Centrifugado extra | +5 min | Sumado al centrifugado normal |
+
+---
+
+## 14. OPCIONES DE PANEL CON ESP32
+
+### Opcion A: Reutilizar botones originales
+
+- Mantener los botones tactiles y el encoder originales.
+- Conectarlos a GPIOs del ESP32.
+- Reemplazar el display original por un LCD I2C 16x2 o OLED.
+
+### Opcion B: Reutilizar flat cable original
+
+- Identificar cada pin del cable plano que va al panel.
+- Mapear funciones y conectar al ESP32 (requiere ingenieria inversa).
+
+### Opcion C: Panel nuevo
+
+- Construir panel con encoder KY-040 + LCD + botones independientes.
+- Mayor flexibilidad pero requiere fabricacion de soporte/frente.
+
+---
+
+## 15. GARANTIA Y SERVICIO TECNICO
+
+- Garantia total: 12 meses (3 legales + 9 del fabricante).
+- SAC Brasil: 3003-0777 (capitales) / 0800-970-0777 (interior).
+- Web: www.consul.com.br/atendimento
+- Fabricante: Whirlpool S.A. - Unidad Electrodomesticos.
+- Codigo documento: W10635052 - Rev. C (16/02/2016).
+- Solo servicio tecnico autorizado puede abrir/reparar sin perder garantia.
+
+---
+
+*Documento generado el 31 de julio de 2026. Fusiona datos del PDF oficial (Guia Rapida Consul CWH15AB) con especificaciones tecnicas recopiladas para implementacion con ESP32.*
