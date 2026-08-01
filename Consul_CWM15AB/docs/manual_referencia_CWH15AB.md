@@ -30,7 +30,7 @@
 - Sigue las instrucciones del **Manual del Producto** que viene dentro de la lavadora.
 - Asegurate de que el electrodomestico este perfectamente **nivelado** (girar pies: derecha sube, izquierda baja).
 - Puedes retirar la pelicula protectora del gabinete; no afecta la funcionalidad.
-- **Electrico:** Voltaje exclusivo (127V o 220V, no es bivolt). Usar toma con tierra y disyuntor exclusivo.
+- **Electrico:** Voltaje exclusivo (127V o 220V, *no es bivolt*). Usar toma con tierra y disyuntor exclusivo.
 - **Agua:** Solo agua fria (5C a 30C). Presion de 20 a 800 kPa. **No usar cinta teflon** en las conexiones.
 - **Desague:** La manguera de salida debe estar a una altura entre **0,85 m y 1,20 m**.
 - **Espacio:** Dejar minimo 10 cm de separacion de paredes o muebles.
@@ -113,6 +113,8 @@
 - **Duplo:** 2 enjuagues.
 - **Unico + Eco / Duplo + Eco:** Reduce el agua de enjuague un 10%.
 
+> Los programas tienen enjuagues predefinidos, pero el usuario puede aumentar, reducir o cambiar el tipo antes de iniciar.
+
 
 
 ---
@@ -150,30 +152,34 @@
    - *Unico/Duplo + Eco:* Reduce el agua un 10%.
 5. Presiona **Iniciar/Desligar**.
 
+
+
 ---
 
 ## 6. Los 16 Programas de Lavado (Detalle Tecnico Completo)
+
+*Cada programa incluye los parametros criticos para el usuario y la estructura de datos para el firmware ESP32.*
 
 ### Tabla Rapida de Tiempos
 
 | # | Programa | Ciclo | Tiempo | Agua | Remojo | Enjuagues | Agitacion | Centrif. |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Cama y Bano | Remojo+Lavado+Enj+Centrif | 1h 36m | 4 (Extra) | Si (10m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 2 | Edredon | Remojo+Lavado+Enj+Centrif | 1h 33m | 4 (Extra)* | Si (12m) | 2 | Muy suave (3s giro / 5s pausa) | 5 min |
-| 3 | Limpieza Pesada | Remojo+Lavado+Enj+Centrif | 2h 04m | 4 (Extra) | Si (15m) | 2 | Maxima (5s giro / 1s pausa) | 8 min |
-| 4 | Panos de Limpieza | Lavado+Enj+Centrif | 2h 27m | 3 (Alto) | No | 3 | Fuerte (4s giro / 2s pausa) | 6 min |
-| 5 | Quita Olores | Lavado+Enj+Centrif | 0h 36m | 3 (Alto) | No | 3 | Moderada (3s giro / 3s pausa) | 4 min |
-| 6 | Rapido | Lavado+Enj+Centrif | 0h 29m | 1 (Bajo) | No | 1 | Moderada (3s giro / 2s pausa) | 3 min |
-| 7 | Lavado Eco | Lavado+Enj+Centrif | 0h 46m | 2 (Medio) | No | 2 | Moderada (3s giro / 2s pausa) | 5 min |
-| 8 | Ropa Blanca | Remojo+Lavado+Enj+Centrif | 1h 42m | 3 (Alto) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 9 | Ropa de Color | Lavado+Enj+Centrif | 0h 51m | 3 (Alto) | No | 2 | Normal (4s giro / 2s pausa) | 6 min |
-| 10 | Ropa Oscura | Lavado+Enj+Centrif | 0h 43m | 3 (Alto) | No | 2 | Suave (3s giro / 4s pausa) | 5 min |
-| 11 | Jeans | Remojo+Lavado+Enj+Centrif | 1h 21m | 3 (Alto) | Si (8m) | 2 | Fuerte (4s giro / 2s pausa) | 6 min |
-| 12 | Uniforme | Remojo+Lavado+Enj+Centrif | 1h 55m | 4 (Extra) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 13 | Ropa interior | Lavado+Enj+Centrif | 1h 03m | 2 (Medio) | No | 2 | Suave (2s giro / 4s pausa) | 4 min |
-| 14 | Ropa Ligera | Remojo+Lavado+Enj+Centrif | 1h 46m | 2 (Medio) | Si (15m) | 2 | Muy suave (2s giro / 6s pausa) | 3 min |
-| 15 | Ropa de Bebe | Remojo+Lavado+Enj+Centrif | 2h 20m | 3 (Alto) | Si (15m) | 3 | Suave (3s giro / 3s pausa) | 5 min |
-| 16 | Limpieza Lavadora | Lavado+Enj+Centrif | 0h 54m | 3 (Alto) | No | 2 | Fuerte (5s giro / 1s pausa) | 5 min |
+| 1 | **Cama y Bano** | Remojo+Lavado+Enj+Centrif | 1h 36m | 4 (Extra) | Si (10m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 2 | **Edredon** | Remojo+Lavado+Enj+Centrif | 1h 33m | 4 (Extra)* | Si (12m) | 2 | Muy suave (3s giro / 5s pausa) | 5 min |
+| 3 | **Limpieza Pesada** | Remojo+Lavado+Enj+Centrif | 2h 04m | 4 (Extra) | Si (15m) | 2 | Maxima (5s giro / 1s pausa) | 8 min |
+| 4 | **Panos de Limpieza** | Lavado+Enj+Centrif | 2h 27m | 3 (Alto) | No | 3 | Fuerte (4s giro / 2s pausa) | 6 min |
+| 5 | **Quita Olores** | Lavado+Enj+Centrif | 0h 36m | 3 (Alto) | No | 3 | Moderada (3s giro / 3s pausa) | 4 min |
+| 6 | **Rapido** | Lavado+Enj+Centrif | 0h 29m | 1 (Bajo) | No | 1 | Moderada (3s giro / 2s pausa) | 3 min |
+| 7 | **Lavado Eco** | Lavado+Enj+Centrif | 0h 46m | 2 (Medio) | No | 2 | Moderada (3s giro / 2s pausa) | 5 min |
+| 8 | **Ropa Blanca** | Remojo+Lavado+Enj+Centrif | 1h 42m | 3 (Alto) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 9 | **Ropa de Color** | Lavado+Enj+Centrif | 0h 51m | 3 (Alto) | No | 2 | Normal (4s giro / 2s pausa) | 6 min |
+| 10 | **Ropa Oscura** | Lavado+Enj+Centrif | 0h 43m | 3 (Alto) | No | 2 | Suave (3s giro / 4s pausa) | 5 min |
+| 11 | **Jeans** | Remojo+Lavado+Enj+Centrif | 1h 21m | 3 (Alto) | Si (8m) | 2 | Fuerte (4s giro / 2s pausa) | 6 min |
+| 12 | **Uniforme** | Remojo+Lavado+Enj+Centrif | 1h 55m | 4 (Extra) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 13 | **Ropa interior** | Lavado+Enj+Centrif | 1h 03m | 2 (Medio) | No | 2 | Suave (2s giro / 4s pausa) | 4 min |
+| 14 | **Ropa Ligera** | Remojo+Lavado+Enj+Centrif | 1h 46m | 2 (Medio) | Si (15m) | 2 | Muy suave (2s giro / 6s pausa) | 3 min |
+| 15 | **Ropa de Bebe** | Remojo+Lavado+Enj+Centrif | 2h 20m | 3 (Alto) | Si (15m) | 3 | Suave (3s giro / 3s pausa) | 5 min |
+| 16 | **Limpieza Lavadora** | Lavado+Enj+Centrif | 0h 54m | 3 (Alto) | No | 2 | Fuerte (5s giro / 1s pausa) | 5 min |
 
 *Edredon: Obligatorio Nivel 4. Solo para tamano matrimonial ("Casal").*
 
@@ -270,18 +276,18 @@
 
 1. **INICIO:** Verificar tapa cerrada -> Activar traba -> Abrir valvula hasta que el presostato corte -> Cerrar valvula.
 2. **REMOJO (si aplica):** Esperar tiempo definido sin agitar.
-3. **AGITACION:** Giro Dir A (`tiempoGiro_ms`) -> **PAUSA** (`pausaGiro_ms`, OBLIGATORIA para proteger transmision) -> Giro Dir B (`tiempoGiro_ms`) -> **PAUSA**. Repetir hasta completar `tiempoLavado_ms`.
+3. **AGITACION:** Giro Dir A (tiempoGiro_ms) -> **PAUSA** (pausaGiro_ms, OBLIGATORIA) -> Giro Dir B (tiempoGiro_ms) -> **PAUSA**. Repetir hasta completar tiempoLavado_ms.
 4. **DRENAJE:** Encender bomba (~90 segundos fijos).
-5. **ENJUAGUES:** Si `numEnjuagues > 0`, volver al paso 1 (con agitacion suave) y restar 1 al contador.
-6. **CENTRIFUGADO:** Encender bomba + Motor en modo centrifugado. **Monitorear microswitch de tapa constantemente** (si se abre, PARAR TODO).
-7. **FIN:** Apagar todo -> Desactivar traba de tapa -> Mostrar "LISTO".
+5. **ENJUAGUES:** Si numEnjuagues > 0, volver al paso 1 (con agitacion suave) y restar 1 al contador.
+6. **CENTRIFUGADO:** Encender bomba + Motor centrifugado. **Monitorear microswitch tapa** (si se abre, PARAR TODO).
+7. **FIN:** Apagar todo -> Desactivar traba -> Mostrar "LISTO".
 
 ### Protecciones de Seguridad (Obligatorias en codigo)
 
-- **Timeout de llenado:** Si pasa de 15 min sin que el presostato corte -> ERROR, apagar todo, destrabar tapa.
-- **Pausa entre giros:** NUNCA invertir direccion del motor sin la pausa definida (`pausaGiro_ms`).
+- **Timeout de llenado:** 15 min -> ERROR, apagar todo, destrabar tapa.
+- **Pausa entre giros:** NUNCA invertir direccion sin pausa (pausaGiro_ms).
 - **Tapa abierta:** Interrupcion inmediata del motor y bomba.
-- **Corte de energia:** Al volver, el sistema debe ir a estado APAGADO (no retomar ciclo automaticamente por seguridad).
+- **Corte de energia:** Al volver, ir a estado APAGADO (no retomar ciclo).
 
 ### Estructura de Datos Unificada (C/C++ para ESP32)
 
@@ -290,30 +296,29 @@ enum NivelAgua { NIVEL_BAJO = 1, NIVEL_MEDIO = 2, NIVEL_ALTO = 3, NIVEL_EXTRA = 
 
 struct ProgramaLavado {
   const char* nombre;
-  uint32_t    tiempoRemojo_ms;       // 0 si no tiene
-  uint32_t    tiempoLavado_ms;       // Tiempo total efectivo de agitacion
-  uint16_t    tiempoGiro_ms;         // Milisegundos girando por direccion
-  uint16_t    pausaGiro_ms;          // Milisegundos de pausa entre giros
-  uint8_t     numEnjuagues;          // 1, 2 o 3
-  uint32_t    tiempoEnjuague_ms;     // Duracion de agitacion por cada enjuague
-  uint32_t    tiempoCentrifugado_ms; // Duracion del centrifugado final
-  bool        agitacionFuerte;       // true = pausa corta, false = pausa larga
+  uint32_t    tiempoRemojo_ms;
+  uint32_t    tiempoLavado_ms;
+  uint16_t    tiempoGiro_ms;
+  uint16_t    pausaGiro_ms;
+  uint8_t     numEnjuagues;
+  uint32_t    tiempoEnjuague_ms;
+  uint32_t    tiempoCentrifugado_ms;
+  bool        agitacionFuerte;
   NivelAgua   nivelAguaDefault;
-  uint8_t     maxCargaKg;            // 15 por defecto, 2 para panos de limpieza
-  bool        requiereRopa;          // false solo para "Limpieza de Lavadora"
-  uint32_t    pausaReuso_ms;         // 0 si no aplica (ej. 2100000 para Eco = 35 min)
+  uint8_t     maxCargaKg;
+  bool        requiereRopa;
+  uint32_t    pausaReuso_ms;
 };
 
-// Ejemplo de instanciacion (Programa Ropa de Color)
 const ProgramaLavado prog_coloridas = {
   .nombre              = "Coloridas",
   .tiempoRemojo_ms     = 0,
-  .tiempoLavado_ms     = 900000,     // 15 min efectivo
-  .tiempoGiro_ms       = 4000,       // 4 s por direccion
-  .pausaGiro_ms        = 2000,       // 2 s entre giros
+  .tiempoLavado_ms     = 900000,
+  .tiempoGiro_ms       = 4000,
+  .pausaGiro_ms        = 2000,
   .numEnjuagues        = 2,
-  .tiempoEnjuague_ms   = 180000,     // 3 min c/u
-  .tiempoCentrifugado_ms = 360000,   // 6 min
+  .tiempoEnjuague_ms   = 180000,
+  .tiempoCentrifugado_ms = 360000,
   .agitacionFuerte     = true,
   .nivelAguaDefault    = NIVEL_ALTO,
   .maxCargaKg          = 15,
@@ -322,9 +327,7 @@ const ProgramaLavado prog_coloridas = {
 };
 ```
 
----
-
-> **Nota final:** Este documento unificado elimina las contradicciones entre las fuentes, priorizando las especificaciones del PDF oficial de Consul, y proporciona toda la granularidad necesaria tanto para operar el equipo como para programar su emulacion o control mediante ESP32.
+> **Nota final:** Este documento prioriza las especificaciones del PDF oficial de Consul.
 
 ---
 
@@ -332,17 +335,43 @@ const ProgramaLavado prog_coloridas = {
 
 | # | Parametro | Como medir | Variable sugerida |
 | --- | --- | --- | --- |
-| 1 | Tiempo de remojo | Desde que llena hasta que agita (solo programas con remojo) | `tiempoRemojo_ms` |
-| 2 | Tiempo de lavado | Desde que agita hasta que detiene | `tiempoLavado_ms` |
-| 3 | Giro por direccion | Segundos girando hacia un lado | `tiempoGiro_ms` |
-| 4 | Pausa entre giros | Segundos quieto entre cambios de direccion | `pausaGiro_ms` |
-| 5 | Cantidad de enjuagues | Veces que vuelve a llenar despues del lavado | `numEnjuagues` |
-| 6 | Tiempo de enjuague | Agitacion durante cada enjuague | `tiempoEnjuague_ms` |
-| 7 | Tiempo de centrifugado | Giro rapido hasta detenerse | `tiempoCentrifugado_ms` |
-| 8 | Tipo de agitacion | Fuerte o suave (define pausas y velocidad) | `agitacionFuerte_bool` |
+| 1 | Tiempo de remojo | Desde que llena hasta que agita | tiempoRemojo_ms |
+| 2 | Tiempo de lavado | Desde que agita hasta que detiene | tiempoLavado_ms |
+| 3 | Giro por direccion | Segundos girando hacia un lado | tiempoGiro_ms |
+| 4 | Pausa entre giros | Segundos quieto entre cambios | pausaGiro_ms |
+| 5 | Cantidad de enjuagues | Veces que vuelve a llenar | numEnjuagues |
+| 6 | Tiempo de enjuague | Agitacion durante cada enjuague | tiempoEnjuague_ms |
+| 7 | Tiempo de centrifugado | Giro rapido hasta detenerse | tiempoCentrifugado_ms |
+| 8 | Tipo de agitacion | Fuerte o suave | agitacionFuerte_bool |
 
-> **Programas prioritarios para medir:** Coloridas (51 min), Rapido (29 min), Cama y Bano (96 min), Limpieza Pesada (124 min).
+> **Programas prioritarios:** Coloridas (51 min), Rapido (29 min), Cama y Bano (96 min), Limpieza Pesada (124 min).
 
 ---
 
-*Documento generado el 31 de julio de 2026. Fusiona datos del PDF oficial (Guia Rapida Consul CWH15AB) con especificaciones tecnicas recopiladas para implementacion con ESP32.*
+## 10. Opciones de Panel con ESP32
+
+### Opcion A: Reutilizar botones originales
+- Mantener botones tactiles y encoder originales conectados a GPIOs del ESP32.
+- Reemplazar display original por LCD I2C 16x2 o OLED.
+
+### Opcion B: Reutilizar flat cable original
+- Identificar cada pin del cable plano. Mapear funciones (requiere ingenieria inversa).
+
+### Opcion C: Panel nuevo
+- Construir panel con encoder KY-040 + LCD + botones independientes.
+- Mayor flexibilidad pero requiere fabricacion de soporte/frente.
+
+---
+
+## 11. Garantia y Servicio Tecnico
+
+- Garantia total: 12 meses (3 legales + 9 del fabricante).
+- SAC Brasil: 3003-0777 (capitales) / 0800-970-0777 (interior).
+- Web: www.consul.com.br/atendimento
+- Fabricante: Whirlpool S.A. - Unidad Electrodomesticos.
+- Codigo documento: W10635052 - Rev. C (16/02/2016).
+- Solo servicio tecnico autorizado puede abrir/reparar sin perder garantia.
+
+---
+
+*Documento generado el 31 de julio de 2026. Fusiona datos del PDF oficial (Guia Rapida Consul CWH15AB) con especificaciones tecnicas para implementacion con ESP32.*
