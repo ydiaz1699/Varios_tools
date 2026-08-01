@@ -2,7 +2,7 @@
 
 ---
 
-# Guia Maestra: Lavadora Consul CWH15AB (15 kg)
+# 🧺 Guia Maestra: Lavadora Consul CWH15AB (15 kg) ✨
 
 *Guia completa de usuario, especificaciones tecnicas y referencia para desarrollo de firmware (ESP32).*
 
@@ -25,30 +25,30 @@
 | **Velocidad de centrifugado** | ~750 rpm (maxima) |
 | **Dispenser** | Dual "Limpa Facil" (Jabon + Suavizante) |
 
-### 1.1 Instalacion y Requisitos Tecnicos
+### 🏠 1.1 Instalacion y Requisitos Tecnicos
 
-- Sigue las instrucciones del **Manual del Producto** que viene dentro de la lavadora.
-- Asegurate de que el electrodomestico este perfectamente **nivelado** (girar pies: derecha sube, izquierda baja).
-- Puedes retirar la pelicula protectora del gabinete; no afecta la funcionalidad.
-- **Electrico:** Voltaje exclusivo (127V o 220V, *no es bivolt*). Usar toma con tierra y disyuntor exclusivo.
-- **Agua:** Solo agua fria (5C a 30C). Presion de 20 a 800 kPa. **No usar cinta teflon** en las conexiones.
-- **Desague:** La manguera de salida debe estar a una altura entre **0,85 m y 1,20 m**.
-- **Espacio:** Dejar minimo 10 cm de separacion de paredes o muebles.
+- 📖 Sigue las instrucciones del **Manual del Producto** que viene dentro de la lavadora.
+- ⚖️ Asegurate de que el electrodomestico este perfectamente **nivelado** (girar pies: derecha sube, izquierda baja).
+- 🎁 Puedes retirar la pelicula protectora del gabinete; no afecta la funcionalidad.
+- 🔌 **Electrico:** Voltaje exclusivo (127V o 220V, *no es bivolt*). Usar toma con tierra y disyuntor exclusivo.
+- 🚿 **Agua:** Solo agua fria (5C a 30C). Presion de 20 a 800 kPa. **No usar cinta teflon** en las conexiones.
+- 📏 **Desague:** La manguera de salida debe estar a una altura entre **0,85 m y 1,20 m**.
+- 📐 **Espacio:** Dejar minimo 10 cm de separacion de paredes o muebles.
 
 ---
 
 ## 2. Instalacion y Requisitos
 
-- **Electrico:** Toma exclusiva con tierra (3 patas) y disyuntor independiente. No usar extensiones, "T" o adaptadores. (Cable 2,5 mm2 hasta 29m en 127V / 70m en 220V; 4,0 mm2 para distancias mayores).
-- **Agua:** Canilla exclusiva de 3/4". Solo agua fria (5C a 30C). Presion de 20 a 800 kPa. **NO usar cinta teflon** en las roscas de la manguera.
-- **Desague:** La manguera de salida debe estar a una altura estricta de **0,85 m a 1,20 m**. (Menos de 0,85 m no llena; mas de 1,20 m no drena).
-- **Posicionamiento:** Superficie plana, nivelada (girar pies: derecha sube, izquierda baja). Dejar minimo 10 cm de separacion de paredes. No instalar sobre alfombras ni al sol directo.
+- ⚡ **Electrico:** Toma exclusiva con tierra (3 patas) y disyuntor independiente. No usar extensiones, "T" o adaptadores. (Cable 2,5 mm2 hasta 29m en 127V / 70m en 220V; 4,0 mm2 para distancias mayores).
+- 🚿 **Agua:** Canilla exclusiva de 3/4". Solo agua fria (5C a 30C). Presion de 20 a 800 kPa. **NO usar cinta teflon** en las roscas de la manguera.
+- 🌊 **Desague:** La manguera de salida debe estar a una altura estricta de **0,85 m a 1,20 m**. (Menos de 0,85 m no llena; mas de 1,20 m no drena).
+- 📏 **Posicionamiento:** Superficie plana, nivelada (girar pies: derecha sube, izquierda baja). Dejar minimo 10 cm de separacion de paredes. No instalar sobre alfombras ni al sol directo.
 
 
 
 ---
 
-## 3. Panel de Control y Secuencia de Operacion
+## 3. 🎛️ Panel de Control y Secuencia de Operacion
 
 ### Elementos del Panel
 
@@ -86,13 +86,13 @@
 
 ## 4. Niveles, Suciedad y Enjuagues
 
-### Carga de Ropa y Niveles
+### 👕 Carga de Ropa y Niveles
 
-- Verifica las etiquetas. **No laves tejidos impermeables**.
-- Coloca la ropa abierta, distribuyendola uniformemente alrededor del agitador.
-- **Regla de Nivel Facil:** La regla dentro del cesto indica la altura de la ropa. Usala para elegir el nivel de agua y la cantidad de jabon.
+- 🏷️ Verifica las etiquetas. **No laves tejidos impermeables** 🚫.
+- 🔄 Coloca la ropa abierta, distribuyendola uniformemente alrededor del agitador.
+- 📏 **Regla de Nivel Facil:** La regla dentro del cesto indica la altura de la ropa. Usala para elegir el nivel de agua y la cantidad de jabon.
 
-### Niveles de Agua (Regla "Nivel Facil" dentro del cesto)
+### 💧 Niveles de Agua (Regla "Nivel Facil" dentro del cesto)
 
 | Nivel | Barras | Volumen aprox. | Uso recomendado |
 | --- | --- | --- | --- |
@@ -101,13 +101,13 @@
 | **3** | 3 barras | ~155 L | Carga normal / completa |
 | **4** | 4 barras | ~186 L | Edredon, sabanas, ropa pesada voluminosa |
 
-### Niveles de Suciedad (Define el patron de agitacion)
+### 🧼 Niveles de Suciedad (Define el patron de agitacion)
 
 - **Poco:** Ropa usada 1 vez, sin manchas. Agitacion mas lenta, pausas largas.
 - **Sucias:** Ropa usada mas de 1 vez. Movimiento normal, balance estandar.
 - **Muy sucias:** Ropa con mucho uso o manchas. Agitacion intensa, pausas cortas.
 
-### Tipos de Enjuague
+### 🔄 Tipos de Enjuague
 
 - **Unico:** 1 enjuague.
 - **Duplo:** 2 enjuagues.
@@ -119,22 +119,22 @@
 
 ---
 
-## 5. Uso del Dispenser "Limpa Facil"
+## 5. 🧴 Uso del Dispenser "Limpa Facil"
 
-**Compartimento A (Detergente en polvo):**
+**🅰️ Compartimento A (Detergente en polvo):**
 
 - Utiliza el **vaso dosificador** incluido.
 - Ajusta la cantidad segun el nivel de agua y suciedad.
 - *Nunca* coloques el detergente directamente sobre la ropa.
 - Capacidad maxima: **240 ml** (aprox. 170 g).
 
-**Compartimento B (Suavizante):**
+**🅱️ Compartimento B (Suavizante):**
 
 - Su uso es **opcional**. Diluye si es muy viscoso.
 - No superes el nivel maximo (**MAX**).
 - El nivel MAX esta calibrado para el **Nivel 4** de agua; reduce la cantidad en niveles inferiores.
 
-**Quitamanchas Liquido / Lejia:**
+**🎯 Quitamanchas Liquido / Lejia:**
 
 - Usa lejia (agua sanitaria) **solo para ropa blanca**.
 - Para colores, usa quitamanchas **sin cloro**.
@@ -156,30 +156,30 @@
 
 ---
 
-## 6. Los 16 Programas de Lavado (Detalle Tecnico Completo)
+## 6. 📋 Los 16 Programas de Lavado (Detalle Tecnico Completo)
 
 *Cada programa incluye los parametros criticos para el usuario y la estructura de datos para el firmware ESP32.*
 
-### Tabla Rapida de Tiempos
+### 📊 Tabla Rapida de Tiempos
 
-| # | Programa | Ciclo | Tiempo | Agua | Remojo | Enjuagues | Agitacion | Centrif. |
+| # | Programa | Ciclo | ⏱️ Tiempo | 💧 Agua | 🔄 Remojo | 🧼 Enjuagues | 💪 Agitacion | 🌀 Centrif. |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **Cama y Bano** | Remojo+Lavado+Enj+Centrif | 1h 36m | 4 (Extra) | Si (10m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 2 | **Edredon** | Remojo+Lavado+Enj+Centrif | 1h 33m | 4 (Extra)* | Si (12m) | 2 | Muy suave (3s giro / 5s pausa) | 5 min |
-| 3 | **Limpieza Pesada** | Remojo+Lavado+Enj+Centrif | 2h 04m | 4 (Extra) | Si (15m) | 2 | Maxima (5s giro / 1s pausa) | 8 min |
-| 4 | **Panos de Limpieza** | Lavado+Enj+Centrif | 2h 27m | 3 (Alto) | No | 3 | Fuerte (4s giro / 2s pausa) | 6 min |
-| 5 | **Quita Olores** | Lavado+Enj+Centrif | 0h 36m | 3 (Alto) | No | 3 | Moderada (3s giro / 3s pausa) | 4 min |
-| 6 | **Rapido** | Lavado+Enj+Centrif | 0h 29m | 1 (Bajo) | No | 1 | Moderada (3s giro / 2s pausa) | 3 min |
-| 7 | **Lavado Eco** | Lavado+Enj+Centrif | 0h 46m | 2 (Medio) | No | 2 | Moderada (3s giro / 2s pausa) | 5 min |
-| 8 | **Ropa Blanca** | Remojo+Lavado+Enj+Centrif | 1h 42m | 3 (Alto) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 9 | **Ropa de Color** | Lavado+Enj+Centrif | 0h 51m | 3 (Alto) | No | 2 | Normal (4s giro / 2s pausa) | 6 min |
-| 10 | **Ropa Oscura** | Lavado+Enj+Centrif | 0h 43m | 3 (Alto) | No | 2 | Suave (3s giro / 4s pausa) | 5 min |
-| 11 | **Jeans** | Remojo+Lavado+Enj+Centrif | 1h 21m | 3 (Alto) | Si (8m) | 2 | Fuerte (4s giro / 2s pausa) | 6 min |
-| 12 | **Uniforme** | Remojo+Lavado+Enj+Centrif | 1h 55m | 4 (Extra) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
-| 13 | **Ropa interior** | Lavado+Enj+Centrif | 1h 03m | 2 (Medio) | No | 2 | Suave (2s giro / 4s pausa) | 4 min |
-| 14 | **Ropa Ligera** | Remojo+Lavado+Enj+Centrif | 1h 46m | 2 (Medio) | Si (15m) | 2 | Muy suave (2s giro / 6s pausa) | 3 min |
-| 15 | **Ropa de Bebe** | Remojo+Lavado+Enj+Centrif | 2h 20m | 3 (Alto) | Si (15m) | 3 | Suave (3s giro / 3s pausa) | 5 min |
-| 16 | **Limpieza Lavadora** | Lavado+Enj+Centrif | 0h 54m | 3 (Alto) | No | 2 | Fuerte (5s giro / 1s pausa) | 5 min |
+| 1 | 🛏️ **Cama y Bano** | Remojo+Lavado+Enj+Centrif | 1h 36m | 4 (Extra) | Si (10m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 2 | 🛌 **Edredon** | Remojo+Lavado+Enj+Centrif | 1h 33m | 4 (Extra)* | Si (12m) | 2 | Muy suave (3s giro / 5s pausa) | 5 min |
+| 3 | 🔧 **Limpieza Pesada** | Remojo+Lavado+Enj+Centrif | 2h 04m | 4 (Extra) | Si (15m) | 2 | Maxima (5s giro / 1s pausa) | 8 min |
+| 4 | 🧽 **Panos de Limpieza** | Lavado+Enj+Centrif | 2h 27m | 3 (Alto) | No | 3 | Fuerte (4s giro / 2s pausa) | 6 min |
+| 5 | 🌬️ **Quita Olores** | Lavado+Enj+Centrif | 0h 36m | 3 (Alto) | No | 3 | Moderada (3s giro / 3s pausa) | 4 min |
+| 6 | ⚡ **Rapido** | Lavado+Enj+Centrif | 0h 29m | 1 (Bajo) | No | 1 | Moderada (3s giro / 2s pausa) | 3 min |
+| 7 | ♻️ **Lavado Eco** | Lavado+Enj+Centrif | 0h 46m | 2 (Medio) | No | 2 | Moderada (3s giro / 2s pausa) | 5 min |
+| 8 | ⚪ **Ropa Blanca** | Remojo+Lavado+Enj+Centrif | 1h 42m | 3 (Alto) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 9 | 🎨 **Ropa de Color** | Lavado+Enj+Centrif | 0h 51m | 3 (Alto) | No | 2 | Normal (4s giro / 2s pausa) | 6 min |
+| 10 | 🌑 **Ropa Oscura** | Lavado+Enj+Centrif | 0h 43m | 3 (Alto) | No | 2 | Suave (3s giro / 4s pausa) | 5 min |
+| 11 | 👖 **Jeans** | Remojo+Lavado+Enj+Centrif | 1h 21m | 3 (Alto) | Si (8m) | 2 | Fuerte (4s giro / 2s pausa) | 6 min |
+| 12 | 👔 **Uniforme** | Remojo+Lavado+Enj+Centrif | 1h 55m | 4 (Extra) | Si (12m) | 2 | Fuerte (4s giro / 2s pausa) | 7 min |
+| 13 | 👙 **Ropa interior** | Lavado+Enj+Centrif | 1h 03m | 2 (Medio) | No | 2 | Suave (2s giro / 4s pausa) | 4 min |
+| 14 | 🌸 **Ropa Ligera** | Remojo+Lavado+Enj+Centrif | 1h 46m | 2 (Medio) | Si (15m) | 2 | Muy suave (2s giro / 6s pausa) | 3 min |
+| 15 | 👶 **Ropa de Bebe** | Remojo+Lavado+Enj+Centrif | 2h 20m | 3 (Alto) | Si (15m) | 3 | Suave (3s giro / 3s pausa) | 5 min |
+| 16 | 🧼 **Limpieza Lavadora** | Lavado+Enj+Centrif | 0h 54m | 3 (Alto) | No | 2 | Fuerte (5s giro / 1s pausa) | 5 min |
 
 *Edredon: Obligatorio Nivel 4. Solo para tamano matrimonial ("Casal").*
 
@@ -215,34 +215,34 @@
 
 ## 7. Funciones y Sistemas Especiales
 
-- **Spray de Agua:** Chorrea agua durante el llenado para mojar mejor la ropa. Es normal que gotee unos segundos al terminar el llenado (vaciado del sistema).
-- **Sistema Anti-Desbalanceo:** Si detecta vibracion extrema en el centrifugado, detiene el ciclo, llena agua y agita para reacomodar. Si persiste, se interrumpe y pide redistribucion manual.
-- **Reuso de Agua (Lavagem Eco):** Tras el lavado, la luz parpadea. Tienes 35 min para desviar la manguera a un balde. Si no, drena sola.
-- **Seguridad de Tapa:** La traba electroiman se activa al iniciar. Si se abre la tapa, el motor se detiene **inmediatamente**.
+- 🚿 **Spray de Agua:** Chorrea agua durante el llenado para mojar mejor la ropa. Es normal que gotee unos segundos al terminar el llenado (vaciado del sistema).
+- ⚖️ **Sistema Anti-Desbalanceo:** Si detecta vibracion extrema en el centrifugado, detiene el ciclo, llena agua y agita para reacomodar. Si persiste, se interrumpe y pide redistribucion manual.
+- ♻️ **Reuso de Agua (Lavagem Eco):** Tras el lavado, la luz parpadea. Tienes 35 min para desviar la manguera a un balde. Si no, drena sola.
+- 🛑 **Seguridad de Tapa:** La traba electroiman se activa al iniciar. Si se abre la tapa, el motor se detiene **inmediatamente**.
 
 ---
 
-## 8. Mantenimiento y Diagnostico
+## 8. 🧽 Mantenimiento y Diagnostico
 
-**Limpieza Interna (Mensual):**
+**📅 Limpieza Interna (Mensual):**
 
 1. Asegurate de que **no haya ropa**.
 2. Vierte **1/2 litro de lejia** directamente en el cesto.
 3. Selecciona **"Limpieza de la Lavadora"** y deja terminar.
 
-**Otras tareas:**
+**🧹 Otras tareas:**
 
 - Limpia el **filtro de pelusas** (arriba del agitador) tras cada lavado.
 - Lava la moldura y el sifon del **dispenser** con agua corriente.
 - Deja la tapa abierta tras usar para evitar moho.
 
-**Solucion rapida de problemas:**
+**⚠️ Solucion rapida de problemas:**
 
 - *No centrifuga:* Tapa abierta o carga desbalanceada.
 - *No drena:* Manguera de salida muy baja (<0,85m) o muy alta (>1,20m) / obstruida.
 - *Mucha espuma:* Exceso de jabon. Usa el vaso dosificador.
 
-### Tabla Rapida de Diagnostico
+### 🔍 Tabla Rapida de Diagnostico
 
 | Problema | Causa Probable | Solucion |
 | --- | --- | --- |
@@ -258,7 +258,7 @@
 
 ## 9. Datos Tecnicos para Proyecto ESP32 (Firmware)
 
-### Actuadores y Sensores
+### 🔌 Actuadores y Sensores
 
 | Componente | Tipo de Carga | Voltaje | Corriente Est. | Notas |
 | --- | --- | --- | --- | --- |
@@ -272,7 +272,7 @@
 
 *Nota:* El motor usa un sistema de transmision. Agitacion = giro lento con vaiven. Centrifugado = giro rapido directo al cesto. Se requieren reles para: Comun, Direccion A, Direccion B y Centrifugado.
 
-### Logica de Maquina de Estados (Firmware)
+### 🧠 Logica de Maquina de Estados (Firmware)
 
 1. **INICIO:** Verificar tapa cerrada -> Activar traba -> Abrir valvula hasta que el presostato corte -> Cerrar valvula.
 2. **REMOJO (si aplica):** Esperar tiempo definido sin agitar.
@@ -282,14 +282,14 @@
 6. **CENTRIFUGADO:** Encender bomba + Motor centrifugado. **Monitorear microswitch tapa** (si se abre, PARAR TODO).
 7. **FIN:** Apagar todo -> Desactivar traba -> Mostrar "LISTO".
 
-### Protecciones de Seguridad (Obligatorias en codigo)
+### 🛡️ Protecciones de Seguridad (Obligatorias en codigo)
 
 - **Timeout de llenado:** 15 min -> ERROR, apagar todo, destrabar tapa.
 - **Pausa entre giros:** NUNCA invertir direccion sin pausa (pausaGiro_ms).
 - **Tapa abierta:** Interrupcion inmediata del motor y bomba.
 - **Corte de energia:** Al volver, ir a estado APAGADO (no retomar ciclo).
 
-### Estructura de Datos Unificada (C/C++ para ESP32)
+### 💻 Estructura de Datos Unificada (C/C++ para ESP32)
 
 ```cpp
 enum NivelAgua { NIVEL_BAJO = 1, NIVEL_MEDIO = 2, NIVEL_ALTO = 3, NIVEL_EXTRA = 4 };
