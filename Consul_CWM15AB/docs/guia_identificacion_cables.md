@@ -313,3 +313,19 @@ _______________________________________________
 ---
 
 *Documento creado para el proyecto Consul CWM15AB ESP32 + Home Assistant*
+
+
+
+---
+
+## Referencias y Proyectos Similares
+
+Tarjetas de Home Assistant para lavadoras (inspiracion para la UI):
+
+- **Samsung HA Washer Card:** https://github.com/raulpetruta/samsung-ha-washer-card.git
+- **LG Washer Dryer Card (phrz):** https://github.com/phrz/lg-washer-dryer-card.git
+- **LG Washer Dryer Card (steveworkman):** https://github.com/steveworkman/lg-washer-dryer-card.git
+
+Estos repos muestran como hacer tarjetas personalizadas en HA para
+visualizar el estado de la lavadora (etapa, tiempo restante, programa, etc.)
+y pueden servir como base para crear una tarjeta similar para la Consul.
