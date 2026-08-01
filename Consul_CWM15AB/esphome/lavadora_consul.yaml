@@ -1,0 +1,674 @@
+# ============================================
+# Lavadora Consul CWH15AB - ESP32 + ESPHome
+# Control inteligente via Home Assistant
+# ============================================
+# Autor: ydiaz1699
+# Voltaje: 220V
+# ESP32: Generico 38 pines
+# ============================================
+
+esphome:
+  name: lavadora-consul
+  friendly_name: "Lavadora Consul CWH15AB"
+  comment: "Control ESP32 reemplazando placa original"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# --- WiFi ---
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Lavadora-Fallback"
+    password: "12345678"
+
+captive_portal:
+
+# --- Logs y API ---
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# --- WEB SERVER (opcional, para debug sin HA) ---
+web_server:
+  port: 80
+
+
+
+# ============================================
+# PINES GPIO - ESP32 38 pines
+# ============================================
+# Ajustar segun tu conexion real despues de
+# identificar los cables (ver guia_identificacion_cables.md)
+# ============================================
+
+# --- SALIDAS: Reles (Actuadores 220V) ---
+switch:
+  # --- Rele 1: Valvula de entrada de agua ---
+  - platform: gpio
+    pin: GPIO25
+    id: rele_valvula
+    name: "Valvula Agua"
+    icon: "mdi:water"
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # --- Rele 2: Motor Agitacion Direccion A ---
+  - platform: gpio
+    pin: GPIO26
+    id: rele_motor_dir_a
+    name: "Motor Dir A"
+    icon: "mdi:rotate-left"
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # --- Rele 3: Motor Agitacion Direccion B ---
+  - platform: gpio
+    pin: GPIO27
+    id: rele_motor_dir_b
+    name: "Motor Dir B"
+    icon: "mdi:rotate-right"
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # --- Rele 4: Motor Centrifugado ---
+  - platform: gpio
+    pin: GPIO32
+    id: rele_centrifugado
+    name: "Motor Centrifugado"
+    icon: "mdi:fan"
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # --- Rele 5: Bomba de Drenaje ---
+  - platform: gpio
+    pin: GPIO33
+    id: rele_bomba
+    name: "Bomba Drenaje"
+    icon: "mdi:water-pump"
+    restore_mode: ALWAYS_OFF
+
+  # --- Rele 6: Traba de Tapa ---
+  - platform: gpio
+    pin: GPIO14
+    id: rele_traba
+    name: "Traba Tapa"
+    icon: "mdi:lock"
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # --- Control Manual: Bomba (para usar como ahora) ---
+  - platform: template
+    name: "Bomba Manual"
+    id: bomba_manual
+    icon: "mdi:water-pump"
+    optimistic: true
+    turn_on_action:
+      - switch.turn_on: rele_bomba
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Drenaje Manual"
+    turn_off_action:
+      - switch.turn_off: rele_bomba
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Detenida"
+
+
+
+# ============================================
+# ENTRADAS: Sensores
+# ============================================
+
+binary_sensor:
+  # --- Presostato (nivel de agua alcanzado) ---
+  - platform: gpio
+    pin:
+      number: GPIO34
+      mode: INPUT
+      # GPIO34-39 no tienen pull-up interno, usar resistencia externa 10k
+    id: presostato
+    name: "Nivel Agua Alcanzado"
+    icon: "mdi:water-check"
+    device_class: moisture
+    filters:
+      - delayed_on: 500ms
+      - delayed_off: 500ms
+
+  # --- Microswitch Tapa ---
+  - platform: gpio
+    pin:
+      number: GPIO35
+      mode: INPUT
+    id: tapa_cerrada
+    name: "Tapa Cerrada"
+    icon: "mdi:door-closed"
+    device_class: door
+    filters:
+      - delayed_on: 200ms
+      - delayed_off: 200ms
+    on_release:
+      # Tapa se abrio: PARAR TODO por seguridad
+      then:
+        - if:
+            condition:
+              lambda: 'return id(ciclo_activo).state;'
+            then:
+              - logger.log: "ALERTA: Tapa abierta durante ciclo!"
+              - script.execute: parada_emergencia
+              - text_sensor.template.publish:
+                  id: estado_lavadora
+                  state: "TAPA ABIERTA!"
+
+  # --- Estado del ciclo (interno) ---
+  - platform: template
+    id: ciclo_activo
+    name: "Ciclo Activo"
+    icon: "mdi:washing-machine"
+
+# ============================================
+# SENSORES DE INFORMACION
+# ============================================
+
+sensor:
+  # --- Tiempo de operacion ---
+  - platform: uptime
+    name: "Tiempo Encendida"
+    update_interval: 60s
+
+  # --- WiFi signal ---
+  - platform: wifi_signal
+    name: "Senal WiFi"
+    update_interval: 60s
+
+  # --- Tiempo restante del ciclo (estimado) ---
+  - platform: template
+    name: "Tiempo Restante"
+    id: tiempo_restante
+    unit_of_measurement: "min"
+    icon: "mdi:timer-outline"
+    accuracy_decimals: 0
+
+# ============================================
+# TEXTOS DE ESTADO
+# ============================================
+
+text_sensor:
+  # --- Estado principal de la lavadora ---
+  - platform: template
+    name: "Estado Lavadora"
+    id: estado_lavadora
+    icon: "mdi:washing-machine"
+    update_interval: never
+
+  # --- Programa seleccionado ---
+  - platform: template
+    name: "Programa"
+    id: programa_actual
+    icon: "mdi:format-list-bulleted"
+    update_interval: never
+
+  # --- Etapa actual ---
+  - platform: template
+    name: "Etapa"
+    id: etapa_actual
+    icon: "mdi:progress-check"
+    update_interval: never
+
+
+
+# ============================================
+# SELECCION DE PROGRAMA (desde Home Assistant)
+# ============================================
+
+select:
+  - platform: template
+    name: "Programa de Lavado"
+    id: selector_programa
+    icon: "mdi:washing-machine"
+    optimistic: true
+    options:
+      - "Cama y Bano"
+      - "Edredon"
+      - "Limpieza Pesada"
+      - "Panos de Limpieza"
+      - "Quita Olores"
+      - "Rapido"
+      - "Lavado Eco"
+      - "Ropa Blanca"
+      - "Ropa de Color"
+      - "Ropa Oscura"
+      - "Jeans"
+      - "Uniforme"
+      - "Ropa Interior"
+      - "Ropa Ligera"
+      - "Ropa de Bebe"
+      - "Limpieza Lavadora"
+    initial_option: "Ropa de Color"
+    set_action:
+      - text_sensor.template.publish:
+          id: programa_actual
+          state: !lambda 'return x;'
+
+  - platform: template
+    name: "Nivel de Agua"
+    id: selector_nivel
+    icon: "mdi:water"
+    optimistic: true
+    options:
+      - "1 - Bajo"
+      - "2 - Medio"
+      - "3 - Alto"
+      - "4 - Extra"
+    initial_option: "3 - Alto"
+
+  - platform: template
+    name: "Nivel de Suciedad"
+    id: selector_suciedad
+    icon: "mdi:blur"
+    optimistic: true
+    options:
+      - "Poco"
+      - "Sucias"
+      - "Muy Sucias"
+    initial_option: "Sucias"
+
+  - platform: template
+    name: "Tipo de Enjuague"
+    id: selector_enjuague
+    icon: "mdi:water-sync"
+    optimistic: true
+    options:
+      - "Unico"
+      - "Doble"
+      - "Unico + Eco"
+      - "Doble + Eco"
+    initial_option: "Doble"
+
+# ============================================
+# BOTONES DE CONTROL (desde Home Assistant)
+# ============================================
+
+button:
+  # --- Iniciar Ciclo ---
+  - platform: template
+    name: "INICIAR Ciclo"
+    id: btn_iniciar
+    icon: "mdi:play-circle"
+    on_press:
+      - if:
+          condition:
+            binary_sensor.is_on: tapa_cerrada
+          then:
+            - script.execute: iniciar_ciclo
+          else:
+            - text_sensor.template.publish:
+                id: estado_lavadora
+                state: "ERROR: Cierra la tapa!"
+            - logger.log: "No se puede iniciar: tapa abierta"
+
+  # --- Parar / Cancelar ---
+  - platform: template
+    name: "PARAR Ciclo"
+    id: btn_parar
+    icon: "mdi:stop-circle"
+    on_press:
+      - script.execute: parada_emergencia
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Cancelado por usuario"
+
+  # --- Solo Drenar (como lo haces ahora manualmente) ---
+  - platform: template
+    name: "Solo Drenar"
+    id: btn_drenar
+    icon: "mdi:water-off"
+    on_press:
+      - script.execute: drenar
+
+  # --- Reiniciar ESP ---
+  - platform: restart
+    name: "Reiniciar ESP32"
+    icon: "mdi:restart"
+
+
+
+# ============================================
+# SCRIPTS (Logica de lavado)
+# ============================================
+# NOTA: Los tiempos son ESTIMADOS. Ajustar
+# despues de medir con la placa original.
+# ============================================
+
+script:
+  # --- PARADA DE EMERGENCIA ---
+  - id: parada_emergencia
+    mode: single
+    then:
+      - switch.turn_off: rele_valvula
+      - switch.turn_off: rele_motor_dir_a
+      - switch.turn_off: rele_motor_dir_b
+      - switch.turn_off: rele_centrifugado
+      - switch.turn_off: rele_bomba
+      - switch.turn_off: rele_traba
+      - binary_sensor.template.publish:
+          id: ciclo_activo
+          state: false
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Detenida"
+      - logger.log: "PARADA DE EMERGENCIA ejecutada"
+
+  # --- DRENAR (lo que haces manualmente ahora) ---
+  - id: drenar
+    mode: single
+    then:
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Drenando..."
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Drenaje"
+      - switch.turn_on: rele_bomba
+      - delay: 90s
+      - switch.turn_off: rele_bomba
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Drenaje completo"
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Listo"
+
+  # --- LLENAR (hasta que presostato corte) ---
+  - id: llenar
+    mode: single
+    then:
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Llenando"
+      - switch.turn_on: rele_valvula
+      # Esperar hasta que presostato indique nivel alcanzado
+      # Timeout de 15 minutos por seguridad
+      - wait_until:
+          condition:
+            binary_sensor.is_on: presostato
+          timeout: 15min
+      - switch.turn_off: rele_valvula
+      # Si fue timeout, error
+      - if:
+          condition:
+            not:
+              binary_sensor.is_on: presostato
+          then:
+            - logger.log: "ERROR: Timeout de llenado!"
+            - script.execute: parada_emergencia
+            - text_sensor.template.publish:
+                id: estado_lavadora
+                state: "ERROR: No llena!"
+
+  # --- AGITAR (un ciclo de agitacion) ---
+  # Parametros definidos por globals
+  - id: agitar_ciclo
+    mode: single
+    then:
+      - switch.turn_on: rele_motor_dir_a
+      - delay: !lambda 'return id(tiempo_giro_ms);'
+      - switch.turn_off: rele_motor_dir_a
+      # PAUSA OBLIGATORIA (protege transmision)
+      - delay: !lambda 'return id(pausa_giro_ms);'
+      - switch.turn_on: rele_motor_dir_b
+      - delay: !lambda 'return id(tiempo_giro_ms);'
+      - switch.turn_off: rele_motor_dir_b
+      # PAUSA OBLIGATORIA
+      - delay: !lambda 'return id(pausa_giro_ms);'
+
+  # --- CENTRIFUGAR ---
+  - id: centrifugar
+    mode: single
+    then:
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Centrifugando"
+      # Drenar mientras centrifuga
+      - switch.turn_on: rele_bomba
+      - switch.turn_on: rele_centrifugado
+      - delay: !lambda 'return id(tiempo_centrifugado_ms);'
+      - switch.turn_off: rele_centrifugado
+      - switch.turn_off: rele_bomba
+
+  # --- CICLO PRINCIPAL ---
+  - id: iniciar_ciclo
+    mode: single
+    then:
+      - binary_sensor.template.publish:
+          id: ciclo_activo
+          state: true
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Ciclo iniciado"
+
+      # 1. Trabar tapa
+      - switch.turn_on: rele_traba
+      - delay: 1s
+
+      # 2. Llenar agua
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Llenando"
+      - script.execute: llenar
+      - script.wait: llenar
+
+      # 3. Remojo (si el programa lo requiere)
+      - if:
+          condition:
+            lambda: 'return id(tiempo_remojo_ms) > 0;'
+          then:
+            - text_sensor.template.publish:
+                id: etapa_actual
+                state: "Remojo"
+            - text_sensor.template.publish:
+                id: estado_lavadora
+                state: "En remojo..."
+            - delay: !lambda 'return id(tiempo_remojo_ms);'
+
+      # 4. Lavado (agitacion)
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Lavando"
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Lavando..."
+      # Repetir agitacion hasta completar tiempo de lavado
+      - lambda: 'id(ciclos_agitacion_restantes) = id(tiempo_lavado_ms) / (id(tiempo_giro_ms)*2 + id(pausa_giro_ms)*2);'
+      - while:
+          condition:
+            lambda: 'return id(ciclos_agitacion_restantes) > 0;'
+          then:
+            - script.execute: agitar_ciclo
+            - script.wait: agitar_ciclo
+            - lambda: 'id(ciclos_agitacion_restantes)--;'
+            # Verificar tapa en cada ciclo
+            - if:
+                condition:
+                  not:
+                    binary_sensor.is_on: tapa_cerrada
+                then:
+                  - script.execute: parada_emergencia
+                  - text_sensor.template.publish:
+                      id: estado_lavadora
+                      state: "TAPA ABIERTA!"
+                  - script.stop: iniciar_ciclo
+
+      # 5. Drenar post-lavado
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Drenando"
+      - script.execute: drenar
+      - script.wait: drenar
+
+      # 6. Enjuagues
+      - lambda: 'id(enjuagues_restantes) = id(num_enjuagues);'
+      - while:
+          condition:
+            lambda: 'return id(enjuagues_restantes) > 0;'
+          then:
+            - text_sensor.template.publish:
+                id: etapa_actual
+                state: !lambda '"Enjuague " + to_string(id(num_enjuagues) - id(enjuagues_restantes) + 1) + "/" + to_string(id(num_enjuagues));'
+            - text_sensor.template.publish:
+                id: estado_lavadora
+                state: "Enjuagando..."
+            # Llenar para enjuague
+            - script.execute: llenar
+            - script.wait: llenar
+            # Agitar suave durante enjuague
+            - lambda: 'id(ciclos_agitacion_restantes) = id(tiempo_enjuague_ms) / (6000 + 6000);'
+            - while:
+                condition:
+                  lambda: 'return id(ciclos_agitacion_restantes) > 0;'
+                then:
+                  - switch.turn_on: rele_motor_dir_a
+                  - delay: 3s
+                  - switch.turn_off: rele_motor_dir_a
+                  - delay: 3s
+                  - switch.turn_on: rele_motor_dir_b
+                  - delay: 3s
+                  - switch.turn_off: rele_motor_dir_b
+                  - delay: 3s
+                  - lambda: 'id(ciclos_agitacion_restantes)--;'
+            # Drenar enjuague
+            - script.execute: drenar
+            - script.wait: drenar
+            - lambda: 'id(enjuagues_restantes)--;'
+
+      # 7. Centrifugado
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "Centrifugando..."
+      - script.execute: centrifugar
+      - script.wait: centrifugar
+
+      # 8. FIN
+      - switch.turn_off: rele_traba
+      - binary_sensor.template.publish:
+          id: ciclo_activo
+          state: false
+      - text_sensor.template.publish:
+          id: estado_lavadora
+          state: "LISTO!"
+      - text_sensor.template.publish:
+          id: etapa_actual
+          state: "Finalizado"
+      - logger.log: "=== CICLO COMPLETADO ==="
+
+
+
+# ============================================
+# VARIABLES GLOBALES (parametros de programa)
+# ============================================
+# Estos valores se configuran al seleccionar
+# un programa. Ajustar con mediciones reales.
+# ============================================
+
+globals:
+  # Tiempos del programa activo (en milisegundos)
+  - id: tiempo_remojo_ms
+    type: int
+    initial_value: '0'
+  - id: tiempo_lavado_ms
+    type: int
+    initial_value: '900000'
+  - id: tiempo_giro_ms
+    type: int
+    initial_value: '4000'
+  - id: pausa_giro_ms
+    type: int
+    initial_value: '2000'
+  - id: num_enjuagues
+    type: int
+    initial_value: '2'
+  - id: tiempo_enjuague_ms
+    type: int
+    initial_value: '180000'
+  - id: tiempo_centrifugado_ms
+    type: int
+    initial_value: '360000'
+
+  # Contadores internos
+  - id: ciclos_agitacion_restantes
+    type: int
+    initial_value: '0'
+  - id: enjuagues_restantes
+    type: int
+    initial_value: '0'
+
+# ============================================
+# INTERVALOS (monitoreo)
+# ============================================
+
+interval:
+  # Actualizar tiempo restante cada 30 seg
+  - interval: 30s
+    then:
+      - if:
+          condition:
+            binary_sensor.is_on: ciclo_activo
+          then:
+            - sensor.template.publish:
+                id: tiempo_restante
+                state: !lambda |-
+                  // Estimacion simple basada en etapa
+                  return 0;  // TODO: calcular real
+
+# ============================================
+# NOTAS DE IMPLEMENTACION
+# ============================================
+#
+# 1. PRIORIDAD INMEDIATA: El boton "Solo Drenar" y "Bomba Manual"
+#    te permiten seguir usando la lavadora como ahora
+#    (conectar/desconectar bomba) pero desde el celular.
+#
+# 2. SEGUNDO PASO: Probar el ciclo completo con el boton
+#    "INICIAR Ciclo" una vez que tengas todos los cables
+#    conectados y los tiempos calibrados.
+#
+# 3. LOS TIEMPOS: Los valores en globals son para el programa
+#    "Ropa de Color" (51 min). Cuando seleccionas otro programa
+#    desde Home Assistant, se deben actualizar estos globals.
+#    Eso se implementa con una automatizacion en HA o con
+#    lambda en el set_action del selector_programa.
+#
+# 4. SEGURIDAD: El script parada_emergencia se ejecuta si:
+#    - Se abre la tapa durante el ciclo
+#    - Se presiona el boton PARAR
+#    - Timeout de llenado (15 min sin llenar)
+#
+# 5. HOME ASSISTANT: Una vez flasheado, aparecera como
+#    dispositivo con controles:
+#    - Selector de programa (dropdown)
+#    - Selector de nivel de agua
+#    - Selector de suciedad
+#    - Selector de enjuague
+#    - Boton INICIAR
+#    - Boton PARAR
+#    - Boton DRENAR
+#    - Estado actual (texto)
+#    - Tapa abierta/cerrada
+#    - Nivel de agua alcanzado
+#
+# 6. NOTIFICACIONES: Configurar en Home Assistant:
+#    - Notificar cuando termina el ciclo
+#    - Notificar si hay error
+#    - Notificar si tapa se abre durante ciclo
+#
+# ============================================
