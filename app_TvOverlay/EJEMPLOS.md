@@ -1,6 +1,51 @@
 # TvOverlay - Ejemplos Practicos y Automatizaciones
 
-## Home Assistant - Automatizaciones YAML
+> **Nota:** Las notificaciones (texto, imagen, video) se envian via REST API.
+> MQTT solo controla configuracion (visibility, esquina, switches).
+> Ver MQTT.md para detalles.
+
+---
+
+## Home Assistant - Automatizaciones con REST API (notificaciones)
+
+### Configuracion previa en configuration.yaml
+
+```yaml
+# Opcion 1: notify service REST
+notify:
+  - name: tvoverlay_sala
+    platform: rest
+    method: POST_JSON
+    resource: http://IP_TV:5001/notify
+    verify_ssl: false
+    title_param_name: title
+    data:
+      id: "{{ data.id | default('default') }}"
+      appTitle: "{{ data.appTitle | default('Home Assistant') }}"
+      color: "{{ data.color | default('#03A9F4') }}"
+      image: "{{ data.image | default(null) }}"
+      video: "{{ data.video | default(null) }}"
+      smallIcon: "{{ data.smallIcon | default('mdi:home-assistant') }}"
+      largeIcon: "{{ data.largeIcon | default(null) }}"
+      corner: "{{ data.corner | default(null) }}"
+      duration: "{{ data.duration | default(7) }}"
+
+# Opcion 2: rest_command (mas flexible)
+rest_command:
+  tvoverlay_notify:
+    url: "http://IP_TV:5001/notify"
+    method: POST
+    content_type: "application/json"
+    payload: '{{ payload }}'
+
+  tvoverlay_notify_fixed:
+    url: "http://IP_TV:5001/notify_fixed"
+    method: POST
+    content_type: "application/json"
+    payload: '{{ payload }}'
+```
+
+---
 
 ### 1. Notificacion cuando alguien llega a casa
 
@@ -14,20 +59,16 @@ trigger:
     to: home
     from: not_home
 action:
-  - service: mqtt.publish
+  - service: notify.tvoverlay_sala
     data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "{{ trigger.from_state.attributes.friendly_name }} llego!",
-          "message": "Acaba de llegar a casa",
-          "smallIcon": "mdi:home-account",
-          "color": "#4CAF50",
-          "duration": 8
-        }
+      title: "{{ trigger.from_state.attributes.friendly_name }} llego!"
+      message: "Acaba de llegar a casa"
+      data:
+        smallIcon: "mdi:home-account"
+        color: "#4CAF50"
+        duration: 8
 mode: single
 ```
-
 
 ### 2. Mostrar camara al detectar movimiento
 
@@ -38,18 +79,15 @@ trigger:
     entity_id: binary_sensor.camara_frontal_motion
     to: "on"
 action:
-  - service: mqtt.publish
+  - service: notify.tvoverlay_sala
     data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "Movimiento detectado!",
-          "message": "Camara frontal",
-          "image": "http://TU_HA_IP:8123{{ state_attr('camera.frontal', 'entity_picture') }}",
-          "smallIcon": "mdi:motion-sensor",
-          "color": "#FF0000",
-          "duration": 12
-        }
+      title: "Movimiento detectado!"
+      message: "Camara frontal"
+      data:
+        image: "http://TU_HA_IP:8123{{ state_attr('camera.frontal', 'entity_picture') }}"
+        smallIcon: "mdi:motion-sensor"
+        color: "#FF0000"
+        duration: 12
 mode: single
 ```
 
@@ -62,24 +100,19 @@ trigger:
     entity_id: binary_sensor.timbre_ring
     to: "on"
 action:
-  - service: mqtt.publish
+  - service: notify.tvoverlay_sala
     data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "Timbre!",
-          "message": "Alguien en la puerta",
-          "video": "rtsp://192.168.1.60:554/live",
-          "smallIcon": "mdi:doorbell-video",
-          "color": "#2196F3",
-          "duration": 25
-        }
+      title: "Timbre!"
+      message: "Alguien en la puerta"
+      data:
+        video: "rtsp://192.168.1.60:554/live"
+        smallIcon: "mdi:doorbell-video"
+        color: "#2196F3"
+        duration: 25
 mode: single
 ```
 
-### 4. Notificacion fija - Luz encendida
-
-Aparece un icono fijo mientras la luz esta encendida, desaparece al apagar.
+### 4. Notificacion fija - Luz encendida (REST)
 
 ```yaml
 alias: TV Overlay - Indicador luz sala
@@ -87,29 +120,18 @@ trigger:
   - platform: state
     entity_id: light.sala
 action:
-  - service: mqtt.publish
+  - service: rest_command.tvoverlay_notify_fixed
     data:
-      topic: "tvoverlay/MI_DEVICE/notify_fixed"
       payload: >-
         {% if trigger.to_state.state == 'on' %}
-        {
-          "id": "luz_sala",
-          "icon": "mdi:lightbulb",
-          "message": "Sala",
-          "iconColor": "#FFEB3B",
-          "borderColor": "#FFEB3B",
-          "visible": true
-        }
+        {"id":"luz_sala","icon":"mdi:lightbulb","message":"Sala","iconColor":"#FFEB3B","borderColor":"#FFEB3B","visible":true}
         {% else %}
-        {
-          "id": "luz_sala",
-          "visible": false
-        }
+        {"id":"luz_sala","visible":false}
         {% endif %}
 mode: single
 ```
 
-### 5. Notificacion fija - Bateria del telefono
+### 5. Notificacion fija - Bateria del telefono (REST)
 
 ```yaml
 alias: TV Overlay - Bateria telefono
@@ -118,23 +140,14 @@ trigger:
     entity_id: sensor.telefono_battery_level
     below: 30
 action:
-  - service: mqtt.publish
+  - service: rest_command.tvoverlay_notify_fixed
     data:
-      topic: "tvoverlay/MI_DEVICE/notify_fixed"
       payload: >-
-        {
-          "id": "bateria_tel",
-          "icon": "mdi:battery-alert",
-          "message": "{{ states('sensor.telefono_battery_level') }}%",
-          "iconColor": "#FF5722",
-          "borderColor": "#FF5722",
-          "expiration": "30m"
-        }
+        {"id":"bateria_tel","icon":"mdi:battery-alert","message":"{{ states('sensor.telefono_battery_level') }}%","iconColor":"#FF5722","borderColor":"#FF5722","expiration":"30m"}
 mode: single
 ```
 
-
-### 6. Notificacion fija - Clima/Temperatura
+### 6. Notificacion fija - Temperatura (REST)
 
 ```yaml
 alias: TV Overlay - Temperatura exterior
@@ -142,20 +155,16 @@ trigger:
   - platform: time_pattern
     minutes: "/15"
 action:
-  - service: mqtt.publish
+  - service: rest_command.tvoverlay_notify_fixed
     data:
-      topic: "tvoverlay/MI_DEVICE/notify_fixed"
       payload: >-
-        {
-          "id": "temp_exterior",
-          "icon": "mdi:thermometer",
-          "message": "{{ states('sensor.temperatura_exterior') }}C",
-          "iconColor": "{% if states('sensor.temperatura_exterior') | float > 30 %}#FF5722{% elif states('sensor.temperatura_exterior') | float < 15 %}#2196F3{% else %}#4CAF50{% endif %}",
-          "borderColor": "{% if states('sensor.temperatura_exterior') | float > 30 %}#FF5722{% elif states('sensor.temperatura_exterior') | float < 15 %}#2196F3{% else %}#4CAF50{% endif %}",
-          "expiration": "20m"
-        }
+        {"id":"temp_exterior","icon":"mdi:thermometer","message":"{{ states('sensor.temperatura_exterior') }}C","iconColor":"{% if states('sensor.temperatura_exterior') | float > 30 %}#FF5722{% elif states('sensor.temperatura_exterior') | float < 15 %}#2196F3{% else %}#4CAF50{% endif %}","borderColor":"{% if states('sensor.temperatura_exterior') | float > 30 %}#FF5722{% elif states('sensor.temperatura_exterior') | float < 15 %}#2196F3{% else %}#4CAF50{% endif %}","expiration":"20m"}
 mode: single
 ```
+
+---
+
+## Home Assistant - Automatizaciones con MQTT (configuracion)
 
 ### 7. Oscurecer TV automaticamente de noche
 
@@ -167,10 +176,12 @@ trigger:
 action:
   - service: mqtt.publish
     data:
-      topic: "tvoverlay/MI_DEVICE/set/overlay"
-      payload: '{"overlayVisibility": 40}'
+      topic: "tv_overlay/<DEVICE_ID>/visibility/level/command"
+      payload: "40"
 mode: single
----
+```
+
+```yaml
 alias: TV Overlay - Modo diurno
 trigger:
   - platform: sun
@@ -178,12 +189,61 @@ trigger:
 action:
   - service: mqtt.publish
     data:
-      topic: "tvoverlay/MI_DEVICE/set/overlay"
-      payload: '{"overlayVisibility": 0}'
+      topic: "tv_overlay/<DEVICE_ID>/visibility/level/command"
+      payload: "0"
 mode: single
 ```
 
-### 8. Alerta de puerta/ventana abierta
+### 8. Mover esquina segun hora del dia
+
+```yaml
+alias: TV Overlay - Esquina nocturna
+trigger:
+  - platform: time
+    at: "22:00:00"
+action:
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/hot_corner/set"
+      payload: "Bottom Right"
+mode: single
+```
+
+### 9. Desactivar notificaciones durante pelicula
+
+```yaml
+alias: TV Overlay - Silenciar durante pelicula
+trigger:
+  - platform: state
+    entity_id: media_player.tv_sala
+    to: "playing"
+action:
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/display_notifications/set"
+      payload: "false"
+mode: single
+```
+
+```yaml
+alias: TV Overlay - Reactivar al pausar
+trigger:
+  - platform: state
+    entity_id: media_player.tv_sala
+    from: "playing"
+action:
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/display_notifications/set"
+      payload: "true"
+mode: single
+```
+
+---
+
+## Home Assistant - Combinando REST + MQTT
+
+### 10. Alerta de puerta abierta + oscurecer pantalla
 
 ```yaml
 alias: TV Overlay - Puerta abierta mucho tiempo
@@ -194,156 +254,21 @@ trigger:
     for:
       minutes: 5
 action:
-  - service: mqtt.publish
-    data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "Puerta abierta!",
-          "message": "La puerta principal lleva 5 min abierta",
-          "smallIcon": "mdi:door-open",
-          "color": "#FF9800",
-          "duration": 15
-        }
-mode: single
-```
-
-### 9. Notificacion al recibir paquete (sensor de correo)
-
-```yaml
-alias: TV Overlay - Paquete recibido
-trigger:
-  - platform: state
-    entity_id: binary_sensor.buzon_correo
-    to: "on"
-action:
-  - service: mqtt.publish
-    data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "Correo!",
-          "message": "Tienes algo en el buzon",
-          "smallIcon": "mdi:mailbox-up",
-          "color": "#795548",
-          "largeIcon": "mdi:package-variant-closed",
-          "duration": 10
-        }
-mode: single
-```
-
-### 10. Recordatorio con timer
-
-```yaml
-alias: TV Overlay - Timer cocina terminado
-trigger:
-  - platform: event
-    event_type: timer.finished
-    event_data:
-      entity_id: timer.cocina
-action:
-  - service: mqtt.publish
-    data:
-      topic: "tvoverlay/MI_DEVICE/notify"
-      payload: >-
-        {
-          "title": "Timer terminado!",
-          "message": "La comida esta lista",
-          "smallIcon": "mdi:timer-alert",
-          "color": "#E91E63",
-          "duration": 20
-        }
-mode: single
-```
-
-
----
-
-## Home Assistant - Usando notify service (REST)
-
-Si prefieres usar la integracion REST en vez de MQTT, configura en `configuration.yaml`:
-
-```yaml
-notify:
-  - name: tvoverlay_sala
-    platform: rest
-    method: POST_JSON
-    resource: http://192.168.1.50:5001/notify
-    verify_ssl: false
-    title_param_name: title
-    data:
-      id: "{{ data.id | default('default') }}"
-      appTitle: "{{ data.appTitle | default('Home Assistant') }}"
-      color: "{{ data.color | default('#03A9F4') }}"
-      image: "{{ data.image | default(null) }}"
-      video: "{{ data.video | default(null) }}"
-      smallIcon: "{{ data.smallIcon | default('mdi:home-assistant') }}"
-      largeIcon: "{{ data.largeIcon | default(null) }}"
-      corner: "{{ data.corner | default(null) }}"
-      duration: "{{ data.duration | default(7) }}"
-```
-
-Luego usarlo en automatizaciones:
-
-```yaml
-action:
+  # Notificacion via REST
   - service: notify.tvoverlay_sala
     data:
-      title: "Titulo"
-      message: "Mensaje"
+      title: "Puerta abierta!"
+      message: "La puerta principal lleva 5 min abierta"
       data:
-        smallIcon: "mdi:bell"
-        color: "#FF0000"
-        duration: 10
-```
-
----
-
-## Node-RED
-
-### Nodo MQTT Out - Notificacion basica
-
-```json
-{
-  "topic": "tvoverlay/MI_DEVICE/notify",
-  "payload": {
-    "title": "Desde Node-RED",
-    "message": "Automatizacion funcionando",
-    "smallIcon": "mdi:robot",
-    "color": "#9C27B0",
-    "duration": 8
-  }
-}
-```
-
-Configurar nodo **mqtt out**:
-- Server: tu broker MQTT
-- Topic: `tvoverlay/MI_DEVICE/notify`
-- QoS: 0
-- Conectar un nodo **inject** o **function** que genere el payload JSON
-
----
-
-## ESPHome - Enviar notificacion desde ESP32
-
-Si tienes un ESP32 con ESPHome conectado al mismo broker MQTT:
-
-```yaml
-# En tu archivo ESPHome .yaml
-mqtt:
-  broker: 192.168.1.100
-  username: mqtt_user
-  password: mqtt_pass
-
-binary_sensor:
-  - platform: gpio
-    pin: GPIO4
-    name: "Boton timbre"
-    on_press:
-      then:
-        - mqtt.publish:
-            topic: "tvoverlay/MI_DEVICE/notify"
-            payload: '{"title":"Timbre!","message":"Alguien toco el timbre","smallIcon":"mdi:doorbell","color":"#2196F3","duration":15}'
+        smallIcon: "mdi:door-open"
+        color: "#FF9800"
+        duration: 15
+  # Bajar brillo via MQTT
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/visibility/level/command"
+      payload: "30"
+mode: single
 ```
 
 ---
@@ -384,9 +309,28 @@ chmod +x notificar_tv.sh
 ./notificar_tv.sh "Backup completo" "NAS backup terminado" "mdi:cloud-check" "#4CAF50" 10
 ```
 
+### Script: oscurecer_tv.sh (via MQTT)
+
+```bash
+#!/bin/bash
+# Uso: ./oscurecer_tv.sh [nivel 0-95]
+
+BROKER="192.168.1.100"
+USER="mqtt_user"
+PASS="mqtt_pass"
+DEVICE_ID="TU_DEVICE_ID"
+NIVEL="${1:-0}"
+
+mosquitto_pub -h "$BROKER" -u "$USER" -P "$PASS" \
+  -t "tv_overlay/${DEVICE_ID}/visibility/level/command" \
+  -m "$NIVEL"
+
+echo " -> Overlay: ${NIVEL}%"
+```
+
 ---
 
-## Python - Enviar notificaciones
+## Python - Enviar notificaciones (REST)
 
 ```python
 import requests
@@ -396,7 +340,7 @@ TV_PORT = 5001
 BASE_URL = f"http://{TV_IP}:{TV_PORT}"
 
 def notify(title, message, icon="mdi:information", color="#03A9F4", duration=7):
-    """Enviar notificacion a TvOverlay"""
+    """Enviar notificacion a TvOverlay via REST"""
     payload = {
         "title": title,
         "message": message,
@@ -408,7 +352,7 @@ def notify(title, message, icon="mdi:information", color="#03A9F4", duration=7):
     return r.status_code
 
 def notify_fixed(id, icon, message, icon_color="#FFFFFF", expiration=None):
-    """Enviar notificacion fija"""
+    """Enviar notificacion fija via REST"""
     payload = {
         "id": id,
         "icon": icon,
@@ -422,31 +366,58 @@ def notify_fixed(id, icon, message, icon_color="#FFFFFF", expiration=None):
     return r.status_code
 
 def set_overlay(visibility=0):
-    """Configurar opacidad del fondo"""
+    """Configurar opacidad del fondo via REST"""
     r = requests.post(f"{BASE_URL}/set/overlay", json={"overlayVisibility": visibility})
     return r.status_code
 
 # Ejemplos de uso
 notify("Hola!", "Desde Python", "mdi:language-python", "#3F51B5", 8)
 notify_fixed("temp", "mdi:thermometer", "24C", "#FF9800", "15m")
-set_overlay(40)  # Oscurecer 40%
+set_overlay(40)
 ```
+
+---
+
+## ESPHome - Controlar config via MQTT desde ESP32
+
+```yaml
+mqtt:
+  broker: 192.168.1.100
+  username: mqtt_user
+  password: mqtt_pass
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO4
+    name: "Boton oscurecer"
+    on_press:
+      then:
+        - mqtt.publish:
+            topic: "tv_overlay/TU_DEVICE_ID/visibility/level/command"
+            payload: "50"
+    on_release:
+      then:
+        - mqtt.publish:
+            topic: "tv_overlay/TU_DEVICE_ID/visibility/level/command"
+            payload: "0"
+```
+
+> Para enviar notificaciones desde ESP32, usar HTTP POST (REST API) en vez de MQTT:
+> ```yaml
+> http_request:
+>   - platform: esphome
+>     url: "http://IP_TV:5001/notify"
+>     method: POST
+>     headers:
+>       Content-Type: application/json
+>     body: '{"title":"Timbre!","message":"Alguien toco","smallIcon":"mdi:doorbell","color":"#2196F3","duration":15}'
+> ```
 
 ---
 
 ## Casos de uso avanzados
 
-### Multiples TVs - Enviar a todos
-
-```bash
-for DEVICE in "tv_sala" "tv_cuarto" "tv_cocina"; do
-  mosquitto_pub -h 192.168.1.100 -u user -P pass \
-    -t "tvoverlay/${DEVICE}/notify" \
-    -m '{"title":"Alerta general","message":"Mensaje para todos","smallIcon":"mdi:alert","color":"#FF0000"}'
-done
-```
-
-### Dashboard de estado con notificaciones fijas
+### Dashboard de estado con notificaciones fijas (REST)
 
 ```bash
 # Temperatura
@@ -467,4 +438,4 @@ curl -s -X POST http://192.168.1.50:5001/notify_fixed \
 
 ---
 
-*Fuente: https://github.com/gugutab/TvOverlay*
+*Fuente: https://github.com/gugutab/TvOverlay + verificacion en instalacion real (2026-08-02)*
