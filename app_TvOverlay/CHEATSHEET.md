@@ -1,6 +1,8 @@
 # TvOverlay - Cheatsheet (Copy-Paste Rapido)
 
 > Reemplazar `IP_TV`, `BROKER_IP`, `MI_DEVICE`, `USER`, `PASS` con tus valores reales.
+>
+> Ultima sincronizacion: 2 de agosto de 2026 | App version: 1.0.4
 
 ---
 
@@ -60,9 +62,35 @@ curl -X POST http://IP_TV:5001/set/mqtt -H "Content-Type: application/json" \
   -d '{"mqttConfig":{"broker":"BROKER_IP","port":1883,"user":"USER","password":"PASS"}}'
 ```
 
+### Encender pantalla (wake up)
+```bash
+curl -X POST http://IP_TV:5001/set/screen_on
+```
+
+### Reiniciar servicio overlay
+```bash
+curl -X POST http://IP_TV:5001/set/restart_service
+```
+
+### Consultar estado (GET)
+```bash
+curl http://IP_TV:5001/get                    # Estado general
+curl http://IP_TV:5001/get/overlay            # Config overlay actual
+curl http://IP_TV:5001/get/mqtt               # Config MQTT actual
+curl http://IP_TV:5001/get/fixed_notifications # Notificaciones fijas activas
+```
+
+### Eliminar config MQTT
+```bash
+curl -X DELETE http://IP_TV:5001/delete/mqtt
+```
+
 ---
 
 ## MQTT (mosquitto_pub)
+
+> **Nota:** Los topics `tvoverlay/MI_DEVICE/...` son derivados de auto-discovery.
+> Verifica tus topics reales con: `mosquitto_sub -h BROKER_IP -u USER -P PASS -t "#" -v | grep tvoverlay`
 
 ### Notificacion
 ```bash

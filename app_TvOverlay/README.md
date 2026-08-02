@@ -2,12 +2,16 @@
 
 > Documentacion local para controlar la app **TvOverlay** sin tener que leer el repositorio original cada vez.
 
+| | |
+|---|---|
+| **Ultima sincronizacion** | 2 de agosto de 2026 |
+| **Version app documentada** | 1.0.4 |
+| **Repo original** | https://github.com/gugutab/TvOverlay |
+
 ## Que es TvOverlay?
 
 App para Android TV que muestra **overlays** (informacion superpuesta) en tu TV mientras ves contenido.
 Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
-
-**Repo original:** https://github.com/gugutab/TvOverlay
 
 ## Formas de control
 

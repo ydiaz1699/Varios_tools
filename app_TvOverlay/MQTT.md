@@ -35,9 +35,16 @@ curl -X POST http://IP_TV:5001/set/mqtt \
 Al conectarse, TvOverlay se registra via **MQTT Auto-Discovery** de Home Assistant.
 El dispositivo aparecera como: `TvOverlay - [Modelo]`
 
+> **IMPORTANTE - A verificar en tu instalacion:**
+> La estructura de topics documentada abajo fue derivada del comportamiento observado con MQTT Auto-Discovery de HA.
+> El repo oficial de TvOverlay **no documenta explicitamente** los nombres exactos de los topics MQTT.
+> Los topics reales pueden variar entre versiones de la app. **Siempre verifica** usando
+> `mosquitto_sub -t "#" -v | grep tvoverlay` o MQTT Explorer antes de confiar en estos valores.
+> Si encuentras una estructura diferente, actualiza este documento.
+
 ### Topics de comando (publicar para controlar)
 
-La estructura general de topics es:
+La estructura general observada de topics es:
 
 ```
 tvoverlay/<DEVICE_ID>/notify          -> Enviar notificacion

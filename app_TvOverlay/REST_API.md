@@ -3,8 +3,8 @@
 ## Informacion general
 
 - **Puerto por defecto:** `5001` (configurable en ajustes)
-- **Metodo:** `POST` (todos los endpoints)
-- **Content-Type:** `application/json`
+- **Metodo:** `POST` (endpoints de escritura), `GET` (lectura), `DELETE` (eliminacion)
+- **Content-Type:** `application/json` (para POST)
 - **Base URL:** `http://<IP_TV>:5001`
 
 No requiere autenticacion. Solo necesitas estar en la misma red.
@@ -12,6 +12,8 @@ No requiere autenticacion. Solo necesitas estar en la misma red.
 ---
 
 ## Endpoints disponibles
+
+### Escritura (POST)
 
 | Endpoint | Descripcion |
 |----------|-------------|
@@ -21,6 +23,23 @@ No requiere autenticacion. Solo necesitas estar en la misma red.
 | `POST /set/notifications` | Configurar comportamiento de notificaciones |
 | `POST /set/settings` | Configurar ajustes generales |
 | `POST /set/mqtt` | Configurar conexion MQTT |
+| `POST /set/screen_on` | Encender pantalla / wake up |
+| `POST /set/restart_service` | Reiniciar el servicio overlay |
+
+### Lectura (GET)
+
+| Endpoint | Descripcion |
+|----------|-------------|
+| `GET /get` | Obtener estado general del dispositivo |
+| `GET /get/overlay` | Obtener config actual del overlay |
+| `GET /get/mqtt` | Obtener config actual de MQTT |
+| `GET /get/fixed_notifications` | Obtener lista de notificaciones fijas activas |
+
+### Eliminacion (DELETE)
+
+| Endpoint | Descripcion |
+|----------|-------------|
+| `DELETE /delete/mqtt` | Eliminar configuracion MQTT y desconectar |
 
 ---
 
@@ -35,9 +54,9 @@ Muestra una notificacion emergente temporal en la pantalla del TV.
 | `id` | string | random | ID unico. Permite editar notificacion activa |
 | `title` | string | null | Texto principal |
 | `message` | string | null | Texto secundario |
-| `source` | string | null | Texto extra informativo (equivale a `appTitle` en HA) |
+| `source` | string | null | Texto extra informativo. **Nota**: via HA/MQTT el campo se llama `appTitle` |
 | `smallIcon` | string | null | Icono pequeno: `mdi:nombre`, URL, o Base64 |
-| `smallIconColor` | string | null | Color del smallIcon (hex 6/8 digitos, `#` opcional) |
+| `color` | string | null | Color tint del smallIcon (hex 6/8 digitos, `#` opcional). **Nota**: este es el nombre real del campo en la REST API; via HA notification service se mapea como `data.color` |
 | `largeIcon` | string | null | Icono grande: `mdi:nombre`, URL, o Base64 |
 | `corner` | string | hot corner | Posicion: `top_start`, `top_end`, `bottom_start`, `bottom_end` |
 | `duration` | int | config app | Segundos visible |
@@ -64,7 +83,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "title": "Puerta abierta",
     "message": "Puerta principal",
     "smallIcon": "mdi:door-open",
-    "smallIconColor": "#FF0000",
+    "color": "#FF0000",
     "largeIcon": "mdi:home",
     "duration": 12
   }'
@@ -79,7 +98,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "message": "Camara frontal",
     "image": "http://192.168.1.60/snapshot.jpg",
     "smallIcon": "mdi:cctv",
-    "smallIconColor": "#B00020",
+    "color": "#B00020",
     "duration": 10
   }'
 ```
@@ -93,7 +112,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "message": "Alguien en la puerta",
     "video": "rtsp://192.168.1.60:554/live",
     "smallIcon": "mdi:doorbell-video",
-    "smallIconColor": "#2196F3",
+    "color": "#2196F3",
     "duration": 20
   }'
 ```
@@ -119,7 +138,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "title": "Temperatura actualizada",
     "message": "35C - Muy caliente!",
     "smallIcon": "mdi:thermometer-alert",
-    "smallIconColor": "#FF5722"
+    "color": "#FF5722"
   }'
 ```
 
@@ -392,6 +411,84 @@ curl -X POST http://192.168.1.50:5001/set/mqtt \
   -H "Content-Type: application/json" \
   -d '{"displayMqttStatusChange": false}'
 ```
+
+---
+
+## 7. Lectura de estado - Endpoints GET
+
+Estos endpoints no requieren body. Devuelven JSON con el estado actual.
+
+### `GET /get` - Estado general
+
+Retorna informacion del dispositivo: nombre, version de la app, estado MQTT, etc.
+
+```bash
+curl http://192.168.1.50:5001/get
+```
+
+### `GET /get/overlay` - Configuracion del overlay
+
+Retorna: overlayVisibility, clockOverlayVisibility, hotCorner actuales.
+
+```bash
+curl http://192.168.1.50:5001/get/overlay
+```
+
+### `GET /get/mqtt` - Configuracion MQTT
+
+Retorna: broker, puerto, usuario, estado de conexion.
+
+```bash
+curl http://192.168.1.50:5001/get/mqtt
+```
+
+### `GET /get/fixed_notifications` - Notificaciones fijas activas
+
+Retorna array con todas las notificaciones fijas actualmente visibles.
+
+```bash
+curl http://192.168.1.50:5001/get/fixed_notifications
+```
+
+**Ejemplo de respuesta (posible):**
+```json
+[
+  {"id": "luz_sala", "icon": "mdi:lightbulb", "message": "Sala", "visible": true},
+  {"id": "temp_ext", "icon": "mdi:thermometer", "message": "28C", "visible": true}
+]
+```
+
+---
+
+## 8. Acciones del sistema
+
+### `POST /set/screen_on` - Encender pantalla
+
+Envia wake-up al TV. Util para despertar la pantalla antes de enviar una notificacion.
+
+```bash
+curl -X POST http://192.168.1.50:5001/set/screen_on
+```
+
+### `POST /set/restart_service` - Reiniciar servicio overlay
+
+Reinicia el servicio de overlay si hay problemas (notificaciones no aparecen, overlay congelado, etc.)
+
+```bash
+curl -X POST http://192.168.1.50:5001/set/restart_service
+```
+
+---
+
+## 9. Eliminacion - `DELETE /delete/mqtt`
+
+Elimina la configuracion MQTT guardada y desconecta del broker.
+
+```bash
+curl -X DELETE http://192.168.1.50:5001/delete/mqtt
+```
+
+> Despues de esto, deberas reconfigurar MQTT desde la app o via `POST /set/mqtt`.
 
 ---
 
