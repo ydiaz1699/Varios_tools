@@ -1,8 +1,7 @@
 # TvOverlay - Cheatsheet (Copy-Paste Rapido)
 
 > Reemplazar `IP_TV`, `BROKER_IP`, `MI_DEVICE`, `USER`, `PASS` con tus valores reales.
->
-> Ultima sincronizacion: 2 de agosto de 2026 | App version: 1.0.4
+> Ver notas de campos alternativos y advertencias en REST_API.md y MQTT.md.
 
 ---
 
@@ -56,41 +55,29 @@ curl -X POST http://IP_TV:5001/set/overlay -H "Content-Type: application/json" \
   -d '{"hotCorner":"top_end"}'
 ```
 
+
 ### Configurar MQTT remotamente
 ```bash
 curl -X POST http://IP_TV:5001/set/mqtt -H "Content-Type: application/json" \
   -d '{"mqttConfig":{"broker":"BROKER_IP","port":1883,"user":"USER","password":"PASS"}}'
 ```
 
-### Encender pantalla (wake up)
+### Consultar estado actual
 ```bash
-curl -X POST http://IP_TV:5001/set/screen_on
+curl http://IP_TV:5001/get
+curl http://IP_TV:5001/get/overlay
+curl http://IP_TV:5001/get/fixed_notifications
 ```
 
-### Reiniciar servicio overlay
-```bash
-curl -X POST http://IP_TV:5001/set/restart_service
-```
-
-### Consultar estado (GET)
-```bash
-curl http://IP_TV:5001/get                    # Estado general
-curl http://IP_TV:5001/get/overlay            # Config overlay actual
-curl http://IP_TV:5001/get/mqtt               # Config MQTT actual
-curl http://IP_TV:5001/get/fixed_notifications # Notificaciones fijas activas
-```
-
-### Eliminar config MQTT
+### Eliminar config MQTT / reiniciar servicio
 ```bash
 curl -X DELETE http://IP_TV:5001/delete/mqtt
+curl -X POST http://IP_TV:5001/set/restart_service
 ```
 
 ---
 
 ## MQTT (mosquitto_pub)
-
-> **Nota:** Los topics `tvoverlay/MI_DEVICE/...` son derivados de auto-discovery.
-> Verifica tus topics reales con: `mosquitto_sub -h BROKER_IP -u USER -P PASS -t "#" -v | grep tvoverlay`
 
 ### Notificacion
 ```bash
@@ -141,13 +128,6 @@ data:
   payload: '{"id":"ha_test","icon":"mdi:home","message":"Home","iconColor":"#03A9F4","borderColor":"#03A9F4","expiration":"10m"}'
 ```
 
-### mqtt.publish - Oscurecer
-```yaml
-service: mqtt.publish
-data:
-  topic: "tvoverlay/MI_DEVICE/set/overlay"
-  payload: '{"overlayVisibility":40}'
-```
 
 ---
 
@@ -221,6 +201,7 @@ pixelShift    boolean  Anti burn-in (mover cada 2min)
 +------------------+------------------+
 ```
 
+
 ---
 
 ## Colores utiles
@@ -269,6 +250,7 @@ Catalogo completo: https://pictogrammers.com/library/mdi/
 | App se cierra sola | Desactivar optimizacion de bateria |
 | Imagen no carga | Verificar URL accesible desde la red del TV |
 | Video no reproduce | Verificar protocolo soportado (RTSP/HLS/DASH) |
+| Campo no tiene efecto | Probar nombre de campo alternativo (ver REST_API.md) |
 
 ---
 

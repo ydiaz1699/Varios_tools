@@ -35,16 +35,9 @@ curl -X POST http://IP_TV:5001/set/mqtt \
 Al conectarse, TvOverlay se registra via **MQTT Auto-Discovery** de Home Assistant.
 El dispositivo aparecera como: `TvOverlay - [Modelo]`
 
-> **IMPORTANTE - A verificar en tu instalacion:**
-> La estructura de topics documentada abajo fue derivada del comportamiento observado con MQTT Auto-Discovery de HA.
-> El repo oficial de TvOverlay **no documenta explicitamente** los nombres exactos de los topics MQTT.
-> Los topics reales pueden variar entre versiones de la app. **Siempre verifica** usando
-> `mosquitto_sub -t "#" -v | grep tvoverlay` o MQTT Explorer antes de confiar en estos valores.
-> Si encuentras una estructura diferente, actualiza este documento.
-
 ### Topics de comando (publicar para controlar)
 
-La estructura general observada de topics es:
+La estructura general de topics es:
 
 ```
 tvoverlay/<DEVICE_ID>/notify          -> Enviar notificacion
@@ -53,6 +46,11 @@ tvoverlay/<DEVICE_ID>/set/overlay     -> Configurar overlay (fondo, reloj, esqui
 tvoverlay/<DEVICE_ID>/set/notifications -> Configurar notificaciones
 tvoverlay/<DEVICE_ID>/set/settings    -> Configurar ajustes generales
 ```
+
+> **Nota:** esta estructura de topics fue inferida por MQTT Auto-Discovery de Home
+> Assistant y no aparece confirmada literalmente en el README oficial del repo. Confirmala
+> en tu propia instalacion (ver "Como descubrir tu DEVICE_ID" abajo) antes de automatizar
+> en base a ella.
 
 ### Como descubrir tu DEVICE_ID
 
@@ -125,30 +123,6 @@ Ajustes > Dispositivos y servicios > MQTT > buscar "TvOverlay" > ver entidades y
 }
 ```
 
-**Ejemplo con imagen:**
-```json
-{
-  "title": "Movimiento detectado",
-  "message": "Camara frontal",
-  "image": "http://192.168.1.50/snapshot.jpg",
-  "smallIcon": "mdi:cctv",
-  "color": "#B00020",
-  "duration": 10
-}
-```
-
-**Ejemplo con video RTSP:**
-```json
-{
-  "title": "Timbre",
-  "message": "Alguien en la puerta",
-  "video": "rtsp://192.168.1.50:554/live",
-  "smallIcon": "mdi:doorbell-video",
-  "color": "#2196F3",
-  "duration": 20
-}
-```
-
 ---
 
 ### 2. Enviar notificacion fija
@@ -188,29 +162,6 @@ Las notificaciones fijas son iconos compactos que permanecen visibles en una esq
 | `shape` | string | No | Forma: `circle`, `rounded`, `rectangular` |
 | `expiration` | string/int | No | Tiempo de vida. Formatos: `60` (seg), `5m`, `1h30m`, `1695693410` (epoch) |
 
-**Ejemplo - Luz encendida:**
-```json
-{
-  "id": "luz_sala",
-  "icon": "mdi:lightbulb",
-  "message": "Sala",
-  "iconColor": "#FFEB3B",
-  "borderColor": "#FFEB3B"
-}
-```
-
-**Ejemplo - Temperatura:**
-```json
-{
-  "id": "temp_exterior",
-  "icon": "mdi:thermometer",
-  "message": "32C",
-  "iconColor": "#FF5722",
-  "borderColor": "#FF5722",
-  "expiration": "10m"
-}
-```
-
 **Eliminar notificacion fija (ocultarla):**
 ```json
 {
@@ -239,21 +190,6 @@ Las notificaciones fijas son iconos compactos que permanecen visibles en una esq
 | `clockOverlayVisibility` | int | 0-95 | Visibilidad del reloj |
 | `hotCorner` | string | - | Esquina activa: `top_start`, `top_end`, `bottom_start`, `bottom_end` |
 
-**Oscurecer pantalla al 50%:**
-```json
-{"overlayVisibility": 50}
-```
-
-**Volver a normal:**
-```json
-{"overlayVisibility": 0}
-```
-
-**Mover notificaciones a esquina inferior derecha:**
-```json
-{"hotCorner": "bottom_end"}
-```
-
 ---
 
 ### 4. Configurar notificaciones
@@ -270,14 +206,6 @@ Las notificaciones fijas son iconos compactos que permanecen visibles en una esq
 }
 ```
 
-| Campo | Tipo | Descripcion |
-|-------|------|-------------|
-| `displayNotifications` | boolean | Activar/desactivar notificaciones |
-| `displayFixedNotifications` | boolean | Activar/desactivar notificaciones fijas |
-| `notificationLayoutName` | string | Layout: `Default`, `Minimalist`, `Icon Only` |
-| `notificationDuration` | int | Duracion por defecto en segundos |
-| `fixedNotificationsVisibility` | int | Visibilidad 0-95. `-1` = misma que el reloj |
-
 ---
 
 ### 5. Configurar ajustes generales
@@ -291,13 +219,6 @@ Las notificaciones fijas son iconos compactos que permanecen visibles en una esq
   "pixelShift": true
 }
 ```
-
-| Campo | Tipo | Descripcion |
-|-------|------|-------------|
-| `deviceName` | string | Nombre del dispositivo |
-| `remotePort` | string | Puerto del servidor REST |
-| `displayDebug` | boolean | Mostrar info de debug en overlay |
-| `pixelShift` | boolean | Mover overlay cada 2min para evitar burn-in |
 
 ---
 
@@ -324,26 +245,6 @@ mosquitto_pub -h 192.168.1.100 -u usuario -P password \
   -m '{"overlayVisibility":40}'
 ```
 
-### Resetear pantalla
-```bash
-mosquitto_pub -h 192.168.1.100 -u usuario -P password \
-  -t "tvoverlay/MI_DEVICE/set/overlay" \
-  -m '{"overlayVisibility":0}'
-```
-
----
-
-## Probar desde Home Assistant (Herramientas de desarrollador)
-
-En HA > Herramientas de desarrollador > Servicios:
-
-```yaml
-service: mqtt.publish
-data:
-  topic: "tvoverlay/MI_DEVICE/notify"
-  payload: '{"title":"Prueba HA","message":"Desde Home Assistant","smallIcon":"mdi:home-assistant","color":"#03A9F4"}'
-```
-
 ---
 
 ## Debugging
@@ -365,28 +266,6 @@ data:
 ## Iconos MDI disponibles
 
 TvOverlay soporta iconos de Material Design Icons. Formato: `mdi:nombre-del-icono`
-
-**Iconos utiles comunes:**
-
-| Icono | Codigo |
-|-------|--------|
-| Casa | `mdi:home` |
-| Campana | `mdi:bell` |
-| Camara | `mdi:cctv` |
-| Puerta | `mdi:door` |
-| Timbre | `mdi:doorbell-video` |
-| Luz | `mdi:lightbulb` |
-| Temperatura | `mdi:thermometer` |
-| Movimiento | `mdi:motion-sensor` |
-| Wifi | `mdi:wifi` |
-| Bateria | `mdi:battery` |
-| Persona | `mdi:account` |
-| Alerta | `mdi:alert` |
-| Clima sol | `mdi:weather-sunny` |
-| Clima lluvia | `mdi:weather-rainy` |
-| Candado | `mdi:lock` |
-| Musica | `mdi:music` |
-| TV | `mdi:television` |
 
 Catalogo completo: https://pictogrammers.com/library/mdi/
 

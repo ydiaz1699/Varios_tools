@@ -2,25 +2,23 @@
 
 > Documentacion local para controlar la app **TvOverlay** sin tener que leer el repositorio original cada vez.
 
-| | |
-|---|---|
-| **Ultima sincronizacion** | 2 de agosto de 2026 |
-| **Version app documentada** | 1.0.4 |
-| **Repo original** | https://github.com/gugutab/TvOverlay |
+**Ultima sincronizacion con el repo original:** 2026-08-02
 
 ## Que es TvOverlay?
 
 App para Android TV que muestra **overlays** (informacion superpuesta) en tu TV mientras ves contenido.
 Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
 
+**Repo original:** https://github.com/gugutab/TvOverlay
+
 ## Formas de control
 
 | Metodo | Descripcion |
 |--------|-------------|
 | TvOverlay Remote | App companion para Android |
-| REST API | HTTP POST al puerto 5001 del TV |
+| REST API | HTTP POST (y algunos GET/DELETE) al puerto 5001 del TV |
 | MQTT | Pub/Sub compatible con Home Assistant |
-| Home Assistant | Integracion via MQTT autodiscovery |
+| Home Assistant | Integracion via MQTT autodiscovery o REST |
 
 ## Requisitos
 
@@ -63,6 +61,12 @@ Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
 
 Al conectar MQTT, TvOverlay se auto-registra como dispositivo en HA via MQTT Discovery.
 El nombre por defecto sera: `TvOverlay - [Modelo del dispositivo]`
+
+## Nota importante sobre esta documentacion
+
+Algunos detalles (estructura exacta de topics MQTT, campo `smallIconColor` vs `color` en `/notify`)
+fueron inferidos y **no estan 100% confirmados en el codigo fuente**. Antes de automatizar algo
+critico, probar el comando manualmente primero (ver seccion Troubleshooting en CHEATSHEET.md).
 
 ---
 
