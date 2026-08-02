@@ -166,7 +166,14 @@ mode: single
 
 ## Home Assistant - Automatizaciones con MQTT (configuracion)
 
+> Topics confirmados en instalacion real (2026-08-02). El patron repite el nombre
+> de la funcion al final del topic (ej. `hot_corner/set/hot_corner`), no es un error
+> de tipeo. Reemplazar `<DEVICE_ID>` por el ID real de tu equipo (ver MQTT.md para
+> como encontrarlo).
+
 ### 7. Oscurecer TV automaticamente de noche
+
+✅ Topic y comportamiento confirmados.
 
 ```yaml
 alias: TV Overlay - Modo nocturno
@@ -196,6 +203,8 @@ mode: single
 
 ### 8. Mover esquina segun hora del dia
 
+✅ Topic y comportamiento confirmados.
+
 ```yaml
 alias: TV Overlay - Esquina nocturna
 trigger:
@@ -204,12 +213,17 @@ trigger:
 action:
   - service: mqtt.publish
     data:
-      topic: "tv_overlay/<DEVICE_ID>/hot_corner/set"
+      topic: "tv_overlay/<DEVICE_ID>/hot_corner/set/hot_corner"
       payload: "Bottom Right"
 mode: single
 ```
 
 ### 9. Desactivar notificaciones durante pelicula
+
+> ⚠️ **No probado en esta sesion.** El topic se infiere por analogia con la entidad
+> `display_notification` que vimos en MQTT Discovery, pero el patron exacto
+> (`set/display_notification` al final, singular) no fue verificado enviando el
+> comando y confirmando el cambio de estado. Probar antes de confiar en produccion.
 
 ```yaml
 alias: TV Overlay - Silenciar durante pelicula
@@ -220,7 +234,7 @@ trigger:
 action:
   - service: mqtt.publish
     data:
-      topic: "tv_overlay/<DEVICE_ID>/display_notifications/set"
+      topic: "tv_overlay/<DEVICE_ID>/display_notification/set/display_notification"
       payload: "false"
 mode: single
 ```
@@ -234,7 +248,7 @@ trigger:
 action:
   - service: mqtt.publish
     data:
-      topic: "tv_overlay/<DEVICE_ID>/display_notifications/set"
+      topic: "tv_overlay/<DEVICE_ID>/display_notification/set/display_notification"
       payload: "true"
 mode: single
 ```
@@ -244,6 +258,8 @@ mode: single
 ## Home Assistant - Combinando REST + MQTT
 
 ### 10. Alerta de puerta abierta + oscurecer pantalla
+
+✅ Ambas partes (REST y MQTT) confirmadas por separado.
 
 ```yaml
 alias: TV Overlay - Puerta abierta mucho tiempo
@@ -310,6 +326,8 @@ chmod +x notificar_tv.sh
 ```
 
 ### Script: oscurecer_tv.sh (via MQTT)
+
+✅ Topic confirmado.
 
 ```bash
 #!/bin/bash
@@ -435,6 +453,19 @@ curl -s -X POST http://192.168.1.50:5001/notify_fixed \
   -H "Content-Type: application/json" \
   -d '{"id":"dash_home","icon":"mdi:account-group","message":"3","iconColor":"#9C27B0","borderColor":"#9C27B0"}'
 ```
+
+---
+
+## Resumen de estado de verificacion (2026-08-02)
+
+| # | Ejemplo | Estado |
+|---|---------|--------|
+| 1-3 | Notificaciones REST via `notify.tvoverlay_sala` | ✅ Patron base confirmado (title/message/duration) |
+| 4-6 | Notificaciones fijas REST | ⚠️ No probado en esta sesion, hereda campos de `/notify_fixed` documentados |
+| 7 | Oscurecer/aclarar por MQTT (`visibility`) | ✅ Confirmado |
+| 8 | Hot corner por MQTT | ✅ Confirmado |
+| 9 | Silenciar notificaciones por MQTT | ⚠️ No probado, topic inferido |
+| 10 | Combinado REST + MQTT | ✅ Cada parte confirmada por separado |
 
 ---
 
