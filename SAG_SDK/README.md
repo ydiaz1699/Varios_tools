@@ -54,6 +54,7 @@ SAG_SDK/
 │   │   ├── errors.md                   ← 8 errores comunes + fixes
 │   │   ├── testing.md                  ← Testear sin LLM (mocks, core)
 │   │   ├── deployment.md              ← Producción (systemd, cron, Docker)
+│   │   ├── memory.md                   ← Memoria persistente + auto-mejora (Learning Loop)
 │   │   └── checklist.md                ← Checklist de producción
 │   └── meta/
 │       └── analyze-chat.md             ← Extraer patrones de chats
@@ -94,7 +95,7 @@ Revisa `examples/` para código funcional que puedes copiar y adaptar.
 
 | Lenguaje | Providers | Features |
 |----------|-----------|----------|
-| **Python** | Gemini, Bedrock (Claude), Ollama | @tool, extended thinking, multi-provider, sesión, seguridad |
+| **Python** | Gemini, Bedrock (Claude), Ollama | @tool, extended thinking, multi-provider, sesión, seguridad, memoria persistente |
 | **TypeScript** | Gemini, Bedrock, OpenAI, Anthropic | Zod tools, MCP, multi-agent (Graph/Swarm), structured output |
 
 ## Fuentes
