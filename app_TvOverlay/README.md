@@ -13,12 +13,15 @@ Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
 
 ## Formas de control
 
-| Metodo | Descripcion |
-|--------|-------------|
-| TvOverlay Remote | App companion para Android |
-| REST API | HTTP POST (y algunos GET/DELETE) al puerto 5001 del TV |
-| MQTT | Pub/Sub compatible con Home Assistant |
-| Home Assistant | Integracion via MQTT autodiscovery o REST |
+| Metodo | Que controla | Protocolo |
+|--------|--------------|-----------|
+| TvOverlay Remote | Todo | App companion Android |
+| REST API | Todo (notificaciones + config) | HTTP POST/GET/DELETE a puerto 5001 |
+| MQTT | Solo configuracion (visibility, esquina, switches) | Pub/Sub texto plano |
+| Home Assistant | Todo (REST para notif, MQTT para config) | Combinado |
+
+> **Descubrimiento clave:** Las notificaciones (texto, imagen, video) solo se envian
+> por REST API. MQTT solo controla ajustes de configuracion del overlay.
 
 ## Requisitos
 
@@ -32,8 +35,8 @@ Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
 
 | Archivo | Contenido |
 |---------|-----------|
-| [MQTT.md](./MQTT.md) | Guia completa de control por MQTT |
-| [REST_API.md](./REST_API.md) | Referencia completa de la REST API |
+| [MQTT.md](./MQTT.md) | Topics REALES confirmados, payloads, descubrimiento de DEVICE_ID |
+| [REST_API.md](./REST_API.md) | Referencia completa de la REST API (notificaciones + config) |
 | [EJEMPLOS.md](./EJEMPLOS.md) | Casos de uso y automatizaciones |
 | [CHEATSHEET.md](./CHEATSHEET.md) | Resumen rapido copy-paste |
 
@@ -51,23 +54,26 @@ Permite mostrar notificaciones, notificaciones fijas, reloj, fondo oscuro y mas.
    ```
 4. **Conectar MQTT** (en la app): Ajustes > MQTT > llenar broker, puerto, user, pass
 5. **Verificar**: Activar "Display status on change" en MQTT settings para ver si conecta
+6. **Encontrar tu DEVICE_ID**: Suscribirse a `tv_overlay/#` y buscar tu ID (ver MQTT.md)
 
-## Puerto por defecto
+## Puertos / Protocolos
 
-- **REST API**: `5001` (configurable en ajustes de la app)
-- **MQTT**: Usa el broker que configures (1883 por defecto)
+- **REST API**: puerto `5001` (configurable) — para notificaciones y todo lo demas
+- **MQTT broker**: puerto `1883` (por defecto) — para ajustes de configuracion
+- **Prefijo MQTT real**: `tv_overlay` (con guion bajo, NO `tvoverlay`)
 
-## Nota sobre Home Assistant
+## Resumen rapido MQTT vs REST
 
-Al conectar MQTT, TvOverlay se auto-registra como dispositivo en HA via MQTT Discovery.
-El nombre por defecto sera: `TvOverlay - [Modelo del dispositivo]`
-
-## Nota importante sobre esta documentacion
-
-Algunos detalles (estructura exacta de topics MQTT, campo `smallIconColor` vs `color` en `/notify`)
-fueron inferidos y **no estan 100% confirmados en el codigo fuente**. Antes de automatizar algo
-critico, probar el comando manualmente primero (ver seccion Troubleshooting en CHEATSHEET.md).
+| Quiero... | Usar |
+|-----------|------|
+| Enviar notificacion con texto/imagen/video | REST API: `POST /notify` |
+| Mostrar icono fijo (bateria, temp, etc.) | REST API: `POST /notify_fixed` |
+| Oscurecer/aclarar la pantalla | MQTT o REST |
+| Cambiar esquina de notificaciones | MQTT o REST |
+| Activar/desactivar notificaciones | MQTT o REST |
+| Activar pixel shift | MQTT o REST |
+| Consultar estado actual | REST API: `GET /get` |
 
 ---
 
-*Fuente: https://github.com/gugutab/TvOverlay*
+*Fuente: https://github.com/gugutab/TvOverlay + verificacion en instalacion real*
