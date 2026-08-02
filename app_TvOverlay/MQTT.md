@@ -1,4 +1,9 @@
-# TvOverlay - Control por MQTT
+# TvOverlay - Control por MQTT (Topics Reales Confirmados)
+
+> **Ultima verificacion:** 2026-08-02
+> Topics confirmados via MQTT Explorer en Home Assistant contra una instalacion real.
+
+---
 
 ## Conexion MQTT
 
@@ -30,219 +35,283 @@ curl -X POST http://IP_TV:5001/set/mqtt \
 
 ---
 
-## Estructura de topics MQTT
+## Como encontrar tu DEVICE_ID
 
-Al conectarse, TvOverlay se registra via **MQTT Auto-Discovery** de Home Assistant.
-El dispositivo aparecera como: `TvOverlay - [Modelo]`
+Al conectar TvOverlay al broker MQTT, la app se registra automaticamente via MQTT
+Auto-Discovery de Home Assistant. Tu `DEVICE_ID` es unico por instalacion/dispositivo.
 
-### Topics de comando (publicar para controlar)
+**Metodo 1 - MQTT Explorer en HA:**
+1. Ir a Home Assistant > Ajustes > Dispositivos y servicios > MQTT
+2. Clic en "Configurar" > "Escuchar un topic"
+3. Suscribirse a `tv_overlay/#`
+4. El DEVICE_ID aparecera como parte del topic: `tv_overlay/<DEVICE_ID>/...`
 
-La estructura general de topics es:
-
-```
-tvoverlay/<DEVICE_ID>/notify          -> Enviar notificacion
-tvoverlay/<DEVICE_ID>/notify_fixed    -> Enviar notificacion fija
-tvoverlay/<DEVICE_ID>/set/overlay     -> Configurar overlay (fondo, reloj, esquina)
-tvoverlay/<DEVICE_ID>/set/notifications -> Configurar notificaciones
-tvoverlay/<DEVICE_ID>/set/settings    -> Configurar ajustes generales
-```
-
-> **Nota:** esta estructura de topics fue inferida por MQTT Auto-Discovery de Home
-> Assistant y no aparece confirmada literalmente en el README oficial del repo. Confirmala
-> en tu propia instalacion (ver "Como descubrir tu DEVICE_ID" abajo) antes de automatizar
-> en base a ella.
-
-### Como descubrir tu DEVICE_ID
-
-**Opcion 1 - MQTT Explorer:**
-Conectate a tu broker con [MQTT Explorer](http://mqtt-explorer.com) y busca topics que contengan `tvoverlay`.
-
-**Opcion 2 - Suscribirse a todo:**
+**Metodo 2 - mosquitto_sub:**
 ```bash
-mosquitto_sub -h BROKER_IP -u USUARIO -P PASSWORD -t "#" -v | grep -i tvoverlay
+mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tv_overlay/#" -v
 ```
 
-**Opcion 3 - Home Assistant:**
-Ajustes > Dispositivos y servicios > MQTT > buscar "TvOverlay" > ver entidades y sus topics.
+**Metodo 3 - MQTT Explorer (app de escritorio):**
+Conectar al broker y expandir el arbol `tv_overlay/` — veras tu ID como subcarpeta.
+
+> **Ejemplo real:** `TB432B197336788` (modelo TB432-B1).
+> Tu ID sera diferente. Usa el placeholder `<DEVICE_ID>` en scripts y reemplazalo.
 
 ---
 
-## Comandos MQTT detallados
+## Estructura REAL de topics
 
-### 1. Enviar notificacion
+### Prefijo correcto
 
-**Topic:** `tvoverlay/<DEVICE_ID>/notify`
-
-**Payload JSON:**
-
-```json
-{
-  "id": "mi_notificacion_01",
-  "title": "Titulo principal",
-  "message": "Texto secundario del mensaje",
-  "appTitle": "Info extra",
-  "smallIcon": "mdi:bell",
-  "color": "#FF5722",
-  "largeIcon": "mdi:home",
-  "corner": "top_end",
-  "duration": 10,
-  "image": "https://url-de-imagen.jpg",
-  "video": "rtsp://192.168.1.50:554/stream"
-}
+```
+tv_overlay/<DEVICE_ID>/...
 ```
 
-**Campos disponibles:**
-
-| Campo | Tipo | Requerido | Descripcion |
-|-------|------|-----------|-------------|
-| `id` | string | No | ID unico. Permite editar/reemplazar notificacion activa |
-| `title` | string | No | Texto principal grande |
-| `message` | string | No* | Texto secundario. *HA lo requiere pero puede ser "null" |
-| `appTitle` | string | No | Texto extra informativo |
-| `smallIcon` | string | No | Icono pequeno: MDI (`mdi:bell`), URL imagen, o Base64 |
-| `color` | string | No | Color del smallIcon. Hex 6 u 8 digitos. `#` opcional |
-| `largeIcon` | string | No | Icono grande: MDI, URL imagen, o Base64 |
-| `corner` | string | No | Posicion: `top_start`, `top_end`, `bottom_start`, `bottom_end` |
-| `duration` | int | No | Segundos visible. Default: usa config de la app |
-| `image` | string | No | URL de imagen, MDI, o Base64 |
-| `video` | string | No | URL de video: RTSP, HLS, DASH, SmoothStreaming |
-
-**Ejemplo minimo:**
-```json
-{"title": "Hola!", "message": "Esto es una prueba"}
-```
-
-**Ejemplo con icono y color:**
-```json
-{
-  "title": "Puerta abierta",
-  "message": "La puerta principal se abrio",
-  "smallIcon": "mdi:door-open",
-  "color": "#FF0000",
-  "duration": 15
-}
-```
+> **IMPORTANTE:** El prefijo real es `tv_overlay` (con guion bajo), NO `tvoverlay` como
+> indicaba documentacion anterior. Esto fue confirmado en instalacion real.
 
 ---
 
-### 2. Enviar notificacion fija
+## Topics de CONFIGURACION (confirmados)
 
-**Topic:** `tvoverlay/<DEVICE_ID>/notify_fixed`
+Estos topics controlan los ajustes del overlay. Los payloads son **texto plano** (no JSON).
 
-Las notificaciones fijas son iconos compactos que permanecen visibles en una esquina.
+### 1. Hot Corner (posicion de notificaciones)
 
-**Payload JSON:**
+**Topic:** `tv_overlay/<DEVICE_ID>/hot_corner/set`
 
-```json
-{
-  "id": "bateria_phone",
-  "icon": "mdi:battery-70",
-  "message": "70%",
-  "iconColor": "#4CAF50",
-  "messageColor": "#FFFFFF",
-  "borderColor": "#4CAF50",
-  "backgroundColor": "#66000000",
-  "shape": "rounded",
-  "expiration": "5m"
-}
-```
+**Payload:** texto plano con valor en mayusculas y espacio.
 
-**Campos disponibles:**
+| Valor | Posicion |
+|-------|----------|
+| `Top Left` | Arriba izquierda |
+| `Top Right` | Arriba derecha |
+| `Bottom Left` | Abajo izquierda |
+| `Bottom Right` | Abajo derecha |
 
-| Campo | Tipo | Requerido | Descripcion |
-|-------|------|-----------|-------------|
-| `id` | string | No | ID unico para editar/eliminar |
-| `visible` | boolean | No | `true`/`false` para mostrar/ocultar (default: true) |
-| `icon` | string | No | MDI, URL imagen, o Base64 |
-| `message` | string | No | Texto corto junto al icono |
-| `messageColor` | string | No | Color del texto (hex). Default: `#FFFFFF` |
-| `iconColor` | string | No | Color del icono (hex) |
-| `borderColor` | string | No | Color del borde (hex). Default: `#FFFFFF` |
-| `backgroundColor` | string | No | Color de fondo con transparencia (hex 8 digitos). Default: `#66000000` |
-| `shape` | string | No | Forma: `circle`, `rounded`, `rectangular` |
-| `expiration` | string/int | No | Tiempo de vida. Formatos: `60` (seg), `5m`, `1h30m`, `1695693410` (epoch) |
-
-**Eliminar notificacion fija (ocultarla):**
-```json
-{
-  "id": "luz_sala",
-  "visible": false
-}
-```
-
----
-
-### 3. Configurar overlay (fondo/reloj/esquina)
-
-**Topic:** `tvoverlay/<DEVICE_ID>/set/overlay`
-
-```json
-{
-  "overlayVisibility": 50,
-  "clockOverlayVisibility": 80,
-  "hotCorner": "top_start"
-}
-```
-
-| Campo | Tipo | Rango | Descripcion |
-|-------|------|-------|-------------|
-| `overlayVisibility` | int | 0-95 | Opacidad del fondo oscuro (0=transparente, 95=casi negro) |
-| `clockOverlayVisibility` | int | 0-95 | Visibilidad del reloj |
-| `hotCorner` | string | - | Esquina activa: `top_start`, `top_end`, `bottom_start`, `bottom_end` |
-
----
-
-### 4. Configurar notificaciones
-
-**Topic:** `tvoverlay/<DEVICE_ID>/set/notifications`
-
-```json
-{
-  "displayNotifications": true,
-  "displayFixedNotifications": true,
-  "notificationDuration": 8,
-  "notificationLayoutName": "Default",
-  "fixedNotificationsVisibility": -1
-}
-```
-
----
-
-### 5. Configurar ajustes generales
-
-**Topic:** `tvoverlay/<DEVICE_ID>/set/settings`
-
-```json
-{
-  "deviceName": "TV Sala",
-  "displayDebug": false,
-  "pixelShift": true
-}
-```
-
----
-
-## Probar con mosquitto_pub
-
-### Notificacion basica
 ```bash
-mosquitto_pub -h 192.168.1.100 -u usuario -P password \
-  -t "tvoverlay/MI_DEVICE/notify" \
-  -m '{"title":"Prueba MQTT","message":"Funciona!","smallIcon":"mdi:check","color":"#4CAF50","duration":8}'
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/hot_corner/set" \
+  -m "Top Left"
 ```
 
-### Notificacion fija
+> **Nota:** los valores NO son `top_start`/`bottom_end` como dice la REST API.
+> Via MQTT se usan `Top Left`, `Top Right`, `Bottom Left`, `Bottom Right`.
+
+---
+
+### 2. Visibility (opacidad del fondo overlay)
+
+**Topic:** `tv_overlay/<DEVICE_ID>/visibility/level/command`
+
+**Payload:** numero como string (`"0"` a `"95"`)
+
 ```bash
-mosquitto_pub -h 192.168.1.100 -u usuario -P password \
-  -t "tvoverlay/MI_DEVICE/notify_fixed" \
-  -m '{"id":"test1","icon":"mdi:wifi","message":"Online","iconColor":"#2196F3","expiration":"60"}'
+# Oscurecer al 50%
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/visibility/level/command" \
+  -m "50"
+
+# Quitar oscuridad (transparente)
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/visibility/level/command" \
+  -m "0"
 ```
 
-### Oscurecer pantalla
+---
+
+### 3. Clock Visibility (visibilidad del reloj)
+
+**Topic:** `tv_overlay/<DEVICE_ID>/clock_visibility/level/command`
+
+**Payload:** numero como string (`"0"` a `"95"`)
+
 ```bash
-mosquitto_pub -h 192.168.1.100 -u usuario -P password \
-  -t "tvoverlay/MI_DEVICE/set/overlay" \
-  -m '{"overlayVisibility":40}'
+# Reloj visible al 80%
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/clock_visibility/level/command" \
+  -m "80"
+
+# Ocultar reloj
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/clock_visibility/level/command" \
+  -m "0"
+```
+
+---
+
+### 4. Display Notifications (activar/desactivar notificaciones)
+
+**Topic:** `tv_overlay/<DEVICE_ID>/display_notifications/set`
+
+**Payload:** `"true"` o `"false"` (string)
+
+```bash
+# Desactivar notificaciones
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/display_notifications/set" \
+  -m "false"
+
+# Reactivar
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/display_notifications/set" \
+  -m "true"
+```
+
+---
+
+### 5. Display Fixed Notifications (activar/desactivar fijas)
+
+**Topic:** `tv_overlay/<DEVICE_ID>/display_fixed_notifications/set`
+
+**Payload:** `"true"` o `"false"` (string)
+
+```bash
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/display_fixed_notifications/set" \
+  -m "true"
+```
+
+---
+
+### 6. Pixel Shift (anti burn-in)
+
+**Topic:** `tv_overlay/<DEVICE_ID>/pixel_shift/set`
+
+**Payload:** `"true"` o `"false"` (string)
+
+```bash
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/pixel_shift/set" \
+  -m "true"
+```
+
+---
+
+### 7. Display Debug
+
+**Topic:** `tv_overlay/<DEVICE_ID>/display_debug/set`
+
+**Payload:** `"true"` o `"false"` (string)
+
+```bash
+mosquitto_pub -h BROKER_IP -u USER -P PASS \
+  -t "tv_overlay/<DEVICE_ID>/display_debug/set" \
+  -m "false"
+```
+
+---
+
+## Topics de ESTADO (lectura)
+
+TvOverlay publica el estado actual en topics de estado. Puedes suscribirte para leerlos:
+
+```bash
+# Ver todos los estados
+mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tv_overlay/<DEVICE_ID>/+/state" -v
+
+# O mas especifico
+mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tv_overlay/<DEVICE_ID>/visibility/level/state" -v
+mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tv_overlay/<DEVICE_ID>/hot_corner/state" -v
+```
+
+---
+
+## Resumen de topics confirmados
+
+| Funcion | Topic | Payload | Tipo |
+|---------|-------|---------|------|
+| Hot corner | `.../hot_corner/set` | `Top Left`, `Top Right`, `Bottom Left`, `Bottom Right` | string |
+| Overlay visibility | `.../visibility/level/command` | `0` - `95` | string numerico |
+| Clock visibility | `.../clock_visibility/level/command` | `0` - `95` | string numerico |
+| Notificaciones on/off | `.../display_notifications/set` | `true` / `false` | string |
+| Fijas on/off | `.../display_fixed_notifications/set` | `true` / `false` | string |
+| Pixel shift | `.../pixel_shift/set` | `true` / `false` | string |
+| Debug | `.../display_debug/set` | `true` / `false` | string |
+
+> Todos los topics usan el prefijo `tv_overlay/<DEVICE_ID>/`
+
+---
+
+## Notificaciones via MQTT — NO CONFIRMADO
+
+> **IMPORTANTE:** A la fecha de esta documentacion, **NO se ha confirmado** que exista un
+> topic MQTT para enviar notificaciones directamente (equivalente a `POST /notify` o
+> `POST /notify_fixed` de la REST API).
+>
+> Las notificaciones (con titulo, mensaje, imagen, video, etc.) probablemente solo son
+> posibles via:
+> - **REST API** (`POST http://IP_TV:5001/notify`)
+> - **Home Assistant notify service** (configurado como REST)
+>
+> Si descubres un topic MQTT para notificaciones, actualizar este documento.
+
+Para enviar notificaciones, usar la REST API documentada en [REST_API.md](./REST_API.md).
+
+---
+
+## Diferencias MQTT vs REST API
+
+| Aspecto | MQTT | REST API |
+|---------|------|----------|
+| Prefijo topic | `tv_overlay` (guion bajo) | N/A |
+| Formato payload | Texto plano | JSON |
+| Hot corner valores | `Top Left`, `Bottom Right` | `top_start`, `bottom_end` |
+| Enviar notificaciones | **No confirmado** | Si (`POST /notify`) |
+| Enviar fixed notifications | **No confirmado** | Si (`POST /notify_fixed`) |
+| Cambiar visibility | Si (numero como string) | Si (JSON con int) |
+| Switches (on/off) | `"true"`/`"false"` string | `true`/`false` boolean JSON |
+
+---
+
+## Ejemplos Home Assistant (con topics reales)
+
+### Oscurecer TV de noche
+
+```yaml
+alias: TV Overlay - Modo nocturno
+trigger:
+  - platform: sun
+    event: sunset
+action:
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/visibility/level/command"
+      payload: "40"
+mode: single
+```
+
+### Quitar oscuridad de dia
+
+```yaml
+alias: TV Overlay - Modo diurno
+trigger:
+  - platform: sun
+    event: sunrise
+action:
+  - service: mqtt.publish
+    data:
+      topic: "tv_overlay/<DEVICE_ID>/visibility/level/command"
+      payload: "0"
+mode: single
+```
+
+### Mover notificaciones a esquina superior derecha
+
+```yaml
+service: mqtt.publish
+data:
+  topic: "tv_overlay/<DEVICE_ID>/hot_corner/set"
+  payload: "Top Right"
+```
+
+### Desactivar notificaciones temporalmente
+
+```yaml
+service: mqtt.publish
+data:
+  topic: "tv_overlay/<DEVICE_ID>/display_notifications/set"
+  payload: "false"
 ```
 
 ---
@@ -250,25 +319,17 @@ mosquitto_pub -h 192.168.1.100 -u usuario -P password \
 ## Debugging
 
 1. **Activar status en la app**: Settings > MQTT > "Display status on change" = ON
-2. **Ver mensajes en broker**:
+2. **Ver TODO lo que publica TvOverlay:**
    ```bash
-   mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tvoverlay/#" -v
+   mosquitto_sub -h BROKER_IP -u USER -P PASS -t "tv_overlay/#" -v
    ```
-3. **Verificar conexion**: Si ves `tvoverlay/[device]/status` con payload `online`, esta conectado
-4. **Probar REST primero**: Si REST funciona pero MQTT no, el problema es la conexion MQTT
+3. **Si no ves nada:** verificar que la app tiene MQTT conectado (debe mostrar "Connected" en la app)
+4. **Si MQTT funciona pero quieres notificaciones:** usar REST API (ver REST_API.md)
    ```bash
    curl -X POST http://IP_TV:5001/notify -H "Content-Type: application/json" \
-     -d '{"title":"Test REST","message":"Funciona"}'
+     -d '{"title":"Test","message":"Funciona"}'
    ```
 
 ---
 
-## Iconos MDI disponibles
-
-TvOverlay soporta iconos de Material Design Icons. Formato: `mdi:nombre-del-icono`
-
-Catalogo completo: https://pictogrammers.com/library/mdi/
-
----
-
-*Fuente: https://github.com/gugutab/TvOverlay*
+*Fuente: https://github.com/gugutab/TvOverlay + verificacion en instalacion real*
