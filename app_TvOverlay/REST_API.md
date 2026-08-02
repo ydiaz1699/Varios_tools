@@ -3,7 +3,6 @@
 ## Informacion general
 
 - **Puerto por defecto:** `5001` (configurable en ajustes)
-- **Metodo:** `POST` (todos los endpoints)
 - **Content-Type:** `application/json`
 - **Base URL:** `http://<IP_TV>:5001`
 
@@ -13,14 +12,27 @@ No requiere autenticacion. Solo necesitas estar en la misma red.
 
 ## Endpoints disponibles
 
-| Endpoint | Descripcion |
-|----------|-------------|
-| `POST /notify` | Enviar notificacion |
-| `POST /notify_fixed` | Enviar notificacion fija |
-| `POST /set/overlay` | Configurar overlay (fondo, reloj, esquina) |
-| `POST /set/notifications` | Configurar comportamiento de notificaciones |
-| `POST /set/settings` | Configurar ajustes generales |
-| `POST /set/mqtt` | Configurar conexion MQTT |
+| Endpoint | Metodo | Descripcion |
+|----------|--------|-------------|
+| `/` | GET | Verifica que la app esta corriendo |
+| `/get` | GET | Obtiene configuracion completa actual |
+| `/get/overlay` | GET | Obtiene configuracion actual del overlay |
+| `/get/mqtt` | GET | Obtiene configuracion actual de MQTT |
+| `/get/fixed_notifications` | GET | Lista notificaciones fijas activas |
+| `/notify` | POST | Enviar notificacion |
+| `/notify_fixed` | POST | Enviar notificacion fija |
+| `/set` | POST | Configurar todo de una vez (overlay+mqtt+notifications+settings) |
+| `/set/overlay` | POST | Configurar overlay (fondo, reloj, esquina) |
+| `/set/notifications` | POST | Configurar comportamiento de notificaciones |
+| `/set/settings` | POST | Configurar ajustes generales |
+| `/set/mqtt` | POST | Configurar conexion MQTT |
+| `/set/screen_on` | POST | Simula "pantalla encendida" (aplica overlay como al despertar) |
+| `/set/restart_service` | POST | Reinicia el servicio interno de la app |
+| `/delete/mqtt` | DELETE | Elimina la configuracion MQTT guardada |
+
+> Los endpoints `GET`, `DELETE`, `/set`, `/set/screen_on` y `/set/restart_service` provienen de la
+> coleccion Postman del repo original y no estan descritos en el README oficial. Probarlos antes
+> de depender de ellos en produccion.
 
 ---
 
@@ -35,12 +47,12 @@ Muestra una notificacion emergente temporal en la pantalla del TV.
 | `id` | string | random | ID unico. Permite editar notificacion activa |
 | `title` | string | null | Texto principal |
 | `message` | string | null | Texto secundario |
-| `source` | string | null | Texto extra informativo (equivale a `appTitle` en HA) |
+| `source` / `appTitle` | string | null | Texto extra informativo (el README usa `source`, la coleccion Postman y HA usan `appTitle`; probar cual responde tu version) |
 | `smallIcon` | string | null | Icono pequeno: `mdi:nombre`, URL, o Base64 |
-| `smallIconColor` | string | null | Color del smallIcon (hex 6/8 digitos, `#` opcional) |
+| `color` | string | null | Color tint del smallIcon (hex 6/8 digitos, `#` opcional). **Nota:** el README oficial documenta este campo como `color`, no `smallIconColor` — usar `color` salvo que confirmes lo contrario en tu instalacion |
 | `largeIcon` | string | null | Icono grande: `mdi:nombre`, URL, o Base64 |
 | `corner` | string | hot corner | Posicion: `top_start`, `top_end`, `bottom_start`, `bottom_end` |
-| `duration` | int | config app | Segundos visible |
+| `duration` / `seconds` | int | config app | Segundos visible (la coleccion Postman usa `seconds`) |
 | `image` | string | null | Imagen: URL, MDI, o Base64 |
 | `video` | string | null | Video: RTSP, HLS, DASH, SmoothStreaming |
 
@@ -64,7 +76,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "title": "Puerta abierta",
     "message": "Puerta principal",
     "smallIcon": "mdi:door-open",
-    "smallIconColor": "#FF0000",
+    "color": "#FF0000",
     "largeIcon": "mdi:home",
     "duration": 12
   }'
@@ -79,7 +91,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "message": "Camara frontal",
     "image": "http://192.168.1.60/snapshot.jpg",
     "smallIcon": "mdi:cctv",
-    "smallIconColor": "#B00020",
+    "color": "#B00020",
     "duration": 10
   }'
 ```
@@ -93,7 +105,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "message": "Alguien en la puerta",
     "video": "rtsp://192.168.1.60:554/live",
     "smallIcon": "mdi:doorbell-video",
-    "smallIconColor": "#2196F3",
+    "color": "#2196F3",
     "duration": 20
   }'
 ```
@@ -119,7 +131,7 @@ curl -X POST http://192.168.1.50:5001/notify \
     "title": "Temperatura actualizada",
     "message": "35C - Muy caliente!",
     "smallIcon": "mdi:thermometer-alert",
-    "smallIconColor": "#FF5722"
+    "color": "#FF5722"
   }'
 ```
 
@@ -136,7 +148,7 @@ Iconos compactos permanentes en una esquina. Utiles para estado: bateria, temper
 | `id` | string | random | ID unico para editar/eliminar |
 | `visible` | boolean | true | Mostrar u ocultar |
 | `icon` | string | null | MDI, URL, o Base64 |
-| `message` | string | null | Texto corto junto al icono |
+| `message` / `text` | string | null | Texto corto junto al icono (el README usa `message`, la coleccion Postman usa `text`) |
 | `messageColor` | string | #FFFFFF | Color del texto (hex) |
 | `iconColor` | string | null | Color del icono (hex) |
 | `borderColor` | string | #FFFFFF | Color del borde (hex) |
@@ -185,48 +197,6 @@ curl -X POST http://192.168.1.50:5001/notify_fixed \
   }'
 ```
 
-**Temperatura exterior:**
-```bash
-curl -X POST http://192.168.1.50:5001/notify_fixed \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "temp_ext",
-    "icon": "mdi:thermometer",
-    "message": "28C",
-    "iconColor": "#FF9800",
-    "borderColor": "#FF9800",
-    "shape": "circle",
-    "expiration": "30m"
-  }'
-```
-
-**Canal de Twitch online:**
-```bash
-curl -X POST http://192.168.1.50:5001/notify_fixed \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "twitch_fav",
-    "icon": "mdi:twitch",
-    "message": "En vivo!",
-    "iconColor": "#9C27B0",
-    "borderColor": "#9C27B0",
-    "backgroundColor": "#99000000"
-  }'
-```
-
-**Actualizar notificacion fija existente:**
-```bash
-curl -X POST http://192.168.1.50:5001/notify_fixed \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "bateria_cel",
-    "icon": "mdi:battery-30",
-    "message": "30%",
-    "iconColor": "#FF5722",
-    "borderColor": "#FF5722"
-  }'
-```
-
 **Eliminar/ocultar notificacion fija:**
 ```bash
 curl -X POST http://192.168.1.50:5001/notify_fixed \
@@ -260,13 +230,6 @@ curl -X POST http://192.168.1.50:5001/set/overlay \
   -d '{"overlayVisibility": 50}'
 ```
 
-**Modo nocturno (muy oscuro):**
-```bash
-curl -X POST http://192.168.1.50:5001/set/overlay \
-  -H "Content-Type: application/json" \
-  -d '{"overlayVisibility": 80, "clockOverlayVisibility": 30}'
-```
-
 **Volver a normal:**
 ```bash
 curl -X POST http://192.168.1.50:5001/set/overlay \
@@ -274,18 +237,9 @@ curl -X POST http://192.168.1.50:5001/set/overlay \
   -d '{"overlayVisibility": 0, "clockOverlayVisibility": 0}'
 ```
 
-**Mover notificaciones a esquina superior izquierda:**
-```bash
-curl -X POST http://192.168.1.50:5001/set/overlay \
-  -H "Content-Type: application/json" \
-  -d '{"hotCorner": "top_start"}'
-```
-
 ---
 
 ## 4. Configurar notificaciones - `POST /set/notifications`
-
-### Campos
 
 | Campo | Tipo | Descripcion |
 |-------|------|-------------|
@@ -295,43 +249,9 @@ curl -X POST http://192.168.1.50:5001/set/overlay \
 | `notificationDuration` | int | Duracion default en segundos |
 | `fixedNotificationsVisibility` | int (-1~95) | Visibilidad fijas. `-1` = misma que reloj |
 
-### Ejemplos
-
-**Cambiar a layout minimalista con 10 seg:**
-```bash
-curl -X POST http://192.168.1.50:5001/set/notifications \
-  -H "Content-Type: application/json" \
-  -d '{
-    "notificationLayoutName": "Minimalist",
-    "notificationDuration": 10
-  }'
-```
-
-**Desactivar todas las notificaciones:**
-```bash
-curl -X POST http://192.168.1.50:5001/set/notifications \
-  -H "Content-Type: application/json" \
-  -d '{
-    "displayNotifications": false,
-    "displayFixedNotifications": false
-  }'
-```
-
-**Reactivar todo:**
-```bash
-curl -X POST http://192.168.1.50:5001/set/notifications \
-  -H "Content-Type: application/json" \
-  -d '{
-    "displayNotifications": true,
-    "displayFixedNotifications": true
-  }'
-```
-
 ---
 
 ## 5. Configurar ajustes - `POST /set/settings`
-
-### Campos
 
 | Campo | Tipo | Descripcion |
 |-------|------|-------------|
@@ -340,23 +260,9 @@ curl -X POST http://192.168.1.50:5001/set/notifications \
 | `displayDebug` | boolean | Mostrar info debug en overlay |
 | `pixelShift` | boolean | Mover overlay cada 2min (anti burn-in) |
 
-### Ejemplo
-
-```bash
-curl -X POST http://192.168.1.50:5001/set/settings \
-  -H "Content-Type: application/json" \
-  -d '{
-    "deviceName": "TV Sala Principal",
-    "pixelShift": true,
-    "displayDebug": false
-  }'
-```
-
 ---
 
 ## 6. Configurar MQTT - `POST /set/mqtt`
-
-### Campos
 
 | Campo | Tipo | Requerido | Descripcion |
 |-------|------|-----------|-------------|
@@ -369,43 +275,39 @@ curl -X POST http://192.168.1.50:5001/set/settings \
 
 *Requeridos solo si envias `mqttConfig`
 
-### Ejemplos
+---
 
-**Configurar broker MQTT:**
-```bash
-curl -X POST http://192.168.1.50:5001/set/mqtt \
-  -H "Content-Type: application/json" \
-  -d '{
-    "displayMqttStatusChange": true,
-    "mqttConfig": {
-      "broker": "192.168.1.100",
-      "port": 1883,
-      "user": "mqtt_user",
-      "password": "mqtt_pass"
-    }
-  }'
-```
+## 7. Consultar estado - `GET /get*` y `DELETE /delete/mqtt`
 
-**Solo activar/desactivar mensaje de status:**
 ```bash
-curl -X POST http://192.168.1.50:5001/set/mqtt \
-  -H "Content-Type: application/json" \
-  -d '{"displayMqttStatusChange": false}'
+# Ver configuracion completa
+curl http://192.168.1.50:5001/get
+
+# Ver solo overlay
+curl http://192.168.1.50:5001/get/overlay
+
+# Ver solo MQTT
+curl http://192.168.1.50:5001/get/mqtt
+
+# Ver notificaciones fijas activas
+curl http://192.168.1.50:5001/get/fixed_notifications
+
+# Eliminar configuracion MQTT guardada
+curl -X DELETE http://192.168.1.50:5001/delete/mqtt
+
+# Reiniciar servicio
+curl -X POST http://192.168.1.50:5001/set/restart_service
 ```
 
 ---
 
 ## Formatos de imagen/icono soportados
 
-Todos los campos de icono e imagen aceptan:
-
 | Formato | Ejemplo |
 |---------|---------|
 | MDI icon | `mdi:home`, `mdi:bell-ring` |
 | URL imagen | `http://192.168.1.60/foto.jpg`, `https://picsum.photos/300` |
 | Base64 | `data:image/png;base64,iVBORw0KGgo...` |
-
----
 
 ## Formatos de video soportados
 
@@ -436,6 +338,9 @@ Todos los campos de icono e imagen aceptan:
 3. **Imagenes de camaras:** Agregar timestamp para evitar cache: `?t=1234567890`
 4. **Videos RTSP:** Asegurar que el TV puede alcanzar la camara por red
 5. **Colores:** Se puede usar con o sin `#`. Hex de 6 digitos (RGB) u 8 digitos (ARGB)
+6. **Nombres de campo alternativos:** algunos campos tienen dos nombres segun la fuente
+   (README oficial vs coleccion Postman vs integracion HA). Si un comando no funciona,
+   probar la variante alternativa del campo (ver notas en cada seccion).
 
 ---
 

@@ -28,6 +28,7 @@ action:
 mode: single
 ```
 
+
 ### 2. Mostrar camara al detectar movimiento
 
 ```yaml
@@ -131,6 +132,7 @@ action:
         }
 mode: single
 ```
+
 
 ### 6. Notificacion fija - Clima/Temperatura
 
@@ -254,6 +256,7 @@ action:
 mode: single
 ```
 
+
 ---
 
 ## Home Assistant - Usando notify service (REST)
@@ -319,30 +322,6 @@ Configurar nodo **mqtt out**:
 - QoS: 0
 - Conectar un nodo **inject** o **function** que genere el payload JSON
 
-### Flow ejemplo - Notificacion al detectar movimiento
-
-```json
-[
-  {
-    "id": "inject_motion",
-    "type": "mqtt in",
-    "topic": "zigbee2mqtt/sensor_movimiento",
-    "broker": "mi_broker"
-  },
-  {
-    "id": "function_format",
-    "type": "function",
-    "func": "if (msg.payload.occupancy === true) {\n  msg.topic = 'tvoverlay/MI_DEVICE/notify';\n  msg.payload = {\n    title: 'Movimiento!',\n    message: 'Sensor de sala',\n    smallIcon: 'mdi:motion-sensor',\n    color: '#FF0000',\n    duration: 8\n  };\n  return msg;\n}\nreturn null;"
-  },
-  {
-    "id": "mqtt_out_tv",
-    "type": "mqtt out",
-    "topic": "",
-    "broker": "mi_broker"
-  }
-]
-```
-
 ---
 
 ## ESPHome - Enviar notificacion desde ESP32
@@ -365,29 +344,6 @@ binary_sensor:
         - mqtt.publish:
             topic: "tvoverlay/MI_DEVICE/notify"
             payload: '{"title":"Timbre!","message":"Alguien toco el timbre","smallIcon":"mdi:doorbell","color":"#2196F3","duration":15}'
-```
-
-### ESP32 - Sensor de temperatura que actualiza notificacion fija
-
-```yaml
-sensor:
-  - platform: dht
-    pin: GPIO5
-    temperature:
-      name: "Temperatura habitacion"
-      on_value:
-        then:
-          - mqtt.publish:
-              topic: "tvoverlay/MI_DEVICE/notify_fixed"
-              payload: !lambda |-
-                char buf[200];
-                snprintf(buf, sizeof(buf),
-                  "{\"id\":\"temp_hab\",\"icon\":\"mdi:thermometer\",\"message\":\"%.1fC\",\"iconColor\":\"%s\",\"borderColor\":\"%s\",\"expiration\":\"20m\"}",
-                  x,
-                  x > 30 ? "#FF5722" : (x < 18 ? "#2196F3" : "#4CAF50"),
-                  x > 30 ? "#FF5722" : (x < 18 ? "#2196F3" : "#4CAF50")
-                );
-                return std::string(buf);
 ```
 
 ---
@@ -428,30 +384,12 @@ chmod +x notificar_tv.sh
 ./notificar_tv.sh "Backup completo" "NAS backup terminado" "mdi:cloud-check" "#4CAF50" 10
 ```
 
-### Script: oscurecer_tv.sh
-
-```bash
-#!/bin/bash
-# Uso: ./oscurecer_tv.sh [nivel 0-95]
-
-TV_IP="192.168.1.50"
-TV_PORT="5001"
-NIVEL="${1:-0}"
-
-curl -s -X POST "http://${TV_IP}:${TV_PORT}/set/overlay" \
-  -H "Content-Type: application/json" \
-  -d "{\"overlayVisibility\": ${NIVEL}}"
-
-echo " -> Overlay: ${NIVEL}%"
-```
-
 ---
 
 ## Python - Enviar notificaciones
 
 ```python
 import requests
-import json
 
 TV_IP = "192.168.1.50"
 TV_PORT = 5001
@@ -494,56 +432,13 @@ notify_fixed("temp", "mdi:thermometer", "24C", "#FF9800", "15m")
 set_overlay(40)  # Oscurecer 40%
 ```
 
-### Python con MQTT (paho-mqtt)
-
-```python
-import paho.mqtt.client as mqtt
-import json
-
-BROKER = "192.168.1.100"
-PORT = 1883
-USER = "mqtt_user"
-PASS = "mqtt_pass"
-DEVICE = "MI_DEVICE"
-
-client = mqtt.Client()
-client.username_pw_set(USER, PASS)
-client.connect(BROKER, PORT)
-
-# Enviar notificacion
-payload = {
-    "title": "Desde Python MQTT",
-    "message": "Funciona perfectamente",
-    "smallIcon": "mdi:language-python",
-    "color": "#3F51B5",
-    "duration": 8
-}
-client.publish(f"tvoverlay/{DEVICE}/notify", json.dumps(payload))
-
-# Notificacion fija
-fixed_payload = {
-    "id": "python_test",
-    "icon": "mdi:check-circle",
-    "message": "OK",
-    "iconColor": "#4CAF50",
-    "borderColor": "#4CAF50",
-    "expiration": "5m"
-}
-client.publish(f"tvoverlay/{DEVICE}/notify_fixed", json.dumps(fixed_payload))
-
-client.disconnect()
-```
-
 ---
 
 ## Casos de uso avanzados
 
 ### Multiples TVs - Enviar a todos
 
-Si tienes varios dispositivos TvOverlay, puedes enviar a todos:
-
 ```bash
-# Bash
 for DEVICE in "tv_sala" "tv_cuarto" "tv_cocina"; do
   mosquitto_pub -h 192.168.1.100 -u user -P pass \
     -t "tvoverlay/${DEVICE}/notify" \
@@ -552,8 +447,6 @@ done
 ```
 
 ### Dashboard de estado con notificaciones fijas
-
-Combinar varias notificaciones fijas para crear un mini-dashboard:
 
 ```bash
 # Temperatura
@@ -570,11 +463,6 @@ curl -s -X POST http://192.168.1.50:5001/notify_fixed \
 curl -s -X POST http://192.168.1.50:5001/notify_fixed \
   -H "Content-Type: application/json" \
   -d '{"id":"dash_home","icon":"mdi:account-group","message":"3","iconColor":"#9C27B0","borderColor":"#9C27B0"}'
-
-# Luces encendidas
-curl -s -X POST http://192.168.1.50:5001/notify_fixed \
-  -H "Content-Type: application/json" \
-  -d '{"id":"dash_lights","icon":"mdi:lightbulb-group","message":"4","iconColor":"#FFEB3B","borderColor":"#FFEB3B"}'
 ```
 
 ---
