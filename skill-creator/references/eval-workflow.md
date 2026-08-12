@@ -202,6 +202,71 @@ mi-skill-workspace/
 
 ---
 
+## Ejemplo real — evaluación de `docker-nas`
+
+Skill de entorno/CLI con 6 archivos (1270 líneas). Evaluada tras su creación.
+
+### Métricas medidas
+
+```bash
+# Ejecutado contra la skill finalizada:
+SKILL.md:              240 líneas
+references/agent.md:   212 líneas
+references/entorno.md: 253 líneas
+references/estructura: 224 líneas
+references/seguridad:  187 líneas
+references/svc.md:     154 líneas
+Description:           ~496 chars
+Tokens estimados/trigger: ~960 (body / 4)
+```
+
+### Resultado vs targets
+
+| Métrica | Target | Resultado | Decisión |
+|---------|--------|-----------|----------|
+| SKILL.md líneas | <200 ideal | 240 | Aceptar: tablas compactas de comandos esenciales (>50% triggers) |
+| references/ max | <200 | 253 (entorno.md) | Aceptar: son tablas de aliases, no prosa verbosa |
+| Description chars | <500 | 496 | ✅ Dentro del ideal |
+| Tokens por trigger | <2000 | 960 | ✅ Muy bien |
+| Carga progresiva | Sí/No | Sí | ✅ |
+| Punteros con contexto | Sí/No | Sí | ✅ |
+
+### Test cases usados (trigger evaluation)
+
+| Query | Should trigger | Resultado |
+|-------|---------------|-----------|
+| "Quiero instalar Jellyfin en el NAS" | ✅ | ✅ Triggerea |
+| "Reinicia traefik" | ✅ | ✅ Triggerea |
+| "¿Cómo veo los logs de emqx?" | ✅ | ✅ Triggerea (responde con `svc logs emqx`) |
+| "Quiero crear un script en Python para scraping" | ❌ | ❌ No triggerea |
+| "Explícame qué es Docker" | ❌ | ❌ No triggerea |
+
+### Problemas encontrados y decisiones
+
+1. **entorno.md excede 200 líneas (253)**
+   - Causa: tablas de aliases + navegación + prompt + git + completions
+   - Opciones: (a) split en entorno.md + aliases.md, (b) dejar como está
+   - Decisión: dejar — split sería artificial, las tablas son compactas
+
+2. **SKILL.md excede ideal de 200 (240)**
+   - Causa: incluye tabla de comandos esenciales
+   - Test: ¿se necesitan en >50% de triggers? → Sí (dk, svc, instal)
+   - Decisión: mantener en body, moverlos a references causaría carga extra
+
+3. **Algunas reglas sin porqué ("NUNCA /docker/ → USA $dkco")**
+   - Causa: el porqué es implícito (portabilidad/configurabilidad)
+   - Mejora futura: agregar "(porque $dkco es configurable via DOCKER_BASE)"
+   - Decisión: aceptar por ahora, iterar si el LLM falla en seguirlas
+
+### Conclusión
+
+Pass rate: 100% en trigger eval (5/5). Métricas dentro de rangos aceptables.
+No se hizo iteración adicional — el usuario confirmó satisfacción.
+
+Para el proceso completo y decisiones de diseño, ver `references/case-study-docker-nas.md`.
+
+---
+
 ## Blind comparison (avanzado, opcional)
 
 Para comparaciones rigurosas entre dos versiones de una skill:
