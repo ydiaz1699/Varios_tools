@@ -160,6 +160,63 @@ Si tu skill interactúa con APIs async (HTTP 202 + polling):
 
 ---
 
+## Patrón: Skill de entorno/CLI
+
+Skills que documentan un framework, shell personalizado, o CLI propio
+del usuario. Diferente a skills de código o API porque NO generan código
+nuevo — guían al LLM sobre cómo USAR el entorno existente.
+
+### Características
+
+- El error más común del LLM es sugerir comandos genéricos en vez del framework
+- La tabla NUNCA/SIEMPRE es el mecanismo más efectivo para prevenir esto
+- No necesitan scripts bundled (el framework ya tiene los suyos)
+- References tienden a ser tablas de comandos/aliases (compactas, muchas líneas)
+
+### Estructura recomendada
+
+```
+mi-entorno/
+├── SKILL.md              ← Reglas + comandos esenciales + cuándo usar qué
+└── references/
+    ├── shell.md          ← Aliases, funciones, variables, prompt
+    ├── cli.md            ← Comandos del CLI principal
+    ├── tools.md          ← Tools/agente si aplica
+    └── security.md       ← Mecanismos de protección si aplica
+```
+
+### Body de SKILL.md (para skills de entorno)
+
+1. Variables y rutas (tabla compacta)
+2. Regla NUNCA/SIEMPRE (lo que previene comandos genéricos)
+3. Comandos esenciales (solo los del >50% de triggers)
+4. Workflow principal (ej: "crear nuevo servicio Docker")
+5. Cuándo usar CLI vs agente (si el entorno tiene ambos)
+6. Punteros a references/ con contexto
+
+### Qué incluir en el body vs references
+
+| En el body (siempre cargado) | En references (on-demand) |
+|------------------------------|---------------------------|
+| Tabla NUNCA/SIEMPRE | Lista exhaustiva de aliases |
+| 5-10 comandos más usados | 30+ comandos con flags y variantes |
+| Variables de entorno principales | Tabla completa de variables |
+| Formato de salida esperado (ej: árbol + mkdir + compose) | Plantillas completas |
+| Reglas de seguridad críticas | Mecanismos detallados (safe_run, audit) |
+
+### Fuente de verdad: el código
+
+Para skills de entorno, SIEMPRE basar la skill en el código fuente real,
+no en documentación desactualizada ni en lo que el usuario dice que tiene.
+El código es la fuente de verdad:
+- Leer `init.sh` para saber qué se carga y en qué orden
+- Leer cada módulo para documentar los aliases/funciones reales
+- Leer el CLI para saber los comandos implementados (no los planeados)
+
+Para un caso completo, ver `references/case-study-docker-nas.md`.
+
+---
+
 ## Checklist antes de publicar
 
 - [ ] name: kebab-case, ≤64 chars, matchea nombre de carpeta
