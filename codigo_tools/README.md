@@ -21,6 +21,7 @@ codigo_tools/
 ├── README.md
 ├── prompts/
 │   ├── analizar-codigo-completo.md
+│   ├── detectar-evolucionar-artefactos.md
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
@@ -30,12 +31,17 @@ codigo_tools/
 │   └── audit-project-docs.md
 ├── references/
 │   ├── criterios.md
+│   ├── politica-evolucion-artefactos.md
 │   └── tipos-documentacion.md
-└── templates/
-    ├── repo-map.yml
-    ├── README-project.md
-    ├── SKILL-project.md
-    └── copilot-instructions.md
+├── templates/
+│   ├── repo-map.yml
+│   ├── README-project.md
+│   ├── SKILL-project.md
+│   ├── copilot-instructions.md
+│   ├── artifact-manifest.json
+│   └── artifact-evolution-report.json
+└── tools/
+    └── artifact_evolution.py
 ```
 
 Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado.
@@ -46,6 +52,7 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 |---|---|
 | `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
+| `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera y compara `copilot-instructions.md` y `SKILL.md` desde el código y la configuración actuales. |
@@ -142,7 +149,54 @@ El prompt `prompts/generar-contexto-agentes.md` genera dos archivos complementar
 
 No deben confundirse con la documentación del producto. `copilot-instructions.md` y `SKILL.md` son contexto de trabajo para agentes; el código sigue siendo la fuente de comportamiento. Antes de entregar ambos archivos se debe comparar la matriz de consistencia para detectar valores divergentes, por ejemplo target, dependencias, pines, umbrales, timeouts y comandos. Los secretos se redactan y los builds/tests no ejecutados se marcan como pendientes.
 
-## Flujo recomendado por proyecto
+## Detección y evolución de artefactos
+
+El prompt `prompts/detectar-evolucionar-artefactos.md` añade una capa meta al flujo: durante el análisis de cada proyecto busca prompts, plantillas, referencias, auditorías, skills, instrucciones de agentes y herramientas que puedan reutilizarse. No compara únicamente nombres o archivos completos; exige extraer un manifiesto normalizado con propósito, capacidades, entradas, salidas, claims, compatibilidad y procedencia.
+
+La política `references/politica-evolucion-artefactos.md` define seis decisiones:
+
+- `NUEVO`: no existe un equivalente reutilizable.
+- `MEJORA`: el artefacto existe, pero el candidato aporta cobertura, evidencia, validación o reglas nuevas.
+- `DUPLICADO`: solo cambia redacción, orden o formato.
+- `CONTRADICTORIO`: la misma regla tiene valores incompatibles.
+- `VARIANTE`: la capacidad es similar, pero cambia target, framework, formato o dependencia.
+- `NO_DECIDIBLE`: falta lectura, procedencia, propósito o evidencia.
+
+Las plantillas `templates/artifact-manifest.json` y `templates/artifact-evolution-report.json` permiten intercambiar datos de forma estructurada. `tools/artifact_evolution.py` ofrece una base determinista para inventariar candidatos, validar manifiestos y comparar un candidato contra un catálogo:
+
+```bash
+python3 codigo_tools/tools/artifact_evolution.py discover /ruta/proyecto \\
+  --output reports/artifact-candidates.json
+python3 codigo_tools/tools/artifact_evolution.py catalog codigo_tools \\
+  --output catalog/artifacts-discovered.json
+python3 codigo_tools/tools/artifact_evolution.py validate candidates/mi-artefacto.json
+python3 codigo_tools/tools/artifact_evolution.py compare \\
+  --candidate candidates/mi-artefacto.json \\
+  --catalog catalog/artifacts.json \\
+  --output reports/mi-artefacto.json \\
+  --markdown reports/mi-artefacto.md
+```
+
+`catalog` construye un índice heurístico de los archivos candidatos existentes. Antes de aceptarlo como catálogo canónico, hay que normalizar sus propósitos y capacidades con el prompt y revisar sus fuentes. La herramienta determinista sirve para inventario, validación y preselección; la decisión semántica final requiere el manifiesto normalizado y revisión de evidencia.
+
+Flujo completo recomendado:
+
+```text
+analizar-codigo-completo
+        ↓
+manifest normalizado del candidato
+        ↓
+detectar-evolucionar-artefactos + artifact_evolution.py
+        ↓
+NUEVO / MEJORA / DUPLICADO / CONTRADICTORIO / VARIANTE / NO_DECIDIBLE
+        ↓
+propuesta revisable y aprobación
+        ↓
+crear o mejorar codigo_tools
+        ↓
+auditar y actualizar catálogo
+```
+
 
 1. Ejecutar `analizar-codigo-completo.md` sobre un `TARGET_ID` y snapshot concretos.
 2. Usar el inventario y la matriz para generar `repo-map.yml`.
