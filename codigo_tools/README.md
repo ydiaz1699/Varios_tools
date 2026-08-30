@@ -20,11 +20,19 @@ La fuente de verdad es el código/configuración actual del proyecto analizado. 
 codigo_tools/
 ├── README.md
 ├── prompts/
+│   ├── analizar-codigo-completo.md
+│   ├── generar-repo-map.md
+│   ├── generar-readme.md
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
-│   └── audit-hardware-docs.md
-└── references/
-    └── criterios.md
+│   ├── audit-hardware-docs.md
+│   └── audit-project-docs.md
+├── references/
+│   ├── criterios.md
+│   └── tipos-documentacion.md
+└── templates/
+    ├── repo-map.yml
+    └── README-project.md
 ```
 
 Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado.
@@ -35,8 +43,11 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 |---|---|
 | `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
+| `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
+| `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
+| `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
 
 ## Flujo recomendado
 
@@ -87,3 +98,44 @@ No se deben generar todavía esos documentos ni modificar el firmware al crear e
 - No convertir un modelo de componente, voltaje o cableado en hecho solo porque sea habitual.
 - Si el código no permite saber algo, escribir `PENDIENTE` o `NO DETERMINADO`.
 - No borrar ni sobrescribir documentación existente sin comparar primero contra ella y registrar las diferencias.
+
+
+## Capas de documentación
+
+`codigo_tools` separa los artefactos por lector y propósito:
+
+```text
+analizar-codigo-completo.md → comprensión profunda y auditoría narrativa
+        ↓
+generar-repo-map.md         → contexto estructurado para LLM/agentes
+        ↓
+generar-readme.md          → instalación y operación para humanos
+        ↓
+gen-notas-hw.md           → pinout y notas de hardware
+gen-conexiones-svg.md       → diagrama físico editable
+        ↓
+audit-*                    → reconciliación contra código/configuración
+```
+
+La referencia `references/tipos-documentacion.md` explica qué debe contener cada capa y evita duplicar prosa entre ellas. Las plantillas de `templates/` son esqueletos: sus placeholders no son datos reales de ningún proyecto.
+
+## Aplicación a `reloj NPT`
+
+Los artefactos se diseñaron a partir del análisis de `reloj NPT`:
+
+- `generar-repo-map.md` consolida las variantes `prompt-repo-map.md` y `generar-archivo-mapa.md`.
+- `generar-readme.md` conserva la estructura de `generar-readme.md`, pero elimina la obligación de inventar cinco problemas.
+- `references/tipos-documentacion.md` incorpora la clasificación de `ress.md`.
+- `templates/repo-map.yml` conserva el esquema del `archivo-mapa.yml` sin copiar sus valores específicos.
+- `templates/README-project.md` conserva la estructura operativa sin incluir datos del reloj.
+
+## Flujo recomendado por proyecto
+
+1. Ejecutar `analizar-codigo-completo.md` sobre un `TARGET_ID` y snapshot concretos.
+2. Usar el inventario y la matriz para generar `repo-map.yml`.
+3. Generar o actualizar `README.md` sin ocultar divergencias.
+4. Para hardware, generar `docs/notas.md` y después `docs/conexiones.drawio.svg`.
+5. Ejecutar las auditorías correspondientes: `audit-hardware-docs.md` para hardware y `audit-project-docs.md` para el conjunto documental.
+6. Registrar build, tests, simulación o hardware solo si realmente se ejecutaron.
+
+No se deben mezclar targets, versiones, emisores/receptores o placas en una única documentación ambigua. Si falta un archivo o una dependencia, el artefacto debe detenerse con `LECTURA_INCOMPLETA`.

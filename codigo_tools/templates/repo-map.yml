@@ -1,0 +1,125 @@
+# Plantilla estructural para repo-map.yml.
+# Sustituir cada placeholder por datos observados y conservar procedencia.
+# No copiar valores de este ejemplo como si fueran del proyecto analizado.
+---
+nombre: "[PENDIENTE]"
+target_id: "[PENDIENTE]"
+snapshot: "[commit/rama/tag/fecha]"
+estado_analisis: "COMPLETO | LECTURA_INCOMPLETA | COMPLETO_CON_CONTRADICCIONES"
+fecha_generacion: "[YYYY-MM-DD]"
+
+objetivo_principal:
+  descripcion: "[Qué hace realmente el código]"
+  estado_evidencia: "OBSERVADO_EN_CODIGO"
+  fuentes:
+    - archivo: "[ruta]"
+      referencia: "[línea/símbolo/chunk]"
+
+identidad:
+  lenguaje_principal: "[PENDIENTE]"
+  framework_runtime: "[PENDIENTE]"
+  plataforma: "[PENDIENTE]"
+  entornos_build:
+    - nombre: "[PENDIENTE]"
+      placa_o_runtime: "[PENDIENTE]"
+      fuente: "[ruta]"
+      estado_evidencia: "OBSERVADO_EN_BUILD"
+  version_declarada: "[NO_ENCONTRADO o versión]"
+  licencia: "[NO_ENCONTRADO o licencia con fuente]"
+
+hardware:
+  aplica: false
+  controlador_o_host: "[PENDIENTE]"
+  componentes: []
+  pines: []
+  buses: []
+  alimentacion:
+    valores: []
+    estado_evidencia: "PENDIENTE_DE_VERIFICAR"
+  comunicaciones_logicas: []
+
+arquitectura:
+  patron_observado: "[PENDIENTE]"
+  puntos_entrada: []
+  componentes:
+    - nombre: "[componente]"
+      responsabilidad: "[responsabilidad observada]"
+      archivos: []
+      dependencias: []
+      estado_evidencia: "OBSERVADO_EN_CODIGO"
+  dependencias:
+    runtime: []
+    desarrollo: []
+
+flujos_principales:
+  inicializacion:
+    pasos: []
+    fuentes: []
+  ciclo_principal:
+    pasos: []
+    fuentes: []
+  flujos_adicionales: []
+
+maquinas_estado:
+  - nombre: "[FSM]"
+    estado_inicial: "[PENDIENTE]"
+    estados: []
+    transiciones: []
+    timers_reintentos: []
+    recuperacion: []
+    fuentes: []
+
+configuracion:
+  archivos: []
+  secretos:
+    requeridos: []
+    rutas_template: []
+    valores: "[REDACTADO: nunca incluir secretos reales]"
+  archivos_ausentes: []
+
+comandos:
+  build: []
+  upload_deploy: []
+  run: []
+  monitor_logs: []
+  tests: []
+  estado_evidencia: "OBSERVADO_EN_BUILD | DOCUMENTADO | PENDIENTE_DE_VERIFICAR"
+
+tests_y_verificacion:
+  tests_presentes: []
+  tests_ausentes: []
+  evidencia_ejecutada: []
+
+limitaciones_y_riesgos:
+  - id: "[H##]"
+    clasificacion: "BUG_DEMOSTRABLE | RIESGO_TECNICO | DIVERGENCIA_DOCUMENTAL | CONFIGURACION_INCOMPLETA | AUSENCIA_RELEVANTE | PROPUESTA_NO_IMPLEMENTADA"
+    severidad: "CRITICA | ALTA | MEDIA | BAJA"
+    descripcion: "[hecho observado]"
+    impacto: "[impacto]"
+    accion: "[acción propuesta o PENDIENTE]"
+    fuentes: []
+    estado_evidencia: "[estado]"
+
+estructura_archivos:
+  - ruta: "[ruta]"
+    tipo: "[codigo/header/build/docs/test/secret/template/asset/generico]"
+    responsabilidad: "[descripción]"
+    fuentes: []
+
+comparacion_baseline:
+  - tema: "[tema]"
+    codigo_observado: "[actual]"
+    baseline: "[documentado]"
+    estado: "COINCIDE | CONTRADICTORIO | DOCUMENTADO | PENDIENTE"
+    impacto: "[impacto]"
+
+propuestas_no_implementadas: []
+archivos_y_datos_no_encontrados: []
+
+trazabilidad:
+  - id: "F01"
+    afirmacion: "[afirmación]"
+    fuente: "[ruta]"
+    referencia: "[línea/símbolo/chunk]"
+    seccion_destino: "[ruta YAML]"
+    estado_evidencia: "[estado]"
