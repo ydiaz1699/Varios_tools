@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "project-wiring",
+  "project_id": "[project-id]",
+  "target_id": "[target-id]",
+  "snapshot": "[commit/branch/tag/date]",
+  "board_ref": "boards/example-board.json",
+  "peripherals": [{"instance": "example-module", "ref": "peripherals/example-peripheral.json", "variant": "example-variant"}],
+  "connections": [{
+    "from": "board:[pin]",
+    "to": "[instance]:[signal]",
+    "signal": "[signal-name]",
+    "protocol": "[protocol]",
+    "level_shifter": "[none/model/required/pending]",
+    "evidence": [{"source": "[code/config/datasheet/test]", "reference": "[line/section]", "state": "PENDIENTE_DE_VERIFICAR"}]
+  }],
+  "power_budget": {"board": "[state]", "peripherals": "[state]", "state": "PENDIENTE_DE_VERIFICAR"},
+  "evidence_status": "PENDIENTE_DE_VERIFICAR"
+}

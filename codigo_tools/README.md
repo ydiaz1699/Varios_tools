@@ -28,20 +28,42 @@ codigo_tools/
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
-│   └── audit-project-docs.md
+│   ├── audit-project-docs.md
+│   ├── generar-ficha-board.md
+│   ├── generar-ficha-periferico.md
+│   ├── generar-project-wiring.md
+│   └── auditar-compatibilidad-hardware.md
 ├── references/
 │   ├── criterios.md
+│   ├── hardware-catalog-policy.md
+│   ├── hardware-evidence.md
 │   ├── politica-evolucion-artefactos.md
 │   └── tipos-documentacion.md
+├── catalog/
+│   ├── README.md
+│   ├── schemas/
+│   │   ├── board.schema.json
+│   │   ├── peripheral.schema.json
+│   │   └── project-wiring.schema.json
+│   ├── boards/
+│   │   ├── index.json
+│   │   └── _template-board.json
+│   ├── peripherals/
+│   │   ├── index.json
+│   │   └── _template-peripheral.json
+│   └── compatibility/
+│       └── rules.json
 ├── templates/
 │   ├── repo-map.yml
 │   ├── README-project.md
 │   ├── SKILL-project.md
 │   ├── copilot-instructions.md
 │   ├── artifact-manifest.json
-│   └── artifact-evolution-report.json
+│   ├── artifact-evolution-report.json
+│   └── project-wiring.json
 └── tools/
-    └── artifact_evolution.py
+    ├── artifact_evolution.py
+    └── hardware_catalog.py
 ```
 
 Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado.
@@ -59,6 +81,10 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
+| `prompts/generar-ficha-board.md` | Genera una ficha de catálogo para una placa física, separada del wiring de proyectos. |
+| `prompts/generar-ficha-periferico.md` | Genera una ficha de módulo separando VCC, lógica, protocolo, variante y requisitos. |
+| `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
+| `prompts/auditar-compatibilidad-hardware.md` | Audita pines, niveles, buses, variantes y compatibilidad entre catálogo y wiring. |
 
 ## Flujo recomendado
 
@@ -204,5 +230,31 @@ auditar y actualizar catálogo
 4. Para hardware, generar `docs/notas.md` y después `docs/conexiones.drawio.svg`.
 5. Ejecutar las auditorías correspondientes: `audit-hardware-docs.md` para hardware y `audit-project-docs.md` para el conjunto documental.
 6. Registrar build, tests, simulación o hardware solo si realmente se ejecutaron.
+
+## Catálogo híbrido de hardware
+
+El catálogo usa un motor común con tres espacios separados:
+
+```text
+catalog/boards/       → modelos físicos de placas y variantes
+catalog/peripherals/  → módulos, sensores, displays, radios y actuadores
+project-wiring.json   → conexiones concretas de un target
+```
+
+La separación evita mezclar las especificaciones genéricas de una placa con el wiring de un proyecto. Los índices seleccionan; las fichas documentan; el manifest resuelve la instancia; las reglas de `catalog/compatibility/` detectan incompatibilidades obvias.
+
+La procedencia es obligatoria para los datos técnicos. Deben distinguirse VCC, nivel lógico, señal, corriente, protocolo, variante y estado de verificación. El catálogo es contexto reusable: si el código/configuración actual contradice una ficha, se registra `CONTRADICTORIO` o `PENDIENTE_DE_VERIFICAR` y no se corrige silenciosamente.
+
+Herramienta común:
+
+```bash
+python3 codigo_tools/tools/hardware_catalog.py validate --type board catalog/boards/_template-board.json
+python3 codigo_tools/tools/hardware_catalog.py validate --type peripheral catalog/peripherals/_template-peripheral.json
+python3 codigo_tools/tools/hardware_catalog.py validate --type wiring templates/project-wiring.json
+python3 codigo_tools/tools/hardware_catalog.py search --type board --catalog-root catalog esp32
+python3 codigo_tools/tools/hardware_catalog.py check-project --catalog-root catalog path/to/project-wiring.json
+```
+
+`hardware_catalog.py` valida estructura, referencias, pines repetidos, pines boot/reservados y mismatches lógicos declarados. No sustituye datasheets, mediciones ni pruebas físicas. Los prompts de generación y auditoría deben ejecutarse sobre el proyecto real antes de afirmar una conexión.
 
 No se deben mezclar targets, versiones, emisores/receptores o placas en una única documentación ambigua. Si falta un archivo o una dependencia, el artefacto debe detenerse con `LECTURA_INCOMPLETA`.
