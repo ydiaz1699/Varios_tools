@@ -22,6 +22,7 @@ codigo_tools/
 ├── prompts/
 │   ├── analizar-codigo-completo.md
 │   ├── detectar-evolucionar-artefactos.md
+│   ├── planificar-material-reutilizable.md
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
@@ -60,9 +61,11 @@ codigo_tools/
 │   ├── copilot-instructions.md
 │   ├── artifact-manifest.json
 │   ├── artifact-evolution-report.json
+│   ├── reusable-material-plan.json
 │   └── project-wiring.json
 └── tools/
     ├── artifact_evolution.py
+    ├── reusable_material_extractor.py
     └── hardware_catalog.py
 ```
 
@@ -75,6 +78,7 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
 | `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
+| `prompts/planificar-material-reutilizable.md` | Revisa el scan determinista, corrige decisiones heurísticas y arma el plan trazable antes de promover artefactos. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera y compara `copilot-instructions.md` y `SKILL.md` desde el código y la configuración actuales. |
@@ -230,6 +234,34 @@ auditar y actualizar catálogo
 4. Para hardware, generar `docs/notas.md` y después `docs/conexiones.drawio.svg`.
 5. Ejecutar las auditorías correspondientes: `audit-hardware-docs.md` para hardware y `audit-project-docs.md` para el conjunto documental.
 6. Registrar build, tests, simulación o hardware solo si realmente se ejecutaron.
+
+## Extracción de material reutilizable
+
+`tools/reusable_material_extractor.py` es la primera etapa para analizar una tanda de proyectos sin desviarse hacia copiar firmware. Lee progresivamente los archivos de la raíz indicada, calcula metadata y hash, registra archivos de texto, binarios y directorios excluidos, extrae headings, tags, referencias y señales técnicas, y genera una matriz de candidatos. No copia el contenido completo ni modifica la fuente.
+
+La comparación contra `--baseline-root` es heurística y sirve para ordenar la revisión; no crea artefactos canónicos ni aprueba decisiones. El prompt `prompts/planificar-material-reutilizable.md` debe revisar después cada candidato `REUSABLE` o `PARAMETRIZABLE` y confirmar la procedencia antes de crear o mejorar un artefacto.
+
+Ejemplo:
+
+```bash
+python3 codigo_tools/tools/reusable_material_extractor.py scan \\
+  /ruta/proyecto \\
+  --target-id proyecto-arduino-uno \\
+  --snapshot 1ef29a9 \\
+  --project-purpose "PENDIENTE_DE_CONFIRMAR" \\
+  --baseline-root /ruta/Varios_tools/codigo_tools \\
+  --output-dir /ruta/reportes/proyecto-arduino-uno
+```
+
+La herramienta escribe fuera de la fuente:
+
+```text
+reportes/proyecto-arduino-uno/
+├── scan.json   # inventario, evidencia, candidatos y matriz máquina
+└── plan.md     # revisión humana y próximos pasos
+```
+
+Reglas de salida: `source_code`, configuración de build y project-wiring se marcan como `PRODUCT_SPECIFIC`; secretos solo generan nombres de campos, nunca valores; las decisiones tienen `review_required: true`; y `promotion_allowed` siempre es `false`. Las fichas concretas de hardware se mantienen separadas de los schemas, prompts y reglas reutilizables.
 
 ## Catálogo híbrido de hardware
 

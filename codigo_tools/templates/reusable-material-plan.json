@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "kind": "reusable-material-scan",
+  "source": {
+    "root": "[project root]",
+    "target_id": "[exact target]",
+    "snapshot": "[commit/branch/tag/date]",
+    "purpose": "[confirmed purpose]"
+  },
+  "coverage": {
+    "read_status": "COMPLETA_CON_BINARIOS_EN_METADATA",
+    "files_discovered": 0,
+    "text_files_read": 0,
+    "binary_metadata_only": 0,
+    "read_errors": 0,
+    "excluded_directories": []
+  },
+  "baseline": {
+    "root": "[codigo_tools root]",
+    "files_compared": 0,
+    "status": "AVAILABLE"
+  },
+  "files": [],
+  "candidates": [],
+  "matrix": [
+    {
+      "material_id": "[stable material id]",
+      "source_file": "[relative source path]",
+      "artifact_type": "prompt | template | reference | schema | audit | tool | hardware_board | hardware_peripheral | project_wiring | source_code | configuration",
+      "scope": "REUSABLE | PARAMETRIZABLE | PRODUCT_SPECIFIC | SENSITIVE",
+      "decision": "NUEVO | MEJORA | DUPLICADO | CONTRADICTORIO | VARIANTE | NO_DECIDIBLE | FUERA_DE_ALCANCE",
+      "canonical_path": "[existing codigo_tools path or null]",
+      "similarity": 0.0,
+      "evidence": "[file and line/heading/symbol reference]",
+      "destination": "[proposed codigo_tools destination or SOURCE_ONLY_EVIDENCE]",
+      "transformation": "[how to generalize without copying product data]",
+      "risk": "[collision, missing evidence or product-specific risk]",
+      "review_required": true
+    }
+  ],
+  "summary": {
+    "decisions": {},
+    "promotion_allowed": false
+  },
+  "guardrails": [
+    "Do not copy firmware, product logic, project wiring or secrets.",
+    "Keep source path and snapshot for every candidate.",
+    "Review every heuristic decision before creating or improving codigo_tools."
+  ]
+}
