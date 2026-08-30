@@ -23,6 +23,7 @@ codigo_tools/
 │   ├── analizar-codigo-completo.md
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
+│   ├── generar-contexto-agentes.md
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
@@ -32,7 +33,9 @@ codigo_tools/
 │   └── tipos-documentacion.md
 └── templates/
     ├── repo-map.yml
-    └── README-project.md
+    ├── README-project.md
+    ├── SKILL-project.md
+    └── copilot-instructions.md
 ```
 
 Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado.
@@ -45,6 +48,7 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
+| `prompts/generar-contexto-agentes.md` | Genera y compara `copilot-instructions.md` y `SKILL.md` desde el código y la configuración actuales. |
 | `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
@@ -128,6 +132,15 @@ Los artefactos se diseñaron a partir del análisis de `reloj NPT`:
 - `references/tipos-documentacion.md` incorpora la clasificación de `ress.md`.
 - `templates/repo-map.yml` conserva el esquema del `archivo-mapa.yml` sin copiar sus valores específicos.
 - `templates/README-project.md` conserva la estructura operativa sin incluir datos del reloj.
+
+## Contexto para agentes
+
+El prompt `prompts/generar-contexto-agentes.md` genera dos archivos complementarios a partir del target real:
+
+- `templates/copilot-instructions.md` — instrucciones generales del repositorio, plataforma, reglas, estilo, verificación y procedencia.
+- `templates/SKILL-project.md` — procedimiento accionable para una tarea recurrente concreta.
+
+No deben confundirse con la documentación del producto. `copilot-instructions.md` y `SKILL.md` son contexto de trabajo para agentes; el código sigue siendo la fuente de comportamiento. Antes de entregar ambos archivos se debe comparar la matriz de consistencia para detectar valores divergentes, por ejemplo target, dependencias, pines, umbrales, timeouts y comandos. Los secretos se redactan y los builds/tests no ejecutados se marcan como pendientes.
 
 ## Flujo recomendado por proyecto
 
