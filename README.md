@@ -7,6 +7,7 @@ Coleccion de herramientas y scripts organizados por proyecto.
 | Carpeta | Descripcion |
 |---------|-------------|
 | `adb_controller/` | Control de DNS Privado en Android por ADB (script, chatbot, documentacion) |
+| `codigo_tools/` | Prompts y herramientas para analizar código y generar/auditar documentación técnica |
 
 ## Estructura
 
