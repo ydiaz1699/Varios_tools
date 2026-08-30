@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "compatibility-rules",
+  "rules": [
+    {
+      "id": "logic-voltage-mismatch",
+      "when": "peripheral.signal_logic_voltage differs from board.logic.nominal_voltage",
+      "action": "require documented level shifting or mark PENDIENTE_DE_VERIFICAR",
+      "severity": "high",
+      "evidence_required": true
+    },
+    {
+      "id": "reserved-or-boot-pin",
+      "when": "wiring uses a board pin marked reserved or boot_sensitive",
+      "action": "warn and require explicit project decision",
+      "severity": "high",
+      "evidence_required": true
+    },
+    {
+      "id": "duplicate-board-pin",
+      "when": "two project connections use the same board pin without a shared-bus declaration",
+      "action": "report conflict",
+      "severity": "high",
+      "evidence_required": true
+    },
+    {
+      "id": "duplicate-bus-address",
+      "when": "two instances on the same bus use the same address without a mux or configuration",
+      "action": "report conflict",
+      "severity": "medium",
+      "evidence_required": true
+    },
+    {
+      "id": "unverified-breakout-spec",
+      "when": "voltage, current, isolation, range or tolerance depends on a module variant",
+      "action": "mark the field PENDIENTE_DE_VERIFICAR and require model/source",
+      "severity": "medium",
+      "evidence_required": true
+    }
+  ]
+}
