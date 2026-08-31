@@ -7,7 +7,7 @@
 
 ## Propósito y alcance
 
-[Describe en 2–3 líneas qué hace realmente el target.] 
+[Describe en 2–3 líneas qué hace realmente el target.]
 
 - Incluye: [target, entorno y capas cubiertos].
 - No incluye: [targets, versiones, placas o capas excluidos].
