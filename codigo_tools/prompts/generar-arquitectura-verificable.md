@@ -1,60 +1,210 @@
-# Generar una arquitectura verificable y parametrizable
+# Generar arquitectura verificable
 
 ## Propósito
 
-Genera un documento de arquitectura para `[PROJECT_ROOT]` a partir del proyecto completo y de la evidencia disponible. El resultado debe orientar a mantenedores y a otros agentes sin presentar como hechos los datos que solo aparecen en documentación, comentarios o configuración no ejecutada.
+Genera una arquitectura técnica de `[PROJECT_ROOT]` para que otro mantenedor o LLM pueda entender el sistema sin confundir código actual, historia, intención, despliegue o hipótesis. Este prompt produce una vista derivada de evidencia; no modifica el proyecto, no ejecuta cambios y no convierte un diagrama en fuente de verdad.
 
-Este prompt recrea un mapa arquitectónico; no copia firmware, hardware, nombres, endpoints, pines, topics, credenciales ni valores de otro proyecto.
+La calidad mínima exige el mismo protocolo de investigación que una documentación técnica de hardware rigurosa: alcance cerrado, inventario demostrable, lectura transitiva, claims trazables, parada segura y auditoría final contra las fuentes primarias.
 
-## Entradas
+## Entradas obligatorias
 
 ```text
-PROJECT_ROOT: [raíz absoluta del proyecto]
-TARGET_ID: [target, variante o sistema analizado]
-SNAPSHOT: [commit/tag/fecha o UNKNOWN]
-RELATED_DOCUMENTS: [documentos de arquitectura, changelog, plan, roadmap y README]
-VALIDATION_EVIDENCE: [builds, tests, logs, despliegue o NONE]
-OUTPUT_PATH: [ruta del documento generado]
+PROJECT_ROOT: [ruta absoluta de la raíz]
+TARGET_ID: [target, variante o sistema exacto]
+SNAPSHOT: [commit/tag/branch/fecha o UNKNOWN]
+OUTPUT_PATH: [ruta del documento]
+```
+
+## Entradas opcionales
+
+```text
+ARCHITECTURE_BASELINE: [ruta o NONE]
+CHANGELOG_BASELINE: [ruta o NONE]
+EXECUTION_PLAN_BASELINE: [ruta o NONE]
+ROADMAP_BASELINE: [ruta o NONE]
+VALIDATION_EVIDENCE: [builds, tests, logs, integración, despliegue o NONE]
+ALLOWED_EXTERNAL_SOURCES: [datasheets, tickets, runbooks o NONE]
 LANGUAGE: [idioma]
 ```
 
-## Procedimiento obligatorio
+No asumas que una carpeta contiene un único target. Si hay varias variantes, enuméralas con sus archivos de build, plataforma, entry points y estado; pide selección o genera documentos separados. Nunca mezcles variantes porque compartan nombres de módulos.
 
-1. Lee todos los archivos del proyecto de forma progresiva. Incluye código, headers, módulos locales, configuración, build, tests, CI, scripts y documentación relacionada.
-2. Sigue imports, includes, llamadas entre módulos, handlers, colas, interfaces, protocolos y dependencias. No infieras una relación solo porque dos nombres parezcan relacionados.
-3. Lee completamente los documentos relacionados y clasifica cada afirmación como `CURRENT`, `HISTORICAL`, `PROPOSED`, `VALIDATION_REQUIRED`, `EXTERNAL_UNVERIFIED` o `UNKNOWN`.
-4. Construye una matriz de claims: afirmación, fuente, rango/símbolo, estado, confianza y limitación.
-5. Usa esta jerarquía para resolver contradicciones: código/configuración actual; tests/builds/logs reproducibles; decisiones aprobadas; plan con estado; arquitectura; changelog; roadmap; drafts.
-6. Si un archivo requerido no existe, está truncado o no puede leerse, marca `LECTURA_INCOMPLETA` y no inventes el contenido faltante.
+## Estados y vocabularios
 
-## Estructura de salida
+Separa dos dimensiones que nunca deben colapsarse:
 
-Produce un Markdown con estas secciones:
+### Estado epistemológico
 
-1. **Identidad, snapshot y alcance**: target, variantes incluidas y excluidas, límites del análisis.
-2. **Resumen del sistema**: propósito y límites, con claims separados de inferencias.
-3. **Componentes y responsabilidades**: módulos, procesos, servicios, dispositivos o capas; cada uno con evidencia.
-4. **Flujos principales**: secuencias de entrada, procesamiento, salida, errores y recuperación.
-5. **Interfaces y contratos**: APIs, mensajes, formatos, buses, storage y dependencias; solo lo observado.
-6. **Versiones o variantes coexistentes**: separar targets incompatibles y declarar qué es actual, histórico o experimental.
-7. **Configuración y despliegue**: solo si está respaldado; parametrizar valores de entorno y redactar secretos.
-8. **Invariantes y riesgos**: reglas de orden, límites, timeouts, prioridades y condiciones de fallo.
-9. **Diagrama abstracto**: representar relaciones verificadas; no convertir conectividad lógica en cableado físico.
-10. **Contradicciones y pendientes**: documento versus código, interfaces no encontradas, claims sin pruebas y decisiones abiertas.
-11. **Matriz de evidencia y validación**: tests/builds ejecutados y no ejecutados.
-12. **Parámetros para reutilización**: nombres, rutas, targets y valores que otro proyecto debe completar.
+```text
+OBSERVED_IN_CODE       operación, relación o valor localizado en código/configuración
+OBSERVED_IN_BUILD      declarado o resuelto por el sistema de build
+DOCUMENTED             afirmado por un documento
+INFERRED               deducido; requiere explicación y confianza
+CONTRADICTED           una fuente confiable discrepa
+UNKNOWN                no hay evidencia suficiente
+INCOMPLETE_READ        depende de una fuente no leída por completo
+EXTERNAL_UNVERIFIED    depende de despliegue, hardware o fuente externa no adjunta
+```
 
-## Reglas de seguridad y generalización
+### Estado de ejecución
 
-- Sustituye nombres de dispositivos, hosts, IPs, pines, topics, IDs, rutas privadas y versiones particulares por placeholders tipados.
-- Nunca copies cuerpos completos de firmware ni bloques que incluyan secretos.
-- No afirmes “funciona”, “está desplegado”, “está flasheado”, “es no bloqueante” o una latencia concreta sin evidencia de ejecución.
-- Diferencia arquitectura observada de arquitectura propuesta.
-- No uses una documentación histórica para sobrescribir el código actual.
-- Si una relación no puede demostrarse, escribe `UNKNOWN` o `VALIDATION_REQUIRED`.
-- Las dependencias declaradas en build prueban intención/configuración, no un build exitoso.
-- Los datos de hardware deben permanecer separados de las relaciones físicas concretas del target.
+```text
+NOT_EXECUTED
+COMPILED
+TESTED
+INTEGRATION_VERIFIED
+HARDWARE_VERIFIED
+```
 
-## Validación antes de entregar
+`OBSERVED_IN_CODE` nunca significa `WORKS`. `COMPILED` nunca significa `HARDWARE_VERIFIED`.
 
-Comprueba que cada componente y relación tiene procedencia; que no se mezclaron variantes; que cada claim importante tiene estado; que las contradicciones quedaron visibles; que no aparecen secretos/valores identificables; que el diagrama solo contiene relaciones verificadas; y que se declara explícitamente qué build, test o prueba física no se ejecutó.
+## Fase 0 — Alcance y línea base
+
+Antes de redactar, entrega un registro interno con:
+
+```text
+Target seleccionado:
+Snapshot y método para obtenerlo:
+Variantes incluidas:
+Variantes excluidas y motivo:
+Entorno(s) de build:
+Entry points:
+Documentos baseline:
+Evidencia de validación:
+Fuentes externas autorizadas:
+```
+
+Cada claim debe pertenecer a un `TARGET_ID` y snapshot. Si el snapshot es `UNKNOWN`, no inventes una versión. Si el alcance es ambiguo, detén la arquitectura final con `INPUT_AMBIGUOUS` y devuelve solo el inventario y las preguntas necesarias.
+
+## Fase 1 — Inventario completo y auditable
+
+Recorre todo el proyecto y clasifica cada archivo relevante como código, configuración, build, dependencia local, test, CI, script, documentación, schema o artefacto generado. Registra:
+
+```text
+FILE_ID | ruta relativa | tipo | bytes/líneas | hash si está disponible |
+read_state | chunks | rol | target(s) | usado como evidencia
+```
+
+Debes leer completamente, cuando existan:
+
+- entry points y módulos llamados;
+- headers/includes e imports transitivos;
+- `platformio.ini`, `CMakeLists.txt`, `package.json`, `pyproject.toml`, Makefiles y build flags;
+- bibliotecas locales, manifests y fuentes compartidas;
+- configuración, schemas, scripts de generación y CI;
+- tests, fixtures y herramientas de simulación;
+- README, arquitectura, changelog, plan, roadmap y documentación baseline.
+
+Para archivos grandes usa chunks con IDs estables:
+
+```text
+FILE_ID-C01 | líneas inicial-final | estado | hash opcional
+```
+
+El índice de chunks debe permitir volver a la fuente. Un resumen no sustituye la lectura del chunk.
+
+Si falta, está truncado, es ilegible o no puede resolverse una dependencia requerida, marca `INCOMPLETE_READ`. No generes un documento que parezca completo: entrega `LECTURA_INCOMPLETA`, inventario, dependencias pendientes y preguntas.
+
+## Fase 2 — Cierre de dependencias y extracción de arquitectura
+
+Sigue las relaciones reales hasta punto fijo. Busca y registra usos, no solo declaraciones:
+
+- funciones de entrada y salida, handlers y callbacks;
+- llamadas entre módulos, constructores, interfaces y adapters;
+- colas, máquinas de estado, timers, retries, locks y prioridades;
+- persistencia, serialización, protocolos, buses y formatos;
+- configuración que altera el camino de ejecución;
+- errores, timeouts, recuperación y efectos secundarios;
+- servicios externos y condiciones de despliegue.
+
+Construye un modelo interno de nodos y aristas:
+
+```text
+EDGE_ID | origen | destino | relación | condición |
+fuente/rango/símbolo | estado | confianza | destino documental
+```
+
+Una arista basada solo en nombres, proximidad de archivos o documentación no confirmada no puede aparecer como relación observada.
+
+## Fase 3 — Registro de claims
+
+Antes de escribir prosa, crea una fila por afirmación relevante:
+
+```text
+CLAIM_ID | target | afirmación normalizada | tipo de claim |
+fuente primaria | rango/símbolo/chunk | fuente secundaria |
+estado epistemológico | confianza | conflicto | sección destino |
+limitación | estado de ejecución
+```
+
+Clasifica los claims por: identidad, componente, responsabilidad, flujo, interfaz, dependencia, variante, configuración, seguridad, rendimiento, despliegue o riesgo.
+
+Jerarquía por tipo de claim:
+
+- estado actual y comportamiento: código/configuración del snapshot;
+- cambio histórico: commit/diff/tag, si existe;
+- decisión: decisión aprobada o plan con estado explícito;
+- intención futura: plan/roadmap, siempre `PROPOSED`;
+- compilación/test/integración/hardware: solo evidencia de ejecución;
+- despliegue externo: evidencia externa autorizada, si existe.
+
+Cuando dos fuentes discrepan, registra ambas, explica cuál tiene autoridad para ese tipo de claim y conserva el conflicto.
+
+## Fase 4 — Redacción del documento
+
+Genera `OUTPUT_PATH` con esta estructura mínima:
+
+```markdown
+# Arquitectura — [TARGET_ID]
+
+> Snapshot: [SNAPSHOT]
+> Estado documental: DRAFT | GENERATED | AUDITED
+> Cobertura: COMPLETE | INCOMPLETE_READ
+
+## 1. Alcance y variantes
+## 2. Resumen del sistema
+## 3. Componentes y responsabilidades
+## 4. Flujos de entrada, procesamiento, salida y recuperación
+## 5. Interfaces y contratos observados
+## 6. Dependencias y configuración que altera el comportamiento
+## 7. Versiones, targets y estados CURRENT/HISTORICAL/PROPOSED
+## 8. Invariantes, límites, riesgos y fallos conocidos
+## 9. Comunicaciones lógicas y servicios externos
+## 10. Diagrama abstracto de relaciones verificadas
+## 11. Contradicciones y decisiones pendientes
+## 12. Matriz de claims y procedencia
+## 13. Validación ejecutada y no ejecutada
+## 14. Parámetros que otro proyecto debe completar
+## 15. Cobertura, exclusiones y limitaciones
+```
+
+Cada componente debe indicar responsabilidad, interfaces, fuentes y estado. Cada flujo debe indicar entrada, precondición, pasos, salida, error y recuperación. El diagrama se genera exclusivamente de la matriz de aristas y debe distinguir relación lógica, dependencia de software, transporte y conexión física; nunca dibujes WiFi, UDP, MQTT, OTA, topics o APIs como cables eléctricos.
+
+## Generalización y seguridad
+
+- No copies firmware, nombres de productos, hosts, IPs, pines, topics, IDs, rutas privadas, credenciales, claves, tokens ni valores de despliegue.
+- En el documento reusable usa placeholders tipados: `[MODULE]`, `[INTERFACE]`, `[TARGET_ID]`, `[ENDPOINT]`, `[DEVICE_ID]`, `[CONFIG_KEY]`.
+- La evidencia interna debe conservar solo ruta, símbolo, rango, hash y categoría; redacta valores sensibles.
+- No deduzcas hardware, voltaje, rendimiento, disponibilidad, no-bloqueo o despliegue desde una convención.
+- Una dependencia declarada en build prueba configuración, no compilación exitosa.
+- Una función disponible en una biblioteca no prueba que el camino real la invoque.
+
+## Fase 5 — Replay y auditoría final
+
+Después de redactar, vuelve a revisar las fuentes primarias completas, no el resumen. Comprueba:
+
+1. Cada componente, arista, flujo e interfaz tiene claim y fuente.
+2. No se mezclaron targets, variantes, producción, laboratorio o historia.
+3. Cada estado actual/histórico/propuesto está etiquetado.
+4. Las contradicciones no fueron ocultadas.
+5. Cada claim importante tiene sección destino o exclusión justificada.
+6. No aparecen secretos ni valores product-specific en la salida reusable.
+7. El diagrama coincide exactamente con las aristas permitidas.
+8. Build, tests, integración y hardware no ejecutados aparecen como `NOT_EXECUTED`.
+9. La cobertura del inventario coincide con la matriz.
+
+Si una comprobación falla, el estado debe ser `AUDIT_FAILED`; no declares la arquitectura terminada.
+
+## Salida de error y revisión
+
+Si la lectura es incompleta, devuelve un informe limitado con inventario, archivos faltantes, dependencias no resueltas, claims afectados y `LECTURA_INCOMPLETA`. Si hay contradicciones irresueltas, usa `CONFLICT_UNRESOLVED`. Toda salida requiere revisión humana; este prompt no autoriza promoción ni commit.
