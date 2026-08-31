@@ -40,11 +40,15 @@ codigo_tools/
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
-│   ├── generar-especificacion-recreador.md
 │   ├── generar-arquitectura-verificable.md
 │   ├── generar-changelog-evidencial.md
 │   ├── generar-plan-ejecucion-canonico.md
 │   ├── generar-roadmap-tecnico.md
+│   ├── generar-ledger-bugs-evidencial.md
+│   ├── generar-auditoria-protocolo.md
+│   ├── generar-especificacion-requisitos.md
+│   ├── generar-checklist-cambio-seguro.md
+│   ├── generar-preflight-contexto.md
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
@@ -56,64 +60,58 @@ codigo_tools/
 ├── references/
 │   ├── arquitectura-canonica-contexto.md
 │   ├── criterios.md
-│   ├── hardware-catalog-policy.md
-│   ├── hardware-evidence.md
-│   ├── politica-evolucion-artefactos.md
-│   ├── recreator-spec-contract.md
-│   └── tipos-documentacion.md
-├── catalog/
-│   ├── README.md
-│   ├── schemas/
-│   │   ├── board.schema.json
-│   │   ├── peripheral.schema.json
-│   │   └── project-wiring.schema.json
-│   ├── boards/
-│   │   ├── index.json
-│   │   └── _template-board.json
-│   ├── peripherals/
-│   │   ├── index.json
-│   │   └── _template-peripheral.json
-│   └── compatibility/
-│       └── rules.json
-├── templates/
-│   ├── PROJECT_CONTEXT.md
-│   ├── repo-map.yml
-│   ├── README-project.md
-│   ├── SKILL-project.md
-│   ├── copilot-instructions.md
-│   ├── artifact-manifest.json
-│   ├── artifact-evolution-report.json
-│   ├── reusable-material-plan.json
-│   ├── recreator-spec.json
-│   └── project-wiring.json
-└── tools/
-    ├── artifact_evolution.py
-    ├── reusable_material_extractor.py
-    ├── recreator_spec.py
-    ├── validate_context_bundle.py
-    └── hardware_catalog.py
+│   ├── tipos-documentacion.md
+│   ├── coding-style-tags.md
+│   ├── shared-platformio-environment.md
+│   └── context-bundle-contract.md
+└── templates/
+    ├── repo-map.yml
+    ├── README-project.md
+    └── project-context-bundle/
+        ├── README.md
+        ├── project-context-bundle-manifest.json
+        ├── shared/
+        │   ├── CODING_STYLE.md
+        │   └── SOFTWARE.md
+        └── project/.ai/
+            ├── PROJECT_CONTEXT.md
+            ├── HARDWARE.md
+            ├── SOFTWARE.md
+            ├── SKILL.md
+            ├── TASKS.md
+            ├── DECISIONS.md
+            ├── ROADMAP.md
+            ├── CHANGELOG.md
+            ├── ARCHITECTURE.md
+            ├── PROTOCOL.md
+            └── TESTING.md
 ```
 
-Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado.
+`tools/validate_context_bundle.py` valida el punto de entrada, los enlaces, secretos redactados y referencias de catálogo en modo report-only.
+
+Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `references/criterios.md` documenta el método común, pero un prompt debe repetir las reglas críticas que necesita para no depender de que ese archivo también sea adjuntado. Las referencias `coding-style-tags.md` y `shared-platformio-environment.md` describen cómo parametrizar las dos piezas compartidas del bundle de contexto sin convertir sus defaults en hechos del proyecto.
 
 ## Prompts disponibles
 
 | Prompt | Función |
 |---|---|
-| `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
-| `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
 | `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
 | `prompts/planificar-material-reutilizable.md` | Revisa el scan determinista, corrige decisiones heurísticas y arma el plan trazable antes de promover artefactos. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
-| `prompts/generar-contexto-agentes.md` | Genera y compara contexto mínimo y artefactos condicionales de agente desde el código y la configuración actuales. |
-| `prompts/generar-especificacion-recreador.md` | Reconstruye el contrato y el prompt genérico de un artefacto documental, incluso cuando la fuente no tiene un prompt equivalente. |
-| `prompts/generar-arquitectura-verificable.md` | Genera un mapa de arquitectura por capas con claims, estados, contradicciones y relaciones verificables. |
-| `prompts/generar-changelog-evidencial.md` | Genera un historial de evolución trazable sin inventar releases, fechas ni resultados. |
-| `prompts/generar-plan-ejecucion-canonico.md` | Genera un plan de continuación con línea base, fases, gates, rollback y checklist. |
-| `prompts/generar-roadmap-tecnico.md` | Genera un backlog técnico priorizado con dependencias, riesgos, aceptación y validación. |
-| `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
+| `prompts/generar-contexto-agentes.md` | Genera contexto general y una skill accionable desde el target real, con matriz de consistencia. |
+| `prompts/generar-arquitectura-verificable.md` | Genera arquitectura por claims, dependencias, flujos, variantes, límites y evidencia. |
+| `prompts/generar-changelog-evidencial.md` | Genera historial basado en diffs/historia disponible, separando cambio de validación. |
+| `prompts/generar-plan-ejecucion-canonico.md` | Genera fases con baseline, gates, aceptación, rollback, riesgos y trazabilidad. |
+| `prompts/generar-roadmap-tecnico.md` | Prioriza gaps futuros con dependencias, riesgos, aceptación y validación. |
+| `prompts/generar-ledger-bugs-evidencial.md` | Registra síntoma, causa, solución, aplicación, validación, regresión y criterios de cierre. |
+| `prompts/generar-auditoria-protocolo.md` | Compara contratos y alternativas antes de recomendar reutilizar, adaptar o crear un protocolo. |
+| `prompts/generar-especificacion-requisitos.md` | Convierte una necesidad en requisitos verificables, alternativas, decisiones, aceptación y fases. |
+| `prompts/generar-checklist-cambio-seguro.md` | Ordena cambios acotados con baseline, precondiciones, validación, rollback y promoción manual. |
+| `prompts/generar-preflight-contexto.md` | Construye la matriz de claims, sensibilidad, destino y condiciones antes de generar contexto. |
+| `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
+| `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
 | `prompts/generar-ficha-board.md` | Genera una ficha de catálogo para una placa física, separada del wiring de proyectos. |
@@ -129,6 +127,17 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 5. Generar el diagrama desde el inventario de hardware validado, no desde una interpretación independiente.
 6. Ejecutar el prompt de auditoría después de cualquier cambio de pines, placa, módulos o conexiones.
 7. Registrar manualmente cualquier confirmación hecha con datasheet, multímetro o hardware real.
+
+## Bundle genérico de contexto compartido
+
+El scaffold [`templates/project-context-bundle/`](templates/project-context-bundle/) recrea de forma genérica el patrón histórico `workspace-context-engineering/` sin copiar sus valores de proyecto. Es un bundle coordinado, no ocho herramientas independientes:
+
+- `shared/CODING_STYLE.md` y `shared/SOFTWARE.md`: convenciones y entorno común, parametrizados.
+- `project/.ai/PROJECT_CONTEXT.md`: punto de entrada mínimo y obligatorio.
+- Templates condicionales: `HARDWARE.md`, `SKILL.md`, `TASKS.md`, `DECISIONS.md`, `ROADMAP.md`, `CHANGELOG.md`, `ARCHITECTURE.md`, `PROTOCOL.md` y `TESTING.md`.
+- `project-context-bundle-manifest.json`: condiciones de generación, estados de evidencia y promoción bloqueada.
+
+El preflight decide qué archivos condicionales tienen justificación. El contrato está en [`references/context-bundle-contract.md`](references/context-bundle-contract.md). PlatformIO/Arduino, Todo Tree, `115200` y `F()` no se tratan como requisitos universales: se registran como defaults o reglas condicionadas y deben confirmarse en el proyecto destinatario.
 
 ## Aplicación a `wifi_PIR`
 
@@ -375,19 +384,56 @@ python3 codigo_tools/tools/hardware_catalog.py check-project --catalog-root cata
 No se deben mezclar targets, versiones, emisores/receptores o placas en una única documentación ambigua. Si falta un archivo o una dependencia, el artefacto debe detenerse con `LECTURA_INCOMPLETA`.
 
 
-## Arquitectura canónica de contexto
+## Extracción reusable de `wifi_PIR/_drafts`
 
-`references/arquitectura-canonica-contexto.md` define tres capas lógicas: catálogo, shared y proyecto. El catálogo usa JSON/schema; `project-wiring.json` representa la instancia física; `PROJECT_CONTEXT.md` es el mínimo del bundle y los demás archivos `.ai/` son condicionales.
+La extracción se hizo sobre dos capas históricas y no copia el firmware:
 
-La validación estática se ejecuta sin modificar ni promover la fuente:
+- Los **11 drafts pre-consolidación** (`BUGS_FIXED.md`, `META_PROMPT.md`, `ideas.md`, `plantilla de prompt.md`, `prodoco.md`, `prompt.md`, `prompt2.md`, `instrucciones.md`, `1mejoras.md`, `bugs.md` y el patch) aportaron contratos de ledger de bugs, requisitos, auditoría de protocolos, roadmap, checklist de cambios y documentación audit-first.
+- La tanda ampliada del snapshot histórico aportó prompts de análisis, README, repo-map, hardware, contexto de agentes, catálogo, wiring y bundle `.ai`.
 
-```bash
-python3 codigo_tools/tools/validate_context_bundle.py validate /ruta/proyecto \
-  --catalog-root codigo_tools/catalog \
-  --output reports/context-bundle.json
-python3 codigo_tools/tools/validate_context_bundle.py catalog-gap \
-  /ruta/proyecto/project-wiring.json \
-  --catalog-root codigo_tools/catalog
+| Comportamiento extraído | Artefacto reusable | Estado de promoción |
+|---|---|---|
+| Lectura completa y trazable | `prompts/analizar-codigo-completo.md` | Integrado |
+| Repo-map y README derivados | `prompts/generar-repo-map.md`, `prompts/generar-readme.md`, templates asociados | Integrado |
+| Notas y diagrama físico | `prompts/gen-notas-hw.md`, `prompts/gen-conexiones-svg.md` | Integrado; el wiring concreto queda en el target |
+| Auditoría documental/hardware | `prompts/audit-project-docs.md`, `prompts/audit-hardware-docs.md` | Integrado |
+| Requisitos antes de implementar | `prompts/generar-especificacion-requisitos.md` cuando esté disponible en la rama enriquecida | Contrato extraído; no duplicar versiones |
+| Ledger de defectos | `prompts/generar-ledger-bugs-evidencial.md` cuando esté disponible en la rama enriquecida | Contrato extraído; bugs concretos excluidos |
+| Auditoría comparativa de protocolos | `prompts/generar-auditoria-protocolo.md` cuando esté disponible en la rama enriquecida | Variante reusable; protocolo de producto excluido |
+| Arquitectura, changelog, plan y roadmap evidenciales | prompts documentales correspondientes de la línea enriquecida | Contratos extraídos; estados deben revisarse antes de promoción |
+| Cambio seguro y promoción manual | `prompts/generar-checklist-cambio-seguro.md` | Integrado en esta extracción |
+| Preflight de claims y bundle | `prompts/generar-preflight-contexto.md` | Integrado en esta extracción |
+| Bundle coordinado de contexto | `templates/project-context-bundle/` | Scaffold genérico, promoción manual |
+| Validación de bundle y gaps de catálogo | `tools/validate_context_bundle.py` | Integrado como herramienta report-only |
+
+El patch `v4.3.1-security.patch`, el firmware, los pines, wiring, protocolos, credenciales, IPs, topics, modelos y valores de producto permanecen fuera de alcance. Una fuente histórica puede demostrar que existió una propuesta; no demuestra que esté implementada ni validada.
+
+## Flujo completo de extracción y uso
+
+```text
+fuente histórica → lectura completa → matriz de trazabilidad → revisión semántica
+                → prompt/template genérico → preflight → scaffold en salida separada
+                → validate_context_bundle → revisión humana → promoción manual
 ```
 
-El validador comprueba secciones mínimas, enlaces Markdown, asignaciones de secretos no redactadas, condiciones documentales y referencias de wiring. Un `catalog-gap` solo informa referencias ausentes y sugerencias; nunca crea ni publica fichas.
+Comandos principales:
+
+```bash
+# Preparar el contexto antes de generar documentos
+# El prompt es report-only y requiere proporcionar PROJECT_ROOT/TARGET_ID/SNAPSHOT.
+
+# Validar un bundle sin modificarlo
+python3 codigo_tools/tools/validate_context_bundle.py validate /ruta/proyecto \
+  --output /ruta/reportes/context-bundle.json
+
+# Detectar referencias de catálogo ausentes desde project-wiring.json
+python3 codigo_tools/tools/validate_context_bundle.py catalog-gap /ruta/proyecto \
+  --catalog-root codigo_tools/catalog \
+  --output /ruta/reportes/catalog-gap.json
+```
+
+La herramienta no corrige enlaces, no ejecuta builds, no crea fichas, no imprime secretos y no promociona archivos. Para cambiar el repositorio fuente debe existir una autorización independiente y un checklist de cambio seguro.
+
+## Artefactos deliberadamente no promovidos
+
+No se convierten en herramientas globales los datos concretos de las fichas de boards/peripherals, los proyectos de ejemplo, los SVG de wiring, los `platformio.ini`, el firmware, el patch de seguridad ni las configuraciones de producto. Las fichas técnicas solo pueden entrar al catálogo tras validación por modelo/variante y procedencia por campo; los gaps generan reportes, no publicaciones automáticas.
