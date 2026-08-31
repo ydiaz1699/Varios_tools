@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "recreator_id": "recreator-[stable-id]",
+  "artifact_id": "[stable-artifact-id]",
+  "artifact_type": "roadmap | file-map | guide | architecture | changelog | inventory | other",
+  "status": "candidate | proposed | accepted | deprecated",
+  "purpose": "[reusable purpose of the recreated artifact generator]",
+  "target_scope": ["general"],
+  "readers": ["llm", "reviewer"],
+  "document_role": "[decision or workflow served by the source document]",
+  "snapshot": "[commit/tag/branch/date or UNKNOWN]",
+  "source_project": "[project identifier or redacted]",
+  "source_files": [
+    {
+      "path": "[relative path]",
+      "reference": "[line/heading/symbol/chunk]",
+      "kind": "code | configuration | documentation | prompt | template | script | test | ci | other",
+      "role": "[why this file was read]",
+      "read_state": "COMPLETE | PARTIAL | MISSING | UNREADABLE",
+      "content_class": "REUSABLE | PARAMETRIZABLE | PRODUCT_SPECIFIC | SENSITIVE | MIXED",
+      "sha256": "[hash or UNAVAILABLE]",
+      "sensitive_content_present": false
+    }
+  ],
+  "document_inputs": [
+    {
+      "id": "[input-id]",
+      "description": "[what the generator needs]",
+      "source_categories": ["code", "documentation"],
+      "required": true,
+      "parameter": "[placeholder or NONE]",
+      "evidence": ["[source file and reference]"]
+    }
+  ],
+  "capabilities": [
+    "[action enabled by the recreated prompt]"
+  ],
+  "inputs": [
+    "[runtime input or project source]"
+  ],
+  "outputs": [
+    "[document or report produced]"
+  ],
+  "sections": [
+    {
+      "id": "[section-id]",
+      "name": "[generic section name]",
+      "required": true,
+      "include_when": "[condition or ALWAYS]",
+      "omit_when": "[condition or NEVER]",
+      "evidence_required": true,
+      "parameters": ["[placeholder]"]
+    }
+  ],
+  "behavioral_contract": {
+    "purpose": "[what the generator must accomplish]",
+    "preconditions": ["[condition before generation]"],
+    "analysis_order": ["[ordered evidence/analysis phase]"],
+    "transformations": ["[how evidence becomes document content]"],
+    "invariants": ["[properties that must always hold]"],
+    "evidence_policy": {
+      "allowed_states": ["CONFIRMED", "INFERRED", "CONTRADICTED", "UNKNOWN", "LECTURA_INCOMPLETA"],
+      "unsupported_claim_action": "[omit | mark unknown | block]",
+      "historical_document_policy": "[how proposals/history are labeled]"
+    }
+  },
+  "reconstruction_steps": [
+    {
+      "id": "S001",
+      "order": 1,
+      "action": "[generic action]",
+      "inputs": ["[input-id]"],
+      "outputs": ["[intermediate result]"],
+      "evidence": ["[source file and reference]"],
+      "failure_action": "[mark incomplete | omit section | block]"
+    }
+  ],
+  "generation_conditions": [
+    {
+      "id": "G001",
+      "condition": "[condition that permits generation]",
+      "effect": "[generation consequence]",
+      "evidence": ["[source and reference]"],
+      "state": "CONFIRMED | INFERRED | UNKNOWN | LECTURA_INCOMPLETA"
+    }
+  ],
+  "omission_conditions": [
+    {
+      "id": "O001",
+      "condition": "[condition requiring omission or warning]",
+      "action": "[omit section | add warning | block generation]",
+      "reason": "[why omission is safer/correct]",
+      "evidence": ["[source and reference]"],
+      "state": "CONFIRMED | INFERRED | UNKNOWN | LECTURA_INCOMPLETA"
+    }
+  ],
+  "conflicts_with_code": [
+    {
+      "id": "X001",
+      "claim": "[normalized document claim]",
+      "document_source": "[path and reference]",
+      "code_source": "[path and reference]",
+      "status": "CONTRADICTED | UNRESOLVED | RESOLVED",
+      "resolution": "[historical label | code takes precedence | omit | pending review]"
+    }
+  ],
+  "claims": [
+    {
+      "id": "C001",
+      "key": "[normalized key]",
+      "value": "[abstract value or placeholder]",
+      "scope": "general | target scope",
+      "state": "CONFIRMED | INFERRED | CONTRADICTED | UNKNOWN | LECTURA_INCOMPLETA",
+      "evidence": [
+        {
+          "file": "[path]",
+          "reference": "[line/heading/symbol/chunk]",
+          "state": "OBSERVADO_EN_CODIGO | DOCUMENTADO | INFERIDO | CONTRADICTORIO | PENDIENTE_DE_VERIFICAR"
+        }
+      ]
+    }
+  ],
+  "reusable_content": [
+    "[general rule or pattern]"
+  ],
+  "parameterized_content": [
+    "[source detail converted to a placeholder]"
+  ],
+  "product_specific_content": [
+    "[source detail explicitly excluded from the generic prompt]"
+  ],
+  "sensitive_fields": [
+    "[redacted field/path/category; never a secret value]"
+  ],
+  "output_artifacts": [
+    {
+      "path": "recreator-prompt.md",
+      "artifact_type": "prompt",
+      "required": true,
+      "description": "[generic prompt for another project]",
+      "promotion_allowed": false
+    },
+    {
+      "path": "review.md",
+      "artifact_type": "review",
+      "required": true,
+      "description": "[traceability and limitations report]",
+      "promotion_allowed": false
+    }
+  ],
+  "compatibility": {
+    "platforms": ["any"],
+    "dependencies": ["[dependency or none]"],
+    "formats": ["markdown", "json"]
+  },
+  "verification": {
+    "read_complete": false,
+    "incomplete_files": [],
+    "traceability_complete": false,
+    "sensitive_values_redacted": true,
+    "output_outside_source_project": false,
+    "build": "NOT_EXECUTED",
+    "tests": "NOT_EXECUTED",
+    "integration": "PENDING_DE_VERIFICAR",
+    "human_review": "REQUIRED"
+  },
+  "promotion": {
+    "promotion_allowed": false,
+    "review_required": true,
+    "approved_by": null,
+    "approved_at": null
+  },
+  "relations": {
+    "improves": [],
+    "duplicates": [],
+    "variants": [],
+    "conflicts_with": []
+  }
+}

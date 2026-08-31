@@ -2,6 +2,20 @@
 
 Colección de prompts y herramientas para analizar proyectos de código y generar documentación derivada de la fuente real.
 
+> **Propósito principal:** analizar proyectos y documentos de `_drafts`, leer su código y documentación completa, y recrear sus comportamientos documentales como prompts, templates, referencias y herramientas genéricas para otros proyectos. Los proyectos de `_drafts` son fuentes de procedencia; `wifi_PIR` no es destino de integración.
+>
+> Consulta [`PURPOSE.md`](PURPOSE.md) antes de añadir o modificar un artefacto. No copies firmware, lógica de producto, pines, wiring, protocolos configurados, secretos ni valores específicos de las fuentes.
+
+## Propósito y alcance
+
+El objetivo de `codigo_tools` no es adaptar el código de los proyectos de `_drafts` a `wifi_PIR`. Es recrear las herramientas documentales que esos proyectos ejemplifican: prompts que leen el código completo y generan `docs/notas.md`, `docs/conexiones.drawio.svg`, `README.md`, mapas de repositorio, archivos `.ai/` y auditorías trazables.
+
+La pregunta central para cada archivo fuente es:
+
+> **¿Qué herramienta, prompt o artefacto reutilizable se puede recrear a partir de este material?**
+
+Los proyectos históricos y el snapshot `1ef29a9ee22af797fb1e4e94c6fccbd0ba50901d` se conservan como procedencia y casos de estudio. El catálogo de hardware y la arquitectura de contexto son soporte de este objetivo, no el objetivo principal.
+
 ## Objetivo
 
 `codigo_tools` no contiene la lógica de los proyectos analizados. Contiene procedimientos reutilizables para que una LLM o una herramienta:
@@ -26,6 +40,7 @@ codigo_tools/
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
+│   ├── generar-especificacion-recreador.md
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
@@ -40,6 +55,7 @@ codigo_tools/
 │   ├── hardware-catalog-policy.md
 │   ├── hardware-evidence.md
 │   ├── politica-evolucion-artefactos.md
+│   ├── recreator-spec-contract.md
 │   └── tipos-documentacion.md
 ├── catalog/
 │   ├── README.md
@@ -64,10 +80,12 @@ codigo_tools/
 │   ├── artifact-manifest.json
 │   ├── artifact-evolution-report.json
 │   ├── reusable-material-plan.json
+│   ├── recreator-spec.json
 │   └── project-wiring.json
 └── tools/
     ├── artifact_evolution.py
     ├── reusable_material_extractor.py
+    ├── recreator_spec.py
     ├── validate_context_bundle.py
     └── hardware_catalog.py
 ```
@@ -86,6 +104,7 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera y compara contexto mínimo y artefactos condicionales de agente desde el código y la configuración actuales. |
+| `prompts/generar-especificacion-recreador.md` | Reconstruye el contrato y el prompt genérico de un artefacto documental, incluso cuando la fuente no tiene un prompt equivalente. |
 | `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
@@ -265,6 +284,34 @@ reportes/proyecto-arduino-uno/
 ```
 
 Reglas de salida: `source_code`, configuración de build y project-wiring se marcan como `PRODUCT_SPECIFIC`; secretos solo generan nombres de campos, nunca valores; las decisiones tienen `review_required: true`; y `promotion_allowed` siempre es `false`. Las fichas concretas de hardware se mantienen separadas de los schemas, prompts y reglas reutilizables.
+
+## Recreación de prompts y artefactos documentales
+
+Cuando un proyecto fuente contiene un artefacto documental pero no un prompt equivalente —por ejemplo, un `ROADMAP.md` sin instrucciones de generación— se puede reconstruir el comportamiento documental sin copiar el producto:
+
+1. Ejecutar `tools/recreator_spec.py prepare` sobre la raíz completa del proyecto, indicando el artefacto de referencia.
+2. Leer el proyecto y el artefacto desde sus rutas originales usando `prompts/generar-especificacion-recreador.md`; el manifiesto preparado solo contiene metadata, hashes y estados de lectura.
+3. Inferir el contrato con trazabilidad: entradas, orden de análisis, secciones, condiciones, omisiones, contradicciones y validaciones.
+4. Generar `recreator-spec.json`, `recreator-prompt.md` y `review.md` fuera del proyecto fuente.
+5. Validar la especificación y revisar semánticamente antes de promoverla.
+
+Ejemplo para un artefacto tipo roadmap:
+
+```bash
+python3 codigo_tools/tools/recreator_spec.py prepare /ruta/proyecto \\
+  --artifact ROADMAP.md \\
+  --output-dir /ruta/reportes/recreator-roadmap \\
+  --target-id proyecto-roadmap \\
+  --snapshot COMMIT_O_TAG \\
+  --purpose "reconstruir un generador genérico de roadmaps"
+
+python3 codigo_tools/tools/recreator_spec.py validate-spec \\
+  /ruta/reportes/recreator-roadmap/recreator-spec.json
+```
+
+Si existe un prompt fuente, añadirlo con `--prompt`; si no existe, el LLM debe inferir el contrato comparando el documento completo con el código, configuración, scripts y documentación relacionada. `ROADMAP.md` se trata como planificación o historia y se contrasta con el código, no como verdad ejecutable. La herramienta determinista no hace esa inferencia: prepara evidencia, valida el contrato y bloquea la promoción.
+
+Las salidas nunca deben incluir cuerpos completos de firmware/documentos, secretos ni valores de producto. Los archivos incompletos se marcan `LECTURA_INCOMPLETA`, las contradicciones se conservan para revisión y `promotion_allowed` permanece `false`.
 
 ## Catálogo híbrido de hardware
 
