@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "kind": "board-index",
+  "entries": [],
+  "rules": [
+    "Una entrada por modelo físico o variante cuyo pinout/flash/alimentación cambie.",
+    "Dos proyectos sobre la misma placa comparten la ficha.",
+    "El wiring de un proyecto no se guarda aquí."
+  ]
+}

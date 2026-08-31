@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "candidate_id": "[candidate-id]",
+  "candidate_snapshot": "[commit/branch/tag/date]",
+  "decision": "NUEVO | MEJORA | DUPLICADO | CONTRADICTORIO | VARIANTE | NO_DECIDIBLE",
+  "confidence": "ALTA | MEDIA | BAJA",
+  "canonical_artifact_id": null,
+  "matching_capabilities": [],
+  "new_capabilities": [],
+  "same_claims": [],
+  "new_claims": [],
+  "conflicts": [],
+  "compatibility_gaps": [],
+  "evidence_gaps": [],
+  "reusable_content": [],
+  "parameterized_content": [],
+  "product_specific_content": [],
+  "sensitive_fields": [],
+  "proposal_path": "[reports/proposals path]",
+  "review": {
+    "status": "PENDING_APPROVAL",
+    "approved_by": null,
+    "approved_at": null,
+    "decision_notes": null
+  }
+}

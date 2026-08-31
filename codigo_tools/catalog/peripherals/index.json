@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "kind": "peripheral-index",
+  "entries": [],
+  "rules": [
+    "Una entrada por módulo o variante con requisitos eléctricos/protocolo diferentes.",
+    "Separar VCC de nivel lógico y señal.",
+    "El wiring de un proyecto no se guarda aquí."
+  ]
+}

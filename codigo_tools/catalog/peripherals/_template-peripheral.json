@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "peripheral",
+  "id": "example-peripheral",
+  "name": "Example module",
+  "aliases": [],
+  "variants": [],
+  "category": "[sensor/display/radio/actuator/etc.]",
+  "power": {"vcc": "[value/state]", "current": "[value/state]", "source": "[breakout/datasheet]"},
+  "signals": {"logic_voltage": "[value/state]", "active_level": "[HIGH/LOW/not applicable]", "level_shifting": "[required/not required/unknown]"},
+  "interfaces": [{"protocol": "[I2C/SPI/UART/GPIO/etc.]", "pins": [], "address": "[if applicable]", "timing": "[if applicable]"}],
+  "requirements": ["[pull-up/timing/calibration/safety requirement]"],
+  "library": {"name": "[optional]", "version": "[declared or not fixed]"},
+  "provenance": [{"source": "[datasheet/code/document]", "reference": "[line/section]", "state": "PENDIENTE_DE_VERIFICAR"}],
+  "evidence_status": "PENDIENTE_DE_VERIFICAR"
+}

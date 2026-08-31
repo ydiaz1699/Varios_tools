@@ -2,6 +2,20 @@
 
 Colección de prompts y herramientas para analizar proyectos de código y generar documentación derivada de la fuente real.
 
+> **Propósito principal:** analizar proyectos y documentos de `_drafts`, leer su código y documentación completa, y recrear sus comportamientos documentales como prompts, templates, referencias y herramientas genéricas para otros proyectos. Los proyectos de `_drafts` son fuentes de procedencia; `wifi_PIR` no es destino de integración.
+>
+> Consulta [`PURPOSE.md`](PURPOSE.md) antes de añadir o modificar un artefacto. No copies firmware, lógica de producto, pines, wiring, protocolos configurados, secretos ni valores específicos de las fuentes.
+
+## Propósito y alcance
+
+El objetivo de `codigo_tools` no es adaptar el código de los proyectos de `_drafts` a `wifi_PIR`. Es recrear las herramientas documentales que esos proyectos ejemplifican: prompts que leen el código completo y generan `docs/notas.md`, `docs/conexiones.drawio.svg`, `README.md`, mapas de repositorio, archivos `.ai/` y auditorías trazables.
+
+La pregunta central para cada archivo fuente es:
+
+> **¿Qué herramienta, prompt o artefacto reutilizable se puede recrear a partir de este material?**
+
+Los proyectos históricos y el snapshot `1ef29a9ee22af797fb1e4e94c6fccbd0ba50901d` se conservan como procedencia y casos de estudio. El catálogo de hardware y la arquitectura de contexto son soporte de este objetivo, no el objetivo principal.
+
 ## Objetivo
 
 `codigo_tools` no contiene la lógica de los proyectos analizados. Contiene procedimientos reutilizables para que una LLM o una herramienta:
@@ -21,6 +35,8 @@ codigo_tools/
 ├── README.md
 ├── prompts/
 │   ├── analizar-codigo-completo.md
+│   ├── detectar-evolucionar-artefactos.md
+│   ├── planificar-material-reutilizable.md
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
@@ -36,8 +52,13 @@ codigo_tools/
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
-│   └── audit-project-docs.md
+│   ├── audit-project-docs.md
+│   ├── generar-ficha-board.md
+│   ├── generar-ficha-periferico.md
+│   ├── generar-project-wiring.md
+│   └── auditar-compatibilidad-hardware.md
 ├── references/
+│   ├── arquitectura-canonica-contexto.md
 │   ├── criterios.md
 │   ├── tipos-documentacion.md
 │   ├── coding-style-tags.md
@@ -75,6 +96,8 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | Prompt | Función |
 |---|---|
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
+| `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
+| `prompts/planificar-material-reutilizable.md` | Revisa el scan determinista, corrige decisiones heurísticas y arma el plan trazable antes de promover artefactos. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera contexto general y una skill accionable desde el target real, con matriz de consistencia. |
@@ -91,6 +114,9 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
+| `prompts/generar-ficha-board.md` | Genera una ficha de catálogo para una placa física, separada del wiring de proyectos. |
+| `prompts/generar-ficha-periferico.md` | Genera una ficha de módulo separando VCC, lógica, protocolo, variante y requisitos. |
+| `prompts/auditar-compatibilidad-hardware.md` | Audita pines, niveles, buses, variantes y compatibilidad entre catálogo y wiring. |
 
 ## Flujo recomendado
 
@@ -183,7 +209,63 @@ Los artefactos se diseñaron a partir del análisis de `reloj NPT`:
 - `templates/repo-map.yml` conserva el esquema del `archivo-mapa.yml` sin copiar sus valores específicos.
 - `templates/README-project.md` conserva la estructura operativa sin incluir datos del reloj.
 
-## Flujo recomendado por proyecto
+## Contexto para agentes
+
+El prompt `prompts/generar-contexto-agentes.md` genera dos archivos complementarios a partir del target real:
+
+- `templates/copilot-instructions.md` — instrucciones generales del repositorio, plataforma, reglas, estilo, verificación y procedencia.
+- `templates/SKILL-project.md` — procedimiento accionable para una tarea recurrente concreta.
+
+No deben confundirse con la documentación del producto. `copilot-instructions.md` y `SKILL.md` son contexto de trabajo para agentes; el código sigue siendo la fuente de comportamiento. Antes de entregar ambos archivos se debe comparar la matriz de consistencia para detectar valores divergentes, por ejemplo target, dependencias, pines, umbrales, timeouts y comandos. Los secretos se redactan y los builds/tests no ejecutados se marcan como pendientes.
+
+## Detección y evolución de artefactos
+
+El prompt `prompts/detectar-evolucionar-artefactos.md` añade una capa meta al flujo: durante el análisis de cada proyecto busca prompts, plantillas, referencias, auditorías, skills, instrucciones de agentes y herramientas que puedan reutilizarse. No compara únicamente nombres o archivos completos; exige extraer un manifiesto normalizado con propósito, capacidades, entradas, salidas, claims, compatibilidad y procedencia.
+
+La política `references/politica-evolucion-artefactos.md` define seis decisiones:
+
+- `NUEVO`: no existe un equivalente reutilizable.
+- `MEJORA`: el artefacto existe, pero el candidato aporta cobertura, evidencia, validación o reglas nuevas.
+- `DUPLICADO`: solo cambia redacción, orden o formato.
+- `CONTRADICTORIO`: la misma regla tiene valores incompatibles.
+- `VARIANTE`: la capacidad es similar, pero cambia target, framework, formato o dependencia.
+- `NO_DECIDIBLE`: falta lectura, procedencia, propósito o evidencia.
+
+Las plantillas `templates/artifact-manifest.json` y `templates/artifact-evolution-report.json` permiten intercambiar datos de forma estructurada. `tools/artifact_evolution.py` ofrece una base determinista para inventariar candidatos, validar manifiestos y comparar un candidato contra un catálogo:
+
+```bash
+python3 codigo_tools/tools/artifact_evolution.py discover /ruta/proyecto \\
+  --output reports/artifact-candidates.json
+python3 codigo_tools/tools/artifact_evolution.py catalog codigo_tools \\
+  --output catalog/artifacts-discovered.json
+python3 codigo_tools/tools/artifact_evolution.py validate candidates/mi-artefacto.json
+python3 codigo_tools/tools/artifact_evolution.py compare \\
+  --candidate candidates/mi-artefacto.json \\
+  --catalog catalog/artifacts.json \\
+  --output reports/mi-artefacto.json \\
+  --markdown reports/mi-artefacto.md
+```
+
+`catalog` construye un índice heurístico de los archivos candidatos existentes. Antes de aceptarlo como catálogo canónico, hay que normalizar sus propósitos y capacidades con el prompt y revisar sus fuentes. La herramienta determinista sirve para inventario, validación y preselección; la decisión semántica final requiere el manifiesto normalizado y revisión de evidencia.
+
+Flujo completo recomendado:
+
+```text
+analizar-codigo-completo
+        ↓
+manifest normalizado del candidato
+        ↓
+detectar-evolucionar-artefactos + artifact_evolution.py
+        ↓
+NUEVO / MEJORA / DUPLICADO / CONTRADICTORIO / VARIANTE / NO_DECIDIBLE
+        ↓
+propuesta revisable y aprobación
+        ↓
+crear o mejorar codigo_tools
+        ↓
+auditar y actualizar catálogo
+```
+
 
 1. Ejecutar `analizar-codigo-completo.md` sobre un `TARGET_ID` y snapshot concretos.
 2. Usar el inventario y la matriz para generar `repo-map.yml`.
@@ -191,6 +273,113 @@ Los artefactos se diseñaron a partir del análisis de `reloj NPT`:
 4. Para hardware, generar `docs/notas.md` y después `docs/conexiones.drawio.svg`.
 5. Ejecutar las auditorías correspondientes: `audit-hardware-docs.md` para hardware y `audit-project-docs.md` para el conjunto documental.
 6. Registrar build, tests, simulación o hardware solo si realmente se ejecutaron.
+
+## Extracción de material reutilizable
+
+`tools/reusable_material_extractor.py` es la primera etapa para analizar una tanda de proyectos sin desviarse hacia copiar firmware. Lee progresivamente los archivos de la raíz indicada, calcula metadata y hash, registra archivos de texto, binarios y directorios excluidos, extrae headings, tags, referencias y señales técnicas, y genera una matriz de candidatos. No copia el contenido completo ni modifica la fuente.
+
+La comparación contra `--baseline-root` es heurística y sirve para ordenar la revisión; no crea artefactos canónicos ni aprueba decisiones. El prompt `prompts/planificar-material-reutilizable.md` debe revisar después cada candidato `REUSABLE` o `PARAMETRIZABLE` y confirmar la procedencia antes de crear o mejorar un artefacto.
+
+Ejemplo:
+
+```bash
+python3 codigo_tools/tools/reusable_material_extractor.py scan \\
+  /ruta/proyecto \\
+  --target-id proyecto-arduino-uno \\
+  --snapshot 1ef29a9 \\
+  --project-purpose "PENDIENTE_DE_CONFIRMAR" \\
+  --baseline-root /ruta/Varios_tools/codigo_tools \\
+  --output-dir /ruta/reportes/proyecto-arduino-uno
+```
+
+La herramienta escribe fuera de la fuente:
+
+```text
+reportes/proyecto-arduino-uno/
+├── scan.json   # inventario, evidencia, candidatos y matriz máquina
+└── plan.md     # revisión humana y próximos pasos
+```
+
+Reglas de salida: `source_code`, configuración de build y project-wiring se marcan como `PRODUCT_SPECIFIC`; secretos solo generan nombres de campos, nunca valores; las decisiones tienen `review_required: true`; y `promotion_allowed` siempre es `false`. Las fichas concretas de hardware se mantienen separadas de los schemas, prompts y reglas reutilizables.
+
+## Recreación de prompts y artefactos documentales
+
+Cuando un proyecto fuente contiene un artefacto documental pero no un prompt equivalente —por ejemplo, un `ROADMAP.md` sin instrucciones de generación— se puede reconstruir el comportamiento documental sin copiar el producto:
+
+1. Ejecutar `tools/recreator_spec.py prepare` sobre la raíz completa del proyecto, indicando el artefacto de referencia.
+2. Leer el proyecto y el artefacto desde sus rutas originales usando `prompts/generar-especificacion-recreador.md`; el manifiesto preparado solo contiene metadata, hashes y estados de lectura.
+3. Inferir el contrato con trazabilidad: entradas, orden de análisis, secciones, condiciones, omisiones, contradicciones y validaciones.
+4. Generar `recreator-spec.json`, `recreator-prompt.md` y `review.md` fuera del proyecto fuente.
+5. Validar la especificación y revisar semánticamente antes de promoverla.
+
+Ejemplo para un artefacto tipo roadmap:
+
+```bash
+python3 codigo_tools/tools/recreator_spec.py prepare /ruta/proyecto \\
+  --artifact ROADMAP.md \\
+  --output-dir /ruta/reportes/recreator-roadmap \\
+  --target-id proyecto-roadmap \\
+  --snapshot COMMIT_O_TAG \\
+  --purpose "reconstruir un generador genérico de roadmaps"
+
+python3 codigo_tools/tools/recreator_spec.py validate-spec \\
+  /ruta/reportes/recreator-roadmap/recreator-spec.json
+```
+
+Si existe un prompt fuente, añadirlo con `--prompt`; si no existe, el LLM debe inferir el contrato comparando el documento completo con el código, configuración, scripts y documentación relacionada. `ROADMAP.md` se trata como planificación o historia y se contrasta con el código, no como verdad ejecutable. La herramienta determinista no hace esa inferencia: prepara evidencia, valida el contrato y bloquea la promoción.
+
+Las salidas nunca deben incluir cuerpos completos de firmware/documentos, secretos ni valores de producto. Los archivos incompletos se marcan `LECTURA_INCOMPLETA`, las contradicciones se conservan para revisión y `promotion_allowed` permanece `false`.
+
+## Artefactos documentales recreables
+
+El análisis de `wifi_PIR/docs/` produjo cuatro prompts genéricos, cada uno correspondiente a un tipo documental distinto. No son adaptaciones de `wifi_PIR`; son contratos parametrizables para otros proyectos:
+
+| Artefacto fuente | Prompt reusable | Función |
+|---|---|---|
+| `ARCHITECTURE.md` | `prompts/generar-arquitectura-verificable.md` | Mapa por capas de componentes, flujos, contratos, variantes e invariantes con evidencia. |
+| `CHANGELOG.md` | `prompts/generar-changelog-evidencial.md` | Historial cronológico basado en commits/diffs/releases y validaciones disponibles. |
+| `PLAN_EJECUCION_FUTURA.md` | `prompts/generar-plan-ejecucion-canonico.md` | Plan de continuación con baseline, estados, fases, gates, rollback y checklist. |
+| `ROADMAP.md` | `prompts/generar-roadmap-tecnico.md` | Backlog futuro priorizado con gaps, dependencias, riesgos y criterios de aceptación. |
+
+Los cuatro prompts requieren leer el proyecto destino completo, contrastar documentación con código/configuración, conservar contradicciones y parametrizar nombres, rutas, targets, comandos, hardware, endpoints e identificadores. Ninguno genera commits ni aplica cambios automáticamente. Los resultados de build, tests, simulación y hardware deben marcarse como no ejecutados si no existe evidencia.
+
+Los informes de procedencia de la prueba se conservaron fuera de la fuente en:
+
+```text
+/projects/sandbox/reports/
+├── wifi-pir-architecture-recreator/
+├── wifi-pir-changelog-recreator/
+├── wifi-pir-execution-plan-recreator/
+└── wifi-pir-roadmap-recreator-v2/
+```
+
+Cada directorio contiene `recreator-input.json`, `recreator-brief.md`, `recreator-prompt.md`, `recreator-spec.json` y `review.md`. Estos reportes son evidencia de análisis y revisión; los prompts genéricos promovibles viven en `codigo_tools/prompts/`.
+
+## Catálogo híbrido de hardware
+
+El catálogo usa un motor común con tres espacios separados:
+
+```text
+catalog/boards/       → modelos físicos de placas y variantes
+catalog/peripherals/  → módulos, sensores, displays, radios y actuadores
+project-wiring.json   → conexiones concretas de un target
+```
+
+La separación evita mezclar las especificaciones genéricas de una placa con el wiring de un proyecto. Los índices seleccionan; las fichas documentan; el manifest resuelve la instancia; las reglas de `catalog/compatibility/` detectan incompatibilidades obvias.
+
+La procedencia es obligatoria para los datos técnicos. Deben distinguirse VCC, nivel lógico, señal, corriente, protocolo, variante y estado de verificación. El catálogo es contexto reusable: si el código/configuración actual contradice una ficha, se registra `CONTRADICTORIO` o `PENDIENTE_DE_VERIFICAR` y no se corrige silenciosamente.
+
+Herramienta común:
+
+```bash
+python3 codigo_tools/tools/hardware_catalog.py validate --type board catalog/boards/_template-board.json
+python3 codigo_tools/tools/hardware_catalog.py validate --type peripheral catalog/peripherals/_template-peripheral.json
+python3 codigo_tools/tools/hardware_catalog.py validate --type wiring templates/project-wiring.json
+python3 codigo_tools/tools/hardware_catalog.py search --type board --catalog-root catalog esp32
+python3 codigo_tools/tools/hardware_catalog.py check-project --catalog-root catalog path/to/project-wiring.json
+```
+
+`hardware_catalog.py` valida estructura, referencias, pines repetidos, pines boot/reservados y mismatches lógicos declarados. No sustituye datasheets, mediciones ni pruebas físicas. Los prompts de generación y auditoría deben ejecutarse sobre el proyecto real antes de afirmar una conexión.
 
 No se deben mezclar targets, versiones, emisores/receptores o placas en una única documentación ambigua. Si falta un archivo o una dependencia, el artefacto debe detenerse con `LECTURA_INCOMPLETA`.
 

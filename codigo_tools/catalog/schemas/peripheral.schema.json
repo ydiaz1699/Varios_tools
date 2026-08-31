@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hardware peripheral catalog entry",
+  "type": "object",
+  "required": ["schema_version", "kind", "id", "name", "aliases", "variants", "category", "power", "signals", "interfaces", "requirements", "provenance", "evidence_status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "peripheral"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "name": {"type": "string", "minLength": 1},
+    "aliases": {"type": "array", "items": {"type": "string"}},
+    "variants": {"type": "array", "items": {"type": "string"}},
+    "category": {"type": "string"},
+    "power": {"type": "object", "required": ["vcc"], "properties": {"vcc": {"type": "string"}, "current": {"type": "string"}, "source": {"type": "string"}}},
+    "signals": {"type": "object", "required": ["logic_voltage"], "properties": {"logic_voltage": {"type": "string"}, "active_level": {"type": "string"}, "level_shifting": {"type": "string"}}},
+    "interfaces": {"type": "array", "items": {"type": "object", "required": ["protocol"], "properties": {"protocol": {"type": "string"}, "pins": {"type": "array", "items": {"type": "string"}}, "address": {"type": "string"}, "timing": {"type": "string"}}}},
+    "requirements": {"type": "array", "items": {"type": "string"}},
+    "library": {"type": "object", "properties": {"name": {"type": "string"}, "version": {"type": "string"}}},
+    "provenance": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "evidence_status": {"type": "string"}
+  },
+  "$defs": {"evidence": {"type": "object", "required": ["source", "state"], "properties": {"source": {"type": "string"}, "reference": {"type": "string"}, "state": {"type": "string"}}}}
+}
