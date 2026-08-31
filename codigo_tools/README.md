@@ -41,6 +41,10 @@ codigo_tools/
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
 │   ├── generar-especificacion-recreador.md
+│   ├── generar-arquitectura-verificable.md
+│   ├── generar-changelog-evidencial.md
+│   ├── generar-plan-ejecucion-canonico.md
+│   ├── generar-roadmap-tecnico.md
 │   ├── gen-notas-hw.md
 │   ├── gen-conexiones-svg.md
 │   ├── audit-hardware-docs.md
@@ -105,6 +109,10 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera y compara contexto mínimo y artefactos condicionales de agente desde el código y la configuración actuales. |
 | `prompts/generar-especificacion-recreador.md` | Reconstruye el contrato y el prompt genérico de un artefacto documental, incluso cuando la fuente no tiene un prompt equivalente. |
+| `prompts/generar-arquitectura-verificable.md` | Genera un mapa de arquitectura por capas con claims, estados, contradicciones y relaciones verificables. |
+| `prompts/generar-changelog-evidencial.md` | Genera un historial de evolución trazable sin inventar releases, fechas ni resultados. |
+| `prompts/generar-plan-ejecucion-canonico.md` | Genera un plan de continuación con línea base, fases, gates, rollback y checklist. |
+| `prompts/generar-roadmap-tecnico.md` | Genera un backlog técnico priorizado con dependencias, riesgos, aceptación y validación. |
 | `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
@@ -312,6 +320,31 @@ python3 codigo_tools/tools/recreator_spec.py validate-spec \\
 Si existe un prompt fuente, añadirlo con `--prompt`; si no existe, el LLM debe inferir el contrato comparando el documento completo con el código, configuración, scripts y documentación relacionada. `ROADMAP.md` se trata como planificación o historia y se contrasta con el código, no como verdad ejecutable. La herramienta determinista no hace esa inferencia: prepara evidencia, valida el contrato y bloquea la promoción.
 
 Las salidas nunca deben incluir cuerpos completos de firmware/documentos, secretos ni valores de producto. Los archivos incompletos se marcan `LECTURA_INCOMPLETA`, las contradicciones se conservan para revisión y `promotion_allowed` permanece `false`.
+
+## Artefactos documentales recreables
+
+El análisis de `wifi_PIR/docs/` produjo cuatro prompts genéricos, cada uno correspondiente a un tipo documental distinto. No son adaptaciones de `wifi_PIR`; son contratos parametrizables para otros proyectos:
+
+| Artefacto fuente | Prompt reusable | Función |
+|---|---|---|
+| `ARCHITECTURE.md` | `prompts/generar-arquitectura-verificable.md` | Mapa por capas de componentes, flujos, contratos, variantes e invariantes con evidencia. |
+| `CHANGELOG.md` | `prompts/generar-changelog-evidencial.md` | Historial cronológico basado en commits/diffs/releases y validaciones disponibles. |
+| `PLAN_EJECUCION_FUTURA.md` | `prompts/generar-plan-ejecucion-canonico.md` | Plan de continuación con baseline, estados, fases, gates, rollback y checklist. |
+| `ROADMAP.md` | `prompts/generar-roadmap-tecnico.md` | Backlog futuro priorizado con gaps, dependencias, riesgos y criterios de aceptación. |
+
+Los cuatro prompts requieren leer el proyecto destino completo, contrastar documentación con código/configuración, conservar contradicciones y parametrizar nombres, rutas, targets, comandos, hardware, endpoints e identificadores. Ninguno genera commits ni aplica cambios automáticamente. Los resultados de build, tests, simulación y hardware deben marcarse como no ejecutados si no existe evidencia.
+
+Los informes de procedencia de la prueba se conservaron fuera de la fuente en:
+
+```text
+/projects/sandbox/reports/
+├── wifi-pir-architecture-recreator/
+├── wifi-pir-changelog-recreator/
+├── wifi-pir-execution-plan-recreator/
+└── wifi-pir-roadmap-recreator-v2/
+```
+
+Cada directorio contiene `recreator-input.json`, `recreator-brief.md`, `recreator-prompt.md`, `recreator-spec.json` y `review.md`. Estos reportes son evidencia de análisis y revisión; los prompts genéricos promovibles viven en `codigo_tools/prompts/`.
 
 ## Catálogo híbrido de hardware
 

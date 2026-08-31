@@ -74,6 +74,17 @@ Priorizar comportamientos documentales como:
 - pasos de validación;
 - condiciones para generar, omitir o marcar un artefacto como pendiente.
 
+## Cuatro contratos documentales extraídos de `wifi_PIR/docs`
+
+La prueba sobre los cuatro documentos confirmó que no forman un único prompt, sino cuatro artefactos con responsabilidades diferentes:
+
+- `ARCHITECTURE.md` → `prompts/generar-arquitectura-verificable.md`: mapa de componentes, dependencias, flujos, contratos, variantes e invariantes con estados de evidencia.
+- `CHANGELOG.md` → `prompts/generar-changelog-evidencial.md`: historial cronológico basado en cambios trazables, impacto, compatibilidad y validación.
+- `PLAN_EJECUCION_FUTURA.md` → `prompts/generar-plan-ejecucion-canonico.md`: continuidad segura desde una línea base, con fases, gates, rollback, trazabilidad y checklist.
+- `ROADMAP.md` → `prompts/generar-roadmap-tecnico.md`: backlog priorizado derivado de gaps, riesgos, dependencias, escenarios negativos y aceptación.
+
+La abstracción reusable está en el procedimiento y el contrato, no en el contenido de `wifi_PIR`. Los nombres de dispositivos, protocolos, pines, hosts, topics, comandos, versiones y snippets quedan fuera o se convierten en placeholders. Las contradicciones entre documentación y código se conservan como evidencia y no se resuelven inventando una versión correcta.
+
 ## Qué significa recrear
 
 Recrear no significa copiar literalmente un documento o prompt específico. Significa abstraer su comportamiento:
