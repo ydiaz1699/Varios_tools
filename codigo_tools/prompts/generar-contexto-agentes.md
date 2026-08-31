@@ -1,22 +1,50 @@
 ---
 name: generar-contexto-agentes
-description: Genera y mantiene copilot-instructions.md y SKILL.md a partir del código, la configuración y el propósito confirmado de un proyecto.
+description: Genera un contexto de proyecto trazable y condicional, con PROJECT_CONTEXT mínimo y artefactos de agente según evidencia, sin duplicar catálogo ni wiring.
 ---
 
 # Generar contexto de agentes desde el proyecto actual
 
 ## Objetivo
 
-Genera dos artefactos complementarios para que un agente de IA trabaje con un repositorio sin tener que redescubrir su contexto en cada sesión:
+Genera y mantiene un bundle de contexto de proyecto trazable para que un agente de IA trabaje con un repositorio sin redescubrir su contexto en cada sesión.
 
-- `copilot-instructions.md`: reglas generales del repositorio, restricciones, estilo y datos técnicos que deben mantenerse.
-- `SKILL.md`: procedimiento accionable para la tarea recurrente principal del proyecto.
+La referencia canónica es `references/arquitectura-canonica-contexto.md`. Este prompt conserva el análisis y la escritura como etapas distintas: primero lee y clasifica; después propone o genera únicamente los artefactos autorizados.
 
-Estos archivos describen cómo debe trabajar el agente; no sustituyen al código, al README, al `repo-map.yml` ni a las pruebas. No conviertas una propuesta documental en una feature implementada.
+El mínimo del bundle es `.ai/PROJECT_CONTEXT.md`. Los demás archivos `.ai/` son condicionales y no deben crearse vacíos solo para completar una lista fija.
+
+Artefactos complementarios con responsabilidades distintas:
+
+- `copilot-instructions.md`: reglas generales del repositorio.
+- `SKILL.md`: procedimiento accionable para una tarea recurrente.
+- `README.md`: instalación y operación para humanos.
+- `repo-map.yml`: contexto estructurado compacto.
+- `project-wiring.json`: instancia machine-readable del hardware, si aplica.
+
+No conviertas una propuesta documental en una feature implementada, no regeneres fichas de catálogo existentes y no escribas en la fuente durante la fase de análisis.
+
+## Fase previa: preflight y condiciones del bundle
+
+Antes de redactar, clasifica cada artefacto como `OBLIGATORIO`, `CONDICIONAL` u `OMITIDO` y registra la evidencia:
+
+| Artefacto | Condición mínima | Estado | Evidencia/acción |
+|---|---|---|---|
+| `.ai/PROJECT_CONTEXT.md` | Se genera contexto de agente | `OBLIGATORIO` | punto de entrada mínimo |
+| `.ai/SKILL.md` | Existe una tarea recurrente accionable | `CONDICIONAL` | omitir si no aplica |
+| `.ai/HARDWARE.md` | Hay hardware físico o wiring identificable | `CONDICIONAL` | referenciar `project-wiring.json` |
+| `.ai/SOFTWARE.md` | Hay build, dependencias o configuración que mantener | `CONDICIONAL` | separar declarado de ejecutado |
+| `.ai/ARCHITECTURE.md` | Hay FSM, flujo temporal o límites complejos | `CONDICIONAL` | documentar estados observados |
+| `.ai/PROTOCOL.md` | El protocolo requiere contrato propio | `CONDICIONAL` | separar comunicación lógica de cables |
+| `.ai/DECISIONS.md` | Hay decisiones relevantes que preservar | `CONDICIONAL` | registrar alternativas y consecuencias |
+| `.ai/TASKS.md` | El proyecto mantiene backlog técnico | `CONDICIONAL` | enlazar origen y evidencia |
+| `.ai/TESTING.md` | Hay tests o estrategia definida | `CONDICIONAL` | no inventar cobertura |
+| `.ai/CHANGELOG.md` / `.ai/ROADMAP.md` | El proyecto mantiene esas convenciones | `CONDICIONAL` | separar histórico de propuesta |
+
+No uses “ocho archivos base” como contrato. Si omites un archivo, indica `[OMITIDO: condición no demostrada]`. Si falta evidencia, usa `PENDIENTE_DE_VERIFICAR`; no lo rellenes por costumbre.
+
+Si existe `project-wiring.json`, valida sus referencias contra el catálogo canónico y genera `HARDWARE.md` solo como documento derivado del manifest, no como fuente alternativa.
 
 ## Entradas obligatorias
-
-- `PROJECT_ROOT`: raíz del proyecto.
 - `TARGET_ID`: target, firmware, servicio, placa o ensamblaje exacto.
 - `SNAPSHOT`: commit, rama, tag o fecha observada.
 - `PROJECT_PURPOSE`: propósito confirmado por el usuario o `PENDIENTE_DE_CONFIRMAR`.
@@ -79,6 +107,20 @@ Extrae como mínimo:
 - Los identificadores técnicos solo deben incluirse si son necesarios para operar el target y están autorizados por el material de entrada; si pueden ser sensibles, usa `[REDACTADO]` y conserva el nombre de la variable.
 - Separa claramente `IMPLEMENTADO`, `PROPUESTO`, `PENDIENTE_DE_VERIFICAR` y `RECHAZADO`.
 
+## Salidas condicionales
+
+### Salida mínima: `.ai/PROJECT_CONTEXT.md`
+
+Genera este archivo como entrada del bundle con el template `templates/PROJECT_CONTEXT.md`. Debe incluir propósito, target, snapshot, puntos de entrada, referencias de catálogo/wiring, archivos clave, restricciones, estado de verificación y pendientes. No debe copiar especificaciones completas del catálogo ni el wiring detallado.
+
+### Salida de instrucciones: `copilot-instructions.md`
+
+Genera este archivo solo si el consumidor del repositorio lo necesita. Debe contener reglas generales relativamente estables y conservar su responsabilidad complementaria respecto de `SKILL.md`.
+
+### Salida de procedimiento: `.ai/SKILL.md`
+
+Genera este archivo solo cuando exista una tarea recurrente accionable. Debe ser específico del target y no sustituir el contexto general.
+
 ## Salida 1: `copilot-instructions.md`
 
 Genera instrucciones generales y relativamente estables con estas secciones:
@@ -133,6 +175,15 @@ Pendientes:
 ```
 
 No sobrescribas silenciosamente un `SKILL.md` o `copilot-instructions.md` existente.
+
+## Scaffolding y promoción
+
+Este prompt puede describir salidas esperadas, pero no autoriza por sí mismo a modificar el repositorio. Si se necesita crear archivos, usa una etapa separada de scaffolding con output nuevo, `dry-run`, no sobrescritura y procedencia.
+
+- No generes ni publiques fichas faltantes de `catalog/boards/` o `catalog/peripherals/` automáticamente.
+- Reporta un `catalog gap` con alias, modelo/variante pendiente, campos faltantes y fuentes requeridas.
+- No copies firmware, secretos, pines ni valores de producto a `codigo_tools`.
+- No trates la similitud heurística como aprobación.
 
 ## Verificación antes de entregar
 

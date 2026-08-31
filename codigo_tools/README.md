@@ -35,6 +35,7 @@ codigo_tools/
 │   ├── generar-project-wiring.md
 │   └── auditar-compatibilidad-hardware.md
 ├── references/
+│   ├── arquitectura-canonica-contexto.md
 │   ├── criterios.md
 │   ├── hardware-catalog-policy.md
 │   ├── hardware-evidence.md
@@ -55,6 +56,7 @@ codigo_tools/
 │   └── compatibility/
 │       └── rules.json
 ├── templates/
+│   ├── PROJECT_CONTEXT.md
 │   ├── repo-map.yml
 │   ├── README-project.md
 │   ├── SKILL-project.md
@@ -66,6 +68,7 @@ codigo_tools/
 └── tools/
     ├── artifact_evolution.py
     ├── reusable_material_extractor.py
+    ├── validate_context_bundle.py
     └── hardware_catalog.py
 ```
 
@@ -76,18 +79,18 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 | Prompt | Función |
 |---|---|
 | `prompts/gen-notas-hw.md` | Genera notas de hardware y pinout a partir del código completo y su configuración. |
+| `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
 | `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
 | `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
 | `prompts/planificar-material-reutilizable.md` | Revisa el scan determinista, corrige decisiones heurísticas y arma el plan trazable antes de promover artefactos. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
-| `prompts/generar-contexto-agentes.md` | Genera y compara `copilot-instructions.md` y `SKILL.md` desde el código y la configuración actuales. |
-| `prompts/gen-conexiones-svg.md` | Genera un diagrama de conexiones draw.io SVG editable, limitado a conexiones físicas verificables. |
+| `prompts/generar-contexto-agentes.md` | Genera y compara contexto mínimo y artefactos condicionales de agente desde el código y la configuración actuales. |
+| `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
 | `prompts/audit-hardware-docs.md` | Compara `notas.md` y el SVG contra el código y reporta omisiones, contradicciones y datos no demostrados. |
 | `prompts/audit-project-docs.md` | Audita README, repo-map, notas, changelog y otros documentos contra el código actual. |
 | `prompts/generar-ficha-board.md` | Genera una ficha de catálogo para una placa física, separada del wiring de proyectos. |
 | `prompts/generar-ficha-periferico.md` | Genera una ficha de módulo separando VCC, lógica, protocolo, variante y requisitos. |
-| `prompts/generar-project-wiring.md` | Genera el manifest de conexiones de un proyecto referenciando boards y peripherals. |
 | `prompts/auditar-compatibilidad-hardware.md` | Audita pines, niveles, buses, variantes y compatibilidad entre catálogo y wiring. |
 
 ## Flujo recomendado
@@ -290,3 +293,21 @@ python3 codigo_tools/tools/hardware_catalog.py check-project --catalog-root cata
 `hardware_catalog.py` valida estructura, referencias, pines repetidos, pines boot/reservados y mismatches lógicos declarados. No sustituye datasheets, mediciones ni pruebas físicas. Los prompts de generación y auditoría deben ejecutarse sobre el proyecto real antes de afirmar una conexión.
 
 No se deben mezclar targets, versiones, emisores/receptores o placas en una única documentación ambigua. Si falta un archivo o una dependencia, el artefacto debe detenerse con `LECTURA_INCOMPLETA`.
+
+
+## Arquitectura canónica de contexto
+
+`references/arquitectura-canonica-contexto.md` define tres capas lógicas: catálogo, shared y proyecto. El catálogo usa JSON/schema; `project-wiring.json` representa la instancia física; `PROJECT_CONTEXT.md` es el mínimo del bundle y los demás archivos `.ai/` son condicionales.
+
+La validación estática se ejecuta sin modificar ni promover la fuente:
+
+```bash
+python3 codigo_tools/tools/validate_context_bundle.py validate /ruta/proyecto \
+  --catalog-root codigo_tools/catalog \
+  --output reports/context-bundle.json
+python3 codigo_tools/tools/validate_context_bundle.py catalog-gap \
+  /ruta/proyecto/project-wiring.json \
+  --catalog-root codigo_tools/catalog
+```
+
+El validador comprueba secciones mínimas, enlaces Markdown, asignaciones de secretos no redactadas, condiciones documentales y referencias de wiring. Un `catalog-gap` solo informa referencias ausentes y sugerencias; nunca crea ni publica fichas.
