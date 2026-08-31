@@ -1,0 +1,39 @@
+{
+  "schema_version": "1",
+  "description": "Generic coordinated project-context bundle. Values and claims must be filled from the target project.",
+  "required_project_files": [
+    ".ai/PROJECT_CONTEXT.md"
+  ],
+  "conditional_project_files": {
+    ".ai/HARDWARE.md": "physical hardware or project wiring is identifiable",
+    ".ai/SOFTWARE.md": "build system, dependencies, runtime or development configuration must be maintained",
+    ".ai/SKILL.md": "a recurring actionable task exists",
+    ".ai/TASKS.md": "maintained pending work exists",
+    ".ai/DECISIONS.md": "technical decisions or ADRs must be maintained",
+    ".ai/ROADMAP.md": "future work is actively planned",
+    ".ai/CHANGELOG.md": "a project history is maintained",
+    ".ai/ARCHITECTURE.md": "complex boundaries, flows or state machines need a dedicated explanation",
+    ".ai/PROTOCOL.md": "a communication contract must be maintained",
+    ".ai/TESTING.md": "testing strategy or evidence must be maintained"
+  },
+  "shared_files": [
+    "shared/CODING_STYLE.md",
+    "shared/SOFTWARE.md"
+  ],
+  "promotion": {
+    "auto_apply": false,
+    "auto_promote": false,
+    "promotion_allowed": false,
+    "review_required": true
+  },
+  "evidence_states": [
+    "OBSERVADO_EN_CODIGO",
+    "OBSERVADO_EN_BUILD",
+    "DOCUMENTADO",
+    "INFERIDO",
+    "PROPUESTO",
+    "CONTRADICTORIO",
+    "NO_ENCONTRADO",
+    "PENDIENTE_DE_VERIFICAR"
+  ]
+}
