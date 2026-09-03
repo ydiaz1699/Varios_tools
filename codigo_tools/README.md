@@ -21,6 +21,7 @@ codigo_tools/
 ├── README.md
 ├── prompts/
 │   ├── analizar-codigo-completo.md
+│   ├── analizar-target-unico.md
 │   ├── generar-repo-map.md
 │   ├── generar-readme.md
 │   ├── generar-contexto-agentes.md
@@ -74,7 +75,8 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 
 | Prompt | Función |
 |---|---|
-| `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
+| `prompts/analizar-codigo-completo.md` | Genera un informe completo para analizar y comparar varios targets o variantes sin ocultar sus diferencias. |
+| `prompts/analizar-target-unico.md` | Analiza un único target y genera un informe narrativo con inventario, flujo, parámetros, problemas, verificación y reutilización controlada. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
 | `prompts/generar-readme.md` | Genera un README operativo para instalar, configurar, ejecutar y diagnosticar el proyecto. |
 | `prompts/generar-contexto-agentes.md` | Genera contexto general y una skill accionable desde el target real, con matriz de consistencia. |
