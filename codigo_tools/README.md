@@ -35,6 +35,7 @@ codigo_tools/
 ├── README.md
 ├── prompts/
 │   ├── analizar-codigo-completo.md
+│   ├── analizar-target-unico.md
 │   ├── detectar-evolucionar-artefactos.md
 │   ├── planificar-material-reutilizable.md
 │   ├── generar-repo-map.md
@@ -95,7 +96,8 @@ Los prompts son independientes y se pueden copiar o adjuntar a otra LLM. `refere
 
 | Prompt | Función |
 |---|---|
-| `prompts/analizar-codigo-completo.md` | Genera un informe archivo por archivo sobre arquitectura, flujo, FSM, dependencias, problemas, contradicciones y reutilización. |
+| `prompts/analizar-codigo-completo.md` | Genera un informe completo para analizar y comparar varios targets o variantes sin ocultar sus diferencias. |
+| `prompts/analizar-target-unico.md` | Analiza un único target y genera un informe narrativo con inventario, flujo, parámetros, problemas, verificación y reutilización controlada. |
 | `prompts/detectar-evolucionar-artefactos.md` | Detecta material reusable y decide si es nuevo, mejora, duplicado, contradictorio, variante o no decidible. |
 | `prompts/planificar-material-reutilizable.md` | Revisa el scan determinista, corrige decisiones heurísticas y arma el plan trazable antes de promover artefactos. |
 | `prompts/generar-repo-map.md` | Genera un `repo-map.yml`/`archivo-mapa.yml` compacto y trazable para dar contexto a otra LLM. |
