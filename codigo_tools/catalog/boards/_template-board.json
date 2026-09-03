@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "board",
+  "id": "example-board",
+  "name": "Example physical board",
+  "aliases": [],
+  "variants": [],
+  "platformio": {"platform": "[platform]", "board": "[board-id]", "framework": "[framework]", "build_flags": []},
+  "identity": {"mcu": "[mcu]", "architecture": "[architecture]", "clock": "[declared clock]", "memory": {"ram": "[value]", "flash": "[value]"}},
+  "power": {"logic_voltage": "[value]", "input_voltage": "[value]", "active_current": "[value/state]", "sleep_current": "[value/state]"},
+  "logic": {"nominal_voltage": "[value]", "adc_voltage": "[value/state]", "five_volt_tolerant": null},
+  "pins": [{"id": "[GPIO/pin]", "role": "[role]", "aliases": [], "boot_sensitive": false, "reserved": false}],
+  "restrictions": ["[restriction with evidence]"],
+  "provenance": [{"source": "[datasheet/code/build/document]", "reference": "[line/section]", "state": "PENDIENTE_DE_VERIFICAR"}],
+  "evidence_status": "PENDIENTE_DE_VERIFICAR"
+}

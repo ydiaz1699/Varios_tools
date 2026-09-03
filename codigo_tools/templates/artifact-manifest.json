@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "artifact_id": "[stable-id]",
+  "artifact_type": "prompt",
+  "status": "candidate | proposed | accepted | deprecated",
+  "purpose": "[reusable task solved]",
+  "target_scope": ["general"],
+  "readers": ["agent"],
+  "snapshot": "[commit/branch/tag/date]",
+  "source_project": "[project or redacted]",
+  "source_files": [
+    {
+      "path": "[path]",
+      "reference": "[line/symbol/chunk]",
+      "state": "OBSERVADO_EN_CODIGO | DOCUMENTADO | PROPUESTO | PENDIENTE_DE_VERIFICAR"
+    }
+  ],
+  "capabilities": [
+    "[action the artifact enables]"
+  ],
+  "inputs": [
+    "[input]"
+  ],
+  "outputs": [
+    "[output]"
+  ],
+  "sections": [
+    "[functional section]"
+  ],
+  "claims": [
+    {
+      "id": "C001",
+      "key": "[normalized key]",
+      "value": "[normalized value]",
+      "scope": "[general or target scope]",
+      "evidence": [
+        {
+          "file": "[path]",
+          "reference": "[line/symbol/chunk]",
+          "state": "OBSERVADO_EN_CODIGO | OBSERVADO_EN_BUILD | DOCUMENTADO | INFERIDO | PROPUESTO | CONTRADICTORIO | PENDIENTE_DE_VERIFICAR"
+        }
+      ]
+    }
+  ],
+  "reusable_content": [
+    "[pattern/rule that can be generalized]"
+  ],
+  "parameterized_content": [
+    "[value that must become a placeholder]"
+  ],
+  "product_specific_content": [
+    "[value kept in the source project, not copied]"
+  ],
+  "sensitive_fields": [
+    "[field/path redacted]"
+  ],
+  "compatibility": {
+    "platforms": ["[platform or any]"],
+    "dependencies": ["[dependency or none]"],
+    "formats": ["markdown", "json"]
+  },
+  "verification": {
+    "read_complete": false,
+    "build": "NOT_EXECUTED",
+    "tests": "NOT_EXECUTED",
+    "integration": "PENDING_DE_VERIFICAR",
+    "hardware": "PENDING_DE_VERIFICAR"
+  },
+  "relations": {
+    "improves": [],
+    "duplicates": [],
+    "variants": [],
+    "conflicts_with": []
+  }
+}

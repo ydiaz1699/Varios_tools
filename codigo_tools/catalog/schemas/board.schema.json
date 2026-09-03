@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hardware board catalog entry",
+  "type": "object",
+  "required": ["schema_version", "kind", "id", "name", "aliases", "variants", "platformio", "identity", "power", "logic", "pins", "restrictions", "provenance", "evidence_status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "board"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "name": {"type": "string", "minLength": 1},
+    "aliases": {"type": "array", "items": {"type": "string"}},
+    "variants": {"type": "array", "items": {"type": "string"}},
+    "platformio": {"type": "object", "required": ["platform", "board", "framework"], "properties": {"platform": {"type": "string"}, "board": {"type": "string"}, "framework": {"type": "string"}, "build_flags": {"type": "array", "items": {"type": "string"}}}},
+    "identity": {"type": "object", "required": ["mcu"], "properties": {"mcu": {"type": "string"}, "architecture": {"type": "string"}, "clock": {"type": "string"}, "memory": {"type": "object"}}},
+    "power": {"type": "object", "required": ["logic_voltage"], "properties": {"logic_voltage": {"type": "string"}, "input_voltage": {"type": "string"}, "active_current": {"type": "string"}, "sleep_current": {"type": "string"}}},
+    "logic": {"type": "object", "required": ["nominal_voltage"], "properties": {"nominal_voltage": {"type": "string"}, "adc_voltage": {"type": "string"}, "five_volt_tolerant": {"type": "boolean"}}},
+    "pins": {"type": "array", "items": {"type": "object", "required": ["id", "role"], "properties": {"id": {"type": "string"}, "role": {"type": "string"}, "aliases": {"type": "array", "items": {"type": "string"}}, "boot_sensitive": {"type": "boolean"}, "reserved": {"type": "boolean"}}}},
+    "restrictions": {"type": "array", "items": {"type": "string"}},
+    "provenance": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "evidence_status": {"type": "string"}
+  },
+  "$defs": {"evidence": {"type": "object", "required": ["source", "state"], "properties": {"source": {"type": "string"}, "reference": {"type": "string"}, "state": {"type": "string"}}}}
+}

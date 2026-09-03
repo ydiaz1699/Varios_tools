@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project hardware wiring manifest",
+  "type": "object",
+  "required": ["schema_version", "kind", "project_id", "target_id", "board_ref", "peripherals", "connections", "evidence_status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "project-wiring"},
+    "project_id": {"type": "string"},
+    "target_id": {"type": "string"},
+    "snapshot": {"type": "string"},
+    "board_ref": {"type": "string"},
+    "peripherals": {"type": "array", "items": {"type": "object", "required": ["instance", "ref"], "properties": {"instance": {"type": "string"}, "ref": {"type": "string"}, "variant": {"type": "string"}}}},
+    "connections": {"type": "array", "items": {"type": "object", "required": ["from", "to", "signal"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "signal": {"type": "string"}, "protocol": {"type": "string"}, "level_shifter": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "object"}}}}},
+    "power_budget": {"type": "object", "properties": {"board": {"type": "string"}, "peripherals": {"type": "string"}, "state": {"type": "string"}}},
+    "evidence_status": {"type": "string"}
+  }
+}
