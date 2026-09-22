@@ -162,10 +162,12 @@ Para cómo encaja la skill en la documentación del proyecto —tamaño del AGEN
 y cuándo delegar un flujo en subagentes (contexto aislado que devuelve solo un
 resumen)—: ver `references/agents-md-and-subagents.md`.
 
-Ejemplo real aplicado (estructura de skills, frontmatter real, references/ vs
-assets/, varios AGENTS.md, qué adoptar y qué no): ver
-`references/prowler-case-study.md` — conocimiento destilado de Prowler para NO
-tener que clonar y leer el repo entero.
+Ejemplos reales aplicados (conocimiento destilado para NO clonar los repos):
+- `references/prowler-case-study.md` — repo grande multi-área: 6 AGENTS.md,
+  37 skills en 3 familias, frontmatter con scope/auto_invoke, references/ vs assets/.
+- `references/gentleman-dots-case-study.md` — repo simple: 1 AGENTS.md, tabla
+  auto-invoke con columna "Why", auto-invoke manual (sin scope/auto_invoke), y el
+  orquestador SDD delegate-only con subagentes (el patrón del video aplicado).
 
 Fuente externa de ambos patrones: `tool_catalog/entries/prowler-agent-skills.md`
 y `tool_catalog/entries/gentleman-agents-skills-video.md` (Agent Skills / video

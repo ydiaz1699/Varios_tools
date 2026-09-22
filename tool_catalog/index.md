@@ -10,7 +10,7 @@ que aplica.
 |------|------|-----------------------|----------|--------|
 | [prowler-agent-skills](entries/prowler-agent-skills.md) | repo | Contexto para LLM en 3 niveles (AGENTS.md + skills por trigger + auto-invoke) | proyectos con .kiro/skills, agentes LLM | APLICADO |
 | [gentleman-agents-skills-video](entries/gentleman-agents-skills-video.md) | video | Arquitectura AGENTS.md + skills + auto-invoke + subagentes (sin releer la transcripción) | diseñar contexto de agentes, dividir AGENTS.md, subagentes | REVISADO_A_FONDO |
-| [gentleman-dots](entries/gentleman-dots.md) | dotfiles | Entorno de desarrollo completo (Neovim/shells/terminales) + capa de IA opcional | montar entorno terminal/Neovim, capa IA multi-CLI | REVISADO_PARCIAL |
+| [gentleman-dots](entries/gentleman-dots.md) | dotfiles | Entorno de desarrollo completo (Neovim/shells/terminales) + capa IA; ejemplo de 1 AGENTS.md + orquestador SDD/subagentes | montar entorno terminal/Neovim, capa IA multi-CLI, ver subagentes aplicados | REVISADO_A_FONDO |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 

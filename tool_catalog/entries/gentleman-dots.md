@@ -17,9 +17,10 @@ reference:
   url: https://github.com/Gentleman-Programming/Gentleman.Dots
   kind: github
 related:
+  - "Conocimiento destilado (NO clonar el repo): tools_AI/skills/skill-creator/references/gentleman-dots-case-study.md"
   - "Capa IA separada: https://github.com/Gentleman-Programming/gentle-ai"
-  - "Mismo autor que el video de Agent Skills (ver prowler-agent-skills)"
-status: REVISADO_PARCIAL
+  - "Mismo autor que el video de Agent Skills (ver gentleman-agents-skills-video / prowler-agent-skills)"
+status: REVISADO_A_FONDO
 evaluated_on: 2026-09-22
 ---
 
@@ -56,11 +57,19 @@ del patrón Agent Skills organiza `skills/` + `AGENTS.md` en un repo real.
 ## Qué llevarte si aplica
 
 - El **instalador TUI** como patrón de despliegue de dotfiles multiplataforma.
-- La organización de `skills/` y `AGENTS.md` del repo (segundo ejemplo del patrón).
+- **1 solo AGENTS.md** (repo no monorepo) con tabla Auto-invoke que añade una
+  columna **"Why"** (la razón de cargar cada skill, no solo el mapeo).
+- El **orquestador SDD delegate-only** + subagentes (el patrón del video
+  aplicado) y la "identity inheritance" (no perder el tono al delegar).
+- Frontmatter de skills **sin `scope`/`auto_invoke`** → auto-invoke manual (la
+  misma variante que nas-dotfiles).
 - `gentle-ai` como referencia de capa de IA multi-CLI con memoria/skills.
 
 ## Referencia
 
-- Repo: https://github.com/Gentleman-Programming/Gentleman.Dots
-- Nota: esta ficha se hizo leyendo SOLO el README (no todo el repo). Leer el
-  repo completo solo si vas a adoptar sus dotfiles o su organización de skills.
+- **Conocimiento ya destilado (leer esto ANTES de clonar):**
+  `tools_AI/skills/skill-creator/references/gentleman-dots-case-study.md` —
+  estructura real, frontmatter real, tabla Auto-invoke con "Why", orquestador
+  SDD/subagentes, y qué adoptar/qué no.
+- Repo: https://github.com/Gentleman-Programming/Gentleman.Dots — clonar SOLO
+  para un matiz que el caso de estudio no cubra.
