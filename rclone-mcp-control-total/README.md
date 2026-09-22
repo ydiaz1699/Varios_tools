@@ -320,43 +320,19 @@ Especiales: `RCLONE_TOOLSETS=default` (mínimo seguro) · **`all` (control total
 > **Kiro Web NO puede** usar este MCP: corre en un sandbox en la nube, sin ruta a tu LAN privada.
 > **Kiro CLI SÍ**, porque se ejecuta en tu máquina. Aquí lo instalamos **en el propio NAS**.
 
-#### 8.4.1 Instalar Kiro CLI en el NAS (Debian)
+#### 8.4.1 Instalar Kiro CLI en el NAS
 
-> Verificado contra el instalador oficial `https://cli.kiro.dev/install` (2026-09-22).
-> El NAS es Debian x86_64 (Dell PowerEdge T20). Instala en `~/.local/bin/` (NO requiere root).
+La instalación de Kiro CLI en el NAS (con opciones de aislamiento: instalador oficial, prefijo
+dedicado en `$HOME`, o contenedor Docker) está documentada en su **guía dedicada y reutilizable**:
 
-**Paso 1 — dependencias** (el instalador las exige en Linux):
+➡️ [`../kiro-cli-nas/README.md`](../kiro-cli-nas/README.md)
 
-```bash
-instal curl unzip                 # 'curl'/'wget', 'unzip' y 'sha256sum' (coreutils, ya presente)
-```
+Para controlar rclone se recomienda la **Opción B (prefijo dedicado en `$HOME`)** de esa guía: sin
+root, aislada y con acceso directo a `localhost:5572` del host. Vuelve aquí cuando `kiro-cli --version`
+y `kiro-cli doctor` respondan OK.
 
-**Paso 2 — instalar** (script oficial de una línea; se instala en tu usuario, sin sudo):
-
-```bash
-curl -fsSL https://cli.kiro.dev/install | bash
-```
-
-El instalador detecta arquitectura (`x86_64`) y, si tu glibc es antiguo, usa el binario musl
-automáticamente. Descarga a un tmp, verifica checksum SHA-256 y copia a `~/.local/bin/`.
-
-**Paso 3 — asegurar el PATH** (si el instalador avisa que `~/.local/bin` no está en PATH):
-
-```bash
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-reload                            # tu alias de 'source ~/.bashrc'
-kiro-cli --version                # verifica que responde
-```
-
-**Paso 4 — autenticar** (abre el navegador; en un NAS headless copia la URL a tu PC):
-
-```bash
-kiro-cli login
-kiro-cli doctor                   # debe decir "Everything looks good!"
-```
-
-> **NAS headless / por SSH:** `kiro-cli login` imprime una URL de autenticación; ábrela en el
-> navegador de tu PC y completa el login. La sesión queda guardada en el NAS.
+> Recuerda dónde vive el `mcp.json` según cómo instalaste (§8.4.2 asume la ruta correcta):
+> Opción A → `~/.kiro/settings/mcp.json` · Opción B → `$aadm/apps/kiro-cli/.kiro/settings/mcp.json`.
 
 #### 8.4.2 Configurar el MCP con auto-aprobación selectiva
 

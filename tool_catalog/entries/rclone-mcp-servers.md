@@ -48,6 +48,7 @@ duda "¿uno control-total o uno read-only seguro?" (respuesta: son modos del mis
 - Solo Google Drive por API nativa/file_id → el enfoque hyunjae (por rutas) es distinto.
 - **Kiro Web NO puede usarlo** (sandbox en la nube, sin ruta a la LAN privada). Sí lo usa un cliente
   que corra en la red: **Kiro CLI en el NAS/PC**, LobeHub en el NAS, o Cursor/Claude Desktop en la LAN.
+  Instalar Kiro CLI en el NAS: ver `../../kiro-cli-nas/README.md`.
 
 ## Qué llevarte si aplica
 
