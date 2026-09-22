@@ -46,7 +46,8 @@
 
 Coherente con el framework nas-dotfiles (Docker + `svc` + `db_net`), la mejor opción es:
 
-- **Pieza A (rclone rcd)** → **contenedor Docker** `rclone/rclone:1.75.1` en `db_net`.
+- **Pieza A (rclone rcd)** → **contenedor Docker** `rclone/rclone:1.75.1` en `db_net`, con
+  **FUSE activo por defecto** (§5.3) para que la tool `mount` proyecte al host = control total real.
   (Alternativa: systemd nativo en el host. Se documenta al final como opción B.)
 - **Pieza B (MCP server)** → se lanza vía `npx` desde tu **gateway MCP** (LobeHub), apuntando al
   daemon por `http://rclone-rcd:5572` (misma `db_net`) o `http://${SERVER_IP}:5572`.
@@ -98,6 +99,7 @@ archivos locales, añade un bind mount de datos (ver §7).
 
 ```bash
 mkdir -p $dkco/rclone-rcd/config
+mkdir -p /mnt                       # punto base para montajes FUSE visibles en el host (§7)
 ```
 
 ---
@@ -129,7 +131,12 @@ chmod 600 $dkco/rclone-rcd/.env
 > Guarda `RCLONE_RC_USER` / `RCLONE_RC_PASS`: el MCP los necesitará (§8).
 > Para leerlos luego sin exponerlos en logs: `grep RCLONE_RC $dkco/rclone-rcd/.env`.
 
-### 5.3 `compose.yml`
+### 5.3 `compose.yml` (control total COMPLETO — FUSE/`mount` activo por defecto)
+
+> **Las 98 tools NO dependen de este compose.** Las expone el MCP server (Pieza B) con
+> `RCLONE_TOOLSETS=all` (§8). Docker **no limita ninguna tool**. Lo único que este compose
+> habilita es que la tool `mount/*` proyecte el montaje al **host** — para eso lleva FUSE
+> (`/dev/fuse` + `SYS_ADMIN` + `/mnt:rshared`) **activo por defecto**, que es el control total real.
 
 `dk rclone-rcd` y crea el `compose.yml`:
 
@@ -150,14 +157,22 @@ services:
       - --rc-serve                     # permite servir archivos por HTTP si se necesita
       - --rc-web-gui=false             # sin GUI web embebida (la controlas por MCP)
       - --config=/config/rclone.conf
+      - --allow-other                  # que otros usuarios/servicios del host lean el mount
       - --log-level=INFO
     volumes:
       - ./config/rclone.conf:/config/rclone.conf   # tu config de remotes
-      # - /mnt:/mnt:rshared                        # (opcional) para montar remotes visibles en host — ver §7
+      - /mnt:/mnt:rshared                          # montajes visibles en el HOST (mount FUSE)
     networks:
       - db_net
     # ports:
     #   - "${SERVER_IP}:5572:5572"     # (opcional) exponer a la LAN SOLO si el MCP no está en db_net
+    # --- FUSE: necesario para que la tool mount/* funcione y suba al host (control total) ---
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse
+    security_opt:
+      - apparmor:unconfined
     healthcheck:
       test: ["CMD", "rclone", "rc", "--rc-addr=:5572",
              "--user=${RCLONE_RC_USER}", "--pass=${RCLONE_RC_PASS}", "core/version"]
@@ -165,10 +180,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    # Para 'mount' (§7) hacen falta capacidades extra; descomentar solo si activas mount:
-    # cap_add: [SYS_ADMIN]
-    # devices: ["/dev/fuse"]
-    # security_opt: ["apparmor:unconfined"]
 
 networks:
   db_net:
@@ -177,6 +188,12 @@ networks:
 
 > `env_file: [../.env, .env]` sigue tu regla de heredar `SERVER_IP`/`TZ` del `.env` global.
 > Si tu `db_net` no está declarada `external`, ajusta el bloque `networks` a tu convención.
+>
+> **Sobre FUSE activo por defecto:** `SYS_ADMIN` + `/dev/fuse` + `/mnt:rshared` dan a la tool
+> `mount` control real sobre el host. Es el precio de "control total": es un contenedor
+> privilegiado en la práctica, así que mantenlo en `db_net` y **no expongas** `5572` a redes
+> no confiables. Si algún día NO necesitas `mount`, puedes quitar el bloque FUSE y el volumen
+> `/mnt` — las otras 90+ tools seguirán funcionando igual.
 
 ---
 
@@ -202,28 +219,29 @@ svc exec rclone-rcd rclone rc --rc-addr=:5572 \
 
 ---
 
-## 7. (Opcional) Habilitar `mount` — montar remotes como carpetas del host
+## 7. Usar `mount` — montar remotes como carpetas del host
 
-Para que la tool `mount/mount` funcione y el punto de montaje sea visible en el **host**, el
-contenedor necesita FUSE y propagación de montaje compartida:
+El bloque FUSE ya va **activo por defecto** en el compose (§5.3), así que la tool `mount`
+funciona sin tocar nada. Prueba a montar un remote (por MCP o directamente por RC):
 
-1. En el `compose.yml`, **descomenta**:
-   ```yaml
-       volumes:
-         - /mnt:/mnt:rshared
-       cap_add: [SYS_ADMIN]
-       devices: ["/dev/fuse"]
-       security_opt: ["apparmor:unconfined"]
-   ```
-2. `svc recreate rclone-rcd`
-3. Monta un remote (por MCP o RC):
-   ```bash
-   svc exec rclone-rcd rclone rc --rc-addr=:5572 --user=nasadmin --pass=TU_RC_PASS \
-     mount/mount fs=gdrive: mountPoint=/mnt/gdrive
-   ```
+```bash
+svc exec rclone-rcd rclone rc --rc-addr=:5572 --user=nasadmin --pass=TU_RC_PASS \
+  mount/mount fs=gdrive: mountPoint=/mnt/gdrive
+
+# Verifica que el montaje subió al HOST:
+ls /mnt/gdrive
+mount | grep /mnt/gdrive
+
+# Desmontar:
+svc exec rclone-rcd rclone rc --rc-addr=:5572 --user=nasadmin --pass=TU_RC_PASS \
+  mount/unmount mountPoint=/mnt/gdrive
+```
 
 > `:rshared` es imprescindible para que el montaje del contenedor "suba" al host (misma técnica que
-> File Browser en tu framework). Sin `SYS_ADMIN` + `/dev/fuse`, `mount` falla.
+> File Browser en tu framework). Sin `SYS_ADMIN` + `/dev/fuse` (ya presentes en el compose), `mount`
+> falla. El `mountPoint` debe estar bajo `/mnt` (el path que se comparte con el host).
+> Si NO vas a usar `mount`, puedes quitar el bloque FUSE + el volumen `/mnt` del compose; el resto
+> del control total (config, operations, sync, vfs, serve, jobs…) sigue igual.
 
 ---
 
@@ -379,9 +397,10 @@ systemctl status rclone-rcd --no-pager | head -5
 
 Luego el MCP apunta a `RCLONE_URL=http://127.0.0.1:5572` (o `http://${SERVER_IP}:5572`).
 
-> **Docker (A) vs systemd (B):** Docker es más coherente con nas-dotfiles (`svc`, layers.conf,
-> backups) y aísla el binario; systemd hace `mount` más directo y no depende del engine.
-> **Recomendación: A (Docker) en `db_net`**, y activa §7 solo si necesitas montar remotes en el host.
+> **Docker (A) vs systemd (B):** ambos dan las 98 tools (eso lo decide `TOOLSETS=all` en el MCP, no
+> el daemon) y ambos soportan `mount`. Docker es más coherente con nas-dotfiles (`svc`, layers.conf,
+> backups) y con FUSE activo por defecto (§5.3) ya cubre `mount` en el host — sin ventaja real de
+> systemd. **Recomendación: A (Docker) en `db_net`.** systemd solo si prefieres no dockerizar el binario.
 
 ---
 
