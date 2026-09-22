@@ -128,22 +128,33 @@ mkdir -p $dkco/kiro-cli/data
 
 ### C.3 Archivos
 
-`Dockerfile`:
+`Dockerfile` (VERIFICADO en runtime — binario en `/opt/kiro`, fuera del volumen):
 
 ```dockerfile
 FROM debian:trixie-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl unzip ca-certificates nodejs npm git \
+        curl unzip ca-certificates coreutils nodejs npm git \
     && rm -rf /var/lib/apt/lists/*
-# Usuario no-root con HOME persistible
 RUN useradd -m -u 1000 kiro
+
+# Instalar Kiro CLI en /opt/kiro (FUERA de /home/kiro, para que el volumen data/ no lo oculte).
+# El instalador oficial usa siempre $HOME/.local/bin, asi que se instala con HOME temporal y se copia.
+RUN HOME=/tmp/ki bash -c 'curl -fsSL https://cli.kiro.dev/install | bash' \
+    && mkdir -p /opt/kiro \
+    && cp -a /tmp/ki/.local/bin/. /opt/kiro/ \
+    && rm -rf /tmp/ki \
+    && chown -R kiro:kiro /opt/kiro
+
 USER kiro
 WORKDIR /home/kiro
-# Instalar Kiro CLI (a ~/.local/bin del usuario kiro)
-RUN curl -fsSL https://cli.kiro.dev/install | bash || true
-ENV PATH="/home/kiro/.local/bin:${PATH}"
-ENTRYPOINT ["kiro-cli"]
+ENV PATH="/opt/kiro:${PATH}"
+ENTRYPOINT ["/opt/kiro/kiro-cli"]
 ```
+
+> ⚠️ **Gotcha verificado:** si instalas Kiro CLI en `/home/kiro/.local/bin` (el default del
+> instalador), el volumen `./data:/home/kiro` **tapa** esa ruta y da
+> `exec: "kiro-cli": executable file not found`. Por eso el binario va a `/opt/kiro`.
+> `coreutils` se añade para garantizar `sha256sum` (el instalador verifica checksum).
 
 `compose.yml` (con `network_mode: host` de fábrica → ve el daemon rclone en `localhost:5572`):
 
@@ -170,16 +181,22 @@ services:
 dk kiro-cli
 svc build kiro-cli
 
-# Autenticar UNA vez (queda guardado en ./data; en NAS headless abre la URL en tu PC):
-docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local login
+# La carpeta data/ la crea root, pero el contenedor corre como uid 1000 -> ajustar (obligatorio):
+chown -R 1000:1000 $dkco/kiro-cli/data
 
-# Sesión normal (bajo demanda):
-docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local
+# Autenticar UNA vez (NAS headless -> device flow, imprime URL+codigo para tu PC):
+docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local login --use-device-flow
 
-# O gestionar como servicio del framework:
-svc up kiro-cli        # cuando lo quieras usar
-svc stop kiro-cli      # cuando no lo necesites  (arranque bajo demanda)
+# Sesion normal, en V3 (para que aplique permissions.yaml):
+docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local --v3
 ```
+
+> ⚠️ **Gotchas verificados:**
+> - **`chown -R 1000:1000 data/`** o el login falla con `Failed to open database: Permission denied`.
+> - **`login --use-device-flow`**: el modo navegador falla en el NAS headless; el device flow imprime
+>   una URL + código que abres en tu PC.
+> - **`--v3`**: obligatorio para que Kiro CLI use `permissions.yaml` (permisos por capacidades). Sin
+>   `--v3` corre en V2, que **ignora** `autoApprove`/`permissions.yaml` y pide aprobación a todo.
 
 ### C.5 Borrado limpio (sin residuos)
 
@@ -207,8 +224,21 @@ Con Kiro CLI ya instalado (A, B o C), la config de un MCP va en `mcp.json`:
 
 Verifica dentro de la sesión con `/mcp`.
 
-Para el **MCP de rclone con control total y auto-aprobación selectiva**, ver la guía dedicada:
-[`../rclone-mcp-control-total/README.md`](../rclone-mcp-control-total/README.md) (§8.4.2).
+### Puntos verificados en runtime (importantes)
+
+- **Permisos (V3):** el `autoApprove` del `mcp.json` **NO** controla las aprobaciones en Kiro CLI V3.
+  El control real es `settings/permissions.yaml` con reglas `capability: mcp` y `effect` allow/ask/deny
+  (`deny > ask > allow`). Hay que lanzar **con `--v3`**.
+- **`mcp.json` limpio (estilo !include):** Kiro no soporta include; se emula con `settings/mcp_tools/<mcp>.json`
+  (uno por MCP) + un script `mcp-build` (jq) que los ensambla en `mcp.json`.
+- **Secretos:** el `mcp.json` usa `"${VAR}"` y un wrapper inyecta la variable al `docker run` (`-e VAR=...`),
+  leyéndola del `.env` del servicio correspondiente. Nunca hardcodear el secreto en el JSON.
+- **Idioma:** `settings/../steering/idioma.md` para respuestas en español (la UI sigue en inglés).
+
+Para el **MCP de rclone con control total y auto-aprobación selectiva** (con el `permissions.yaml`,
+`mcp-build` y wrapper ya escritos y probados), ver la guía dedicada:
+[`../rclone-mcp-control-total/README.md`](../rclone-mcp-control-total/README.md) — sección
+"✅ Verificado en runtime" (R5–R8).
 
 ---
 

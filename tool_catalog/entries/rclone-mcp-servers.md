@@ -17,7 +17,7 @@ reference:
   url: https://github.com/angenge/rclone-mcp-server
   kind: github
 related: []
-status: APLICADO          # se generó guía en ../../rclone-mcp-control-total/README.md
+status: APLICADO          # montado y verificado en runtime en el NAS (2026-09-22)
 evaluated_on: 2026-09-22
 ---
 
@@ -70,6 +70,15 @@ con **FUSE activo por defecto** (SYS_ADMIN + /dev/fuse + /mnt:rshared) para que 
 + **B)** `rclone-mcp-server` (`TOOLSETS=all`) lanzado por el gateway MCP. Las 98 tools las da el MCP
 (no el daemon); Docker no limita ninguna. Guía completa (compose, .env, mount FUSE, seguridad, systemd alt.) en
 [`../../rclone-mcp-control-total/README.md`](../../rclone-mcp-control-total/README.md).
+
+## Estado del montaje (verificado en runtime 2026-09-22)
+
+Montado y funcionando en el NAS: daemon `rclone-rcd` (Docker, healthy) + `rclone-mcp-server`
+(101 tools) consumido por **Kiro CLI V3 en Docker**. Hallazgos clave (detalle en la guía §"Verificado
+en runtime"): (1) `--allow-other` NO es flag de `rcd`; (2) binario de Kiro CLI en `/opt/kiro` porque
+el volumen tapa `/home/kiro`; (3) `chown 1000` en el volumen; (4) login `--use-device-flow`; (5) **V3
+usa `permissions.yaml` (allow/ask), no `autoApprove`**; (6) `mcp_tools/` + `mcp-build` emulan
+`!include`; (7) pass inyectada desde `.env` vía wrapper. Remotes: `mega` (prueba) y `gdrive`.
 
 ## Referencia
 
