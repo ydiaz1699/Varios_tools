@@ -63,8 +63,9 @@ Los 4 candidatos y para qué sirve cada uno (no re-leer los repos):
   (no file_id). No toca mount/sync/config/crypt → descartado como base; solo la idea de "rutas".
 
 Arquitectura para el NAS = 2 piezas: **A)** `rclone/rclone:1.75.1` como `rcd` en `db_net`
-+ **B)** `rclone-mcp-server` (`TOOLSETS=all`) lanzado por el gateway MCP. Guía completa
-(compose, .env, mount FUSE, seguridad, systemd alt.) en
+con **FUSE activo por defecto** (SYS_ADMIN + /dev/fuse + /mnt:rshared) para que `mount` suba al host
++ **B)** `rclone-mcp-server` (`TOOLSETS=all`) lanzado por el gateway MCP. Las 98 tools las da el MCP
+(no el daemon); Docker no limita ninguna. Guía completa (compose, .env, mount FUSE, seguridad, systemd alt.) en
 [`../../rclone-mcp-control-total/README.md`](../../rclone-mcp-control-total/README.md).
 
 ## Referencia
