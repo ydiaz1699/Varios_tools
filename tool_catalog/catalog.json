@@ -1,12 +1,13 @@
 {
-  "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. La fuente de verdad es cada ficha; regenerar si cambian.",
-  "version": 1,
+  "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type/origin SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. origin=external (fuente a leer si aplica) | local (artefacto propio en ../tools_AI). La fuente de verdad es cada ficha; regenerar si cambian.",
+  "version": 2,
   "generated_on": "2026-09-22",
   "entries": [
     {
       "slug": "prowler-agent-skills",
       "title": "Prowler — arquitectura de Agent Skills (AGENTS.md + skills + auto-invoke)",
       "type": "repo",
+      "origin": "external",
       "problem": "Contexto para LLM en 3 niveles: AGENTS.md breve + skills por trigger + auto-invoke obligado, sin saturar tokens.",
       "applies_to": [
         "proyectos con .kiro/skills (o .claude/.gemini/.codex)",
@@ -26,6 +27,7 @@
       "slug": "gentleman-dots",
       "title": "Gentleman.Dots — entorno de desarrollo (dotfiles) + capa de IA",
       "type": "dotfiles",
+      "origin": "external",
       "problem": "Entorno de desarrollo completo (Neovim, shells, multiplexores, terminales) + capa de IA opcional para CLIs de LLM.",
       "applies_to": [
         "montar/estandarizar entorno terminal + Neovim (macOS/Linux/RPi)",
@@ -40,6 +42,58 @@
       "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
       "status": "REVISADO_PARCIAL",
       "file": "entries/gentleman-dots.md"
+    },
+    {
+      "slug": "skill-creator",
+      "title": "skill-creator — meta-skill para crear/optimizar skills de agentes LLM",
+      "type": "tool",
+      "origin": "local",
+      "problem": "Crear skills de agentes LLM bien estructuradas (frontmatter, carga progresiva, triggering, auto-invoke) sin reinventar el proceso.",
+      "applies_to": [
+        "crear una skill nueva para Kiro/Claude Code/Claude.ai",
+        "mejorar/optimizar una skill existente",
+        "entender best practices de authoring de skills"
+      ],
+      "not_for": ["proyectos sin agentes LLM"],
+      "tags": ["skill", "meta-skill", "authoring", "agent-skills", "auto-invoke", "kiro"],
+      "reference": { "url": "tools_AI/skills/skill-creator/SKILL.md", "kind": "web" },
+      "status": "APLICADO",
+      "file": "entries/skill-creator.md"
+    },
+    {
+      "slug": "unificador-skill",
+      "title": "unificador-skill — consolida fragmentos dispersos en una guía coherente",
+      "type": "tool",
+      "origin": "local",
+      "problem": "Unir notas/diagnósticos/conversaciones dispersas en un documento de ejecución paso a paso, sin resumir ni inventar, deduplicando.",
+      "applies_to": [
+        "consolidar múltiples fragmentos de un mismo tema en una guía",
+        "convertir notas sueltas o handoffs en un documento autocontenido"
+      ],
+      "not_for": ["redactar desde cero sin fragmentos fuente"],
+      "tags": ["unificar", "consolidar", "documentacion", "guia", "deduplicar", "drafts"],
+      "reference": { "url": "tools_AI/skills/unificador-skill/SKILL.md", "kind": "web" },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/unificador-skill.md"
+    },
+    {
+      "slug": "nas-agent-memory",
+      "title": "nas-agent-memory — diseño de memoria persistente + auto-mejora para un agente",
+      "type": "pattern",
+      "origin": "local",
+      "problem": "Dar a un agente LLM memoria persistente entre sesiones y un Learning Loop (recordar, aprender skills, modelar al usuario, auto-curarse).",
+      "applies_to": [
+        "diseñar memoria persistente para un agente (Strands SDK u otro)",
+        "implementar un Learning Loop / auto-mejora en un agente propio"
+      ],
+      "not_for": [
+        "agentes sin necesidad de estado entre sesiones",
+        "proyectos sin componente de agente"
+      ],
+      "tags": ["memoria", "agente", "learning-loop", "auto-mejora", "strands", "nudge", "diseño"],
+      "reference": { "url": "tools_AI/resources/nas-agent-memory/README.md", "kind": "web" },
+      "status": "SOLO_REFERENCIA",
+      "file": "entries/nas-agent-memory.md"
     }
   ]
 }

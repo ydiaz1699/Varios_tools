@@ -9,6 +9,7 @@ Cada ficha (`entries/<slug>.md`) tiene frontmatter YAML + cuerpo breve.
 | `slug` | Sí | Identificador único, snake/kebab-case (= nombre de archivo sin `.md`) |
 | `title` | Sí | Nombre legible del recurso |
 | `type` | Sí | Tipo de recurso: `repo` \| `video` \| `dotfiles` \| `tool` \| `article` \| `pattern` |
+| `origin` | Sí (en catalog.json) | `external` (fuente a leer si aplica) \| `local` (artefacto propio en `../tools_AI/`) |
 | `problem` | Sí | En UNA frase: qué problema resuelve (para filtrar rápido) |
 | `applies_to` | Sí | Lista de contextos donde SÍ aplica (ej. `["proyectos con .kiro/skills", "agentes LLM"]`) |
 | `not_for` | No | Lista de contextos donde NO aplica (ej. `["firmware arduino", "proyectos sin agentes"]`) |

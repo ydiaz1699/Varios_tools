@@ -7,6 +7,13 @@ description: >
   la description para triggering, y evaluación iterativa. Usar cuando el
   usuario quiera crear una skill nueva, mejorar una existente, o entender
   las best practices de authoring de skills.
+license: MIT
+metadata:
+  author: ydiaz1699
+  version: "1.1"
+  scope: [root]
+  auto_invoke:
+    - "Crear una skill nueva o mejorar/optimizar una existente"
 ---
 
 # skill-creator
@@ -132,6 +139,24 @@ Criterios de éxito:
 - No hay mejoras significativas entre iteraciones
 
 Para el flujo detallado de evaluación, ver `references/eval-workflow.md`.
+
+---
+
+## Paso 6 (opcional): auto-invoke y metadata
+
+Si el proyecto tiene varias skills y un `AGENTS.md`, el `description` NO basta:
+los modelos no auto-activan skills de forma fiable. Reforzar con:
+
+- Frontmatter `metadata.{scope, auto_invoke}` (campos extra que Kiro ignora sin
+  romper nada; habilitan router/índice y un futuro sync).
+- Una tabla **"Auto-invoke Skills"** en el `AGENTS.md` que ORDENE cargar la skill
+  antes de actuar.
+
+Plantilla lista para copiar: `assets/SKILL-TEMPLATE.md`.
+Detalle del patrón (scope, auto_invoke, manual vs skill-sync, assets/ vs
+references/, qué NO copiar de Prowler): ver
+`references/auto-invoke-and-metadata.md`. Fuente externa del patrón:
+`tool_catalog/entries/prowler-agent-skills.md` (Agent Skills / video Gentleman).
 
 ---
 
