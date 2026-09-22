@@ -88,10 +88,16 @@ Guardaremos ese `rclone.conf` en la carpeta del servicio para montarlo en el con
 ├── .env                      # SOLO secretos: RC user/pass del daemon
 └── config/
     └── rclone.conf           # tu config real de remotes (copiada del host)
+
+/mnt/                         # (en el HOST) donde aparecen los remotes montados por 'mount'
+└── gdrive/                   #   ej: /mnt/gdrive tras mount/mount fs=gdrive: (§7)
 ```
 
-Opcionalmente, si quieres que el daemon pueda **montar** remotes visibles en el host o mover
-archivos locales, añade un bind mount de datos (ver §7).
+Los montajes **SÍ son visibles en el host**: el compose comparte `/mnt` entre contenedor y host
+con propagación `rshared` (§5.3), así que cuando la tool `mount` monta un remote en `/mnt/<nombre>`
+dentro del contenedor, ese punto aparece igual en `/mnt/<nombre>` del host — y otros servicios
+(Jellyfin, File Browser, etc.) pueden leerlo gracias a `--allow-other`. Esto ya viene activo
+por defecto; no hay que añadir nada. Detalle de uso en §7.
 
 ---
 
