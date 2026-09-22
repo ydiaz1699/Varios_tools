@@ -170,8 +170,9 @@ services:
       - /mnt:/mnt:rshared                          # montajes visibles en el HOST (mount FUSE)
     networks:
       - db_net
-    # ports:
-    #   - "${SERVER_IP}:5572:5572"     # (opcional) exponer a la LAN SOLO si el MCP no está en db_net
+    ports:
+      - "127.0.0.1:5572:5572"        # expone SOLO a localhost del NAS (para Kiro CLI en el NAS, §8.4)
+    #   - "${SERVER_IP}:5572:5572"   # alternativa: exponer a la LAN (Kiro CLI/MCP en otro PC) — menos seguro
     # --- FUSE: necesario para que la tool mount/* funcione y suba al host (control total) ---
     cap_add:
       - SYS_ADMIN
@@ -313,6 +314,80 @@ No lo expongas a redes no confiables sin un reverse-proxy con autenticación.
 | `debug` | perfilado/gc |
 
 Especiales: `RCLONE_TOOLSETS=default` (mínimo seguro) · **`all` (control total, 98 tools)**.
+
+### 8.4 Usar con **Kiro CLI en el NAS** (control total + auto-aprobación selectiva) — recomendado
+
+> **Kiro Web NO puede** usar este MCP: corre en un sandbox en la nube, sin ruta a tu LAN privada.
+> **Kiro CLI SÍ**, porque se ejecuta en tu máquina. Aquí lo instalamos **en el propio NAS**.
+
+Idea: control total (`TOOLSETS=all`) pero con **`autoApprove`** para que las tools **no
+destructivas** (leer, listar, copiar, subir, descargar, `sync_copy` aditivo, crear carpeta) se
+ejecuten solas, y las **destructivas** (borrar, purgar, mirror `sync_sync`, mover, crear/borrar
+remotes, montar/desmontar) **pidan confirmación**.
+
+**Requisitos en el NAS:**
+- Node.js instalado (para `npx`): `instal nodejs npm` (o vía nvm).
+- Exponer el puerto del daemon **solo a localhost del NAS** (Kiro CLI habla por `localhost`, no está
+  en `db_net`). En el `compose.yml` (§5.3) descomenta y usa:
+  ```yaml
+      ports:
+        - "127.0.0.1:5572:5572"     # solo localhost del NAS — NO lo abras a la LAN
+  ```
+  y `svc recreate rclone-rcd`.
+
+**Config** en `~/.kiro/settings/mcp.json` (global) del NAS:
+
+```json
+{
+  "mcpServers": {
+    "rclone": {
+      "command": "npx",
+      "args": ["-y", "rclone-mcp-server"],
+      "env": {
+        "RCLONE_URL": "http://localhost:5572",
+        "RCLONE_USER": "nasadmin",
+        "RCLONE_PASS": "${RCLONE_RC_PASS}",
+        "RCLONE_TOOLSETS": "all"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "core_version", "core_stats", "core_about",
+        "config_listremotes", "config_get", "config_dump",
+        "operations_list", "operations_stat", "operations_size", "operations_check",
+        "operations_fsinfo", "operations_publiclink",
+        "operations_mkdir",
+        "operations_copyfile", "operations_copyurl",
+        "sync_copy",
+        "job_status", "job_list", "vfs_refresh", "vfs_list"
+      ]
+    }
+  }
+}
+```
+
+Exporta el secreto en la shell antes de lanzar la CLI (no lo pongas en claro en el JSON):
+```bash
+export RCLONE_RC_PASS="$(grep RCLONE_RC_PASS $dkco/rclone-rcd/.env | cut -d= -f2)"
+kiro-cli            # dentro de la sesión: /mcp  → verifica que 'rclone' cargó y lista las tools
+```
+
+**Clasificación aplicada** (destructividad real de rclone):
+
+| Se ejecuta SOLO (autoApprove) | Pide CONFIRMACIÓN (no está en la lista) |
+|-------------------------------|------------------------------------------|
+| Leer/listar: version, stats, about, listremotes, get, dump, list, stat, size, check, fsinfo, publiclink | `sync_sync` / `sync_bisync` / `sync_resync` (MIRROR, **borran**) |
+| Crear carpeta: `operations_mkdir` | `operations_deletefile` / `delete` / `purge` / `rmdir` / `rmdirs` |
+| Copiar/subir/descargar: `operations_copyfile`, `operations_copyurl`, `sync_copy` (aditivo) | **Mover**: `operations_movefile`, `sync_move` (borran del origen) |
+| Jobs y VFS de solo lectura: `job_status`, `job_list`, `vfs_refresh`, `vfs_list` | Remotes/unidades: `config_create` / `config_update` / `config_delete` |
+|  | Montaje: `mount_mount`, `mount_unmount` |
+
+> **Decisiones tomadas:** `sync_copy` (aditivo) va en auto porque NO borra; `sync_sync` (mirror) va a
+> confirmación porque borra en destino. **Mover** va a confirmación (borra del origen tras copiar).
+> Nombres de tool = endpoint RC en snake_case (`/operations/copyfile` → `operations_copyfile`),
+> verificado en el paquete `rclone-mcp-server@1.0.3`.
+>
+> Alternativa: `disabledTools` oculta tools por completo (ni con confirmación). `autoApprove: ["*"]`
+> aprobaría TODO (incluido borrar) — **no recomendado** con `TOOLSETS=all`.
 
 ---
 
