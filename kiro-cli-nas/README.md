@@ -16,14 +16,16 @@ literalmente — pero SÍ se puede instalar de forma **aislada y sin root**, que
 
 Tres niveles de aislamiento (elige uno):
 
-| Opción | Qué aísla | ¿Root? | Sirve para el MCP de rclone (host) | Esfuerzo |
-|--------|-----------|--------|-------------------------------------|----------|
-| **A. Instalador oficial** (`~/.local/bin`) | Tu usuario | No | ✅ Sí | Mínimo |
-| **B. Prefijo dedicado** (`$HOME` apuntado a `~/apps/kiro-cli`) | Carpeta propia, fácil de borrar | No | ✅ Sí | Bajo |
-| **C. Contenedor Docker** | Total (FS, red, deps) | No (usa Docker) | ⚠️ Limitado — ver §C.4 | Medio |
+| Opción | Borrado sin residuos | Encender/apagar bajo demanda | ¿Toca el host? | Acceso a rclone |
+|--------|----------------------|------------------------------|----------------|-----------------|
+| **A. Instalador oficial** (`~/.local/bin`) | Medio (borrar 2 binarios + config) | No (siempre disponible) | Deja binario/config en `$HOME` | ✅ directo |
+| **B. Prefijo dedicado** (`~/apps/kiro-cli`) | Fácil (`rm -rf` la carpeta) | No | Deja Node/deps en el host | ✅ directo |
+| **C. Contenedor Docker** ⭐ | **Total** (`svc down` + borrar carpeta) | **Sí** (`svc up`/`svc stop`) | **No** (todo dentro) | ✅ con `network_mode: host` |
 
-> **Para controlar rclone** (que corre en el host del NAS), lo natural es **B** (o A).
-> **C (Docker)** aísla más pero complica el acceso a `localhost:5572` y a `rclone.conf` del host.
+> **Recomendada: C (Docker).** Si tu prioridad es **borrar limpio sin residuos** y **decidir cuándo
+> corre** (encender solo cuando lo necesites), Docker es la mejor: `svc up kiro-cli` para usarlo,
+> `svc stop` cuando no, y borrado total sin dejar nada en el host. La limitante de red se resuelve con
+> `network_mode: host` (§C). B y A siguen documentadas como alternativas más ligeras.
 
 ---
 
@@ -97,10 +99,17 @@ kiro-cli doctor
 
 ---
 
-## Opción C — Contenedor Docker (aislamiento total)
+## Opción C — Contenedor Docker (aislamiento total) ⭐ recomendada
 
-Máximo aislamiento: Kiro CLI corre en su propio contenedor, con su filesystem, sus dependencias y
-sus credenciales, sin tocar el host. Encaja con el framework nas-dotfiles.
+Máximo aislamiento: Kiro CLI corre en su propio contenedor con su filesystem, dependencias y
+credenciales, **sin tocar el host**. Ventajas para tu caso:
+
+- **Borrado sin residuos:** `svc down kiro-cli` + `rm -rf $dkco/kiro-cli` = no queda NADA en el host
+  (ni binario, ni Node, ni config).
+- **Bajo demanda:** `svc up kiro-cli` cuando lo necesites, `svc stop kiro-cli` cuando no. Tú decides
+  cuándo vive.
+- **Red resuelta:** con `network_mode: host` el contenedor ve `localhost:5572` del host → el MCP de
+  rclone funciona sin trucos (§C.4).
 
 ### C.1 Estructura
 
@@ -136,7 +145,7 @@ ENV PATH="/home/kiro/.local/bin:${PATH}"
 ENTRYPOINT ["kiro-cli"]
 ```
 
-`compose.yml`:
+`compose.yml` (con `network_mode: host` de fábrica → ve el daemon rclone en `localhost:5572`):
 
 ```yaml
 services:
@@ -144,40 +153,47 @@ services:
     build: .
     image: kiro-cli-nas:local
     container_name: kiro-cli
+    network_mode: host               # ve localhost:5572 del host (MCP de rclone) sin trucos
     stdin_open: true                 # interactivo (TUI)
     tty: true
     volumes:
       - ./data:/home/kiro            # persiste login, config y mcp.json
-    # Para que el MCP de rclone alcance el daemon del host (§C.4):
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
-    # network_mode: host             # alternativa: ve localhost:5572 del host directamente
 ```
 
-Uso:
+> **Importante:** con `network_mode: host` NO puedes usar a la vez `networks:`, `ports:` ni
+> `extra_hosts:` en este servicio (Docker los ignora/rechaza). No hacen falta: en host mode el
+> contenedor comparte la red del NAS y llega directo a `127.0.0.1:5572`.
+
+### C.4 Autenticar y usar
 
 ```bash
 dk kiro-cli
 svc build kiro-cli
-docker run -it --rm -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local login   # autenticar una vez
-docker run -it --rm -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local          # sesión normal
+
+# Autenticar UNA vez (queda guardado en ./data; en NAS headless abre la URL en tu PC):
+docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local login
+
+# Sesión normal (bajo demanda):
+docker run -it --rm --network host -v $dkco/kiro-cli/data:/home/kiro kiro-cli-nas:local
+
+# O gestionar como servicio del framework:
+svc up kiro-cli        # cuando lo quieras usar
+svc stop kiro-cli      # cuando no lo necesites  (arranque bajo demanda)
 ```
 
-### C.4 ⚠️ Limitación para el caso rclone
+### C.5 Borrado limpio (sin residuos)
 
-Un Kiro CLI **dentro de Docker** tiene el MISMO problema de red que Kiro Web: por defecto NO ve
-`localhost:5572` del host ni el `rclone.conf` del host. Para que el MCP de rclone funcione desde el
-contenedor tienes que **darle ruta al daemon**:
+```bash
+svc down kiro-cli                   # para y elimina el contenedor
+docker image rm kiro-cli-nas:local  # elimina la imagen
+rm -rf $dkco/kiro-cli               # elimina Dockerfile, compose y data (login/config/mcp.json)
+```
 
-- **`network_mode: host`** → el contenedor comparte la red del host y `RCLONE_URL=http://localhost:5572`
-  funciona. Es lo más simple, pero reduce el aislamiento de red.
-- o **`extra_hosts: host.docker.internal:host-gateway`** + `RCLONE_URL=http://host.docker.internal:5572`
-  (con el puerto expuesto en el compose de rclone).
-- o meter este contenedor en **`db_net`** y usar `RCLONE_URL=http://rclone-rcd:5572` (misma red que el
-  daemon) — la opción más limpia si ya usas `db_net`.
+Tras esto **no queda nada** en el host relacionado con Kiro CLI. Ese es el objetivo que buscabas.
 
-> Por esta fricción, **para controlar rclone recomiendo la opción B** (Kiro CLI en el host). Usa C si
-> tu prioridad es el aislamiento total y aceptas configurar la red.
+> **No añadir a `layers.conf`:** este servicio es bajo demanda, NO debe arrancar en el boot. Si tu
+> framework exige listar todos los servicios (`BOOT_ORDER_REQUIRE_ALL=1`), usa `svc no-boot kiro-cli`
+> para que el arranque escalonado lo salte sin bloquear su capa.
 
 ---
 

@@ -327,12 +327,12 @@ dedicado en `$HOME`, o contenedor Docker) está documentada en su **guía dedica
 
 ➡️ [`../kiro-cli-nas/README.md`](../kiro-cli-nas/README.md)
 
-Para controlar rclone se recomienda la **Opción B (prefijo dedicado en `$HOME`)** de esa guía: sin
-root, aislada y con acceso directo a `localhost:5572` del host. Vuelve aquí cuando `kiro-cli --version`
-y `kiro-cli doctor` respondan OK.
+Para controlar rclone se recomienda la **Opción C (contenedor Docker con `network_mode: host`)** de
+esa guía: aislamiento total, arranque bajo demanda (`svc up`/`svc stop`), borrado sin residuos y
+acceso directo a `localhost:5572` del host. Vuelve aquí cuando `kiro-cli doctor` responda OK.
 
 > Recuerda dónde vive el `mcp.json` según cómo instalaste (§8.4.2 asume la ruta correcta):
-> Opción A → `~/.kiro/settings/mcp.json` · Opción B → `$aadm/apps/kiro-cli/.kiro/settings/mcp.json`.
+> Opción C → `$dkco/kiro-cli/data/.kiro/settings/mcp.json` · Opción B → `$aadm/apps/kiro-cli/.kiro/settings/mcp.json` · Opción A → `~/.kiro/settings/mcp.json`.
 
 #### 8.4.2 Configurar el MCP con auto-aprobación selectiva
 
@@ -342,9 +342,10 @@ ejecuten solas, y las **destructivas** (borrar, purgar, mirror `sync_sync`, move
 remotes, montar/desmontar) **pidan confirmación**.
 
 **Requisitos en el NAS (además de Kiro CLI del §8.4.1):**
-- Node.js instalado (para que `npx` lance el MCP): `instal nodejs npm` (o vía nvm).
-- Exponer el puerto del daemon **solo a localhost del NAS** (Kiro CLI habla por `localhost`, no está
-  en `db_net`). En el `compose.yml` (§5.3) descomenta y usa:
+- Node.js para que `npx` lance el MCP: con la **Opción C (Docker)** ya viene en la imagen (§C.3);
+  con A/B instálalo en el host (`instal nodejs npm`).
+- Exponer el puerto del daemon **solo a localhost del NAS** (Kiro CLI habla por `localhost`; con
+  `network_mode: host` el contenedor comparte esa red). En el `compose.yml` de rclone (§5.3) usa:
   ```yaml
       ports:
         - "127.0.0.1:5572:5572"     # solo localhost del NAS — NO lo abras a la LAN
