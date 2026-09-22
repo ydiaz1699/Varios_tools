@@ -155,8 +155,16 @@ los modelos no auto-activan skills de forma fiable. Reforzar con:
 Plantilla lista para copiar: `assets/SKILL-TEMPLATE.md`.
 Detalle del patrón (scope, auto_invoke, manual vs skill-sync, assets/ vs
 references/, qué NO copiar de Prowler): ver
-`references/auto-invoke-and-metadata.md`. Fuente externa del patrón:
-`tool_catalog/entries/prowler-agent-skills.md` (Agent Skills / video Gentleman).
+`references/auto-invoke-and-metadata.md`.
+
+Para cómo encaja la skill en la documentación del proyecto —tamaño del AGENTS.md
+(~250, máx ~500 líneas), uno vs varios AGENTS.md por feature con root que enruta,
+y cuándo delegar un flujo en subagentes (contexto aislado que devuelve solo un
+resumen)—: ver `references/agents-md-and-subagents.md`.
+
+Fuente externa de ambos patrones: `tool_catalog/entries/prowler-agent-skills.md`
+y `tool_catalog/entries/gentleman-agents-skills-video.md` (Agent Skills / video
+de Gentleman Programming).
 
 ---
 

@@ -17,7 +17,9 @@ reference:
   url: https://github.com/prowler-cloud/prowler
   kind: github
 related:
+  - "Ficha del video: tool_catalog/entries/gentleman-agents-skills-video.md"
   - "Video Gentleman: https://www.youtube.com/watch?v=Nvn6s3r9ZAw"
+  - "Transcripción (gist): https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
   - "Estándar: https://agentskills.io"
   - "Aplicado en: nas-dotfiles (.kiro/skills/, PRs #148/#149/#150)"
 status: APLICADO
