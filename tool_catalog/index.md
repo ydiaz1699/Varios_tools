@@ -17,6 +17,12 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 | [sdd-video](entries/gentleman-programming/sdd-video.md) | video | Spec-Driven Development: proceso para que la IA no improvise (init, skill registry, strict TDD, fases, subagentes) | definir proceso anti-improvisación, skill registry, orquestador/subagentes | REVISADO_A_FONDO |
 | [engram](entries/gentleman-programming/engram.md) | repo | Memoria persistente para agentes (Go + SQLite/FTS5, MCP, agent-agnostic) | dar memoria a un agente, alternativa lista-para-usar a diseñar memoria propia | REVISADO_PARCIAL |
 
+### Recursos externos — otros
+
+| Slug | Tipo | Problema que resuelve | Aplica a | Estado |
+|------|------|-----------------------|----------|--------|
+| [rclone-mcp-servers](entries/rclone-mcp-servers.md) | repo | MCP para rclone (control total vía RC API): daemon rcd + rclone-mcp-server con TOOLSETS=all | exponer rclone a un LLM por MCP, elegir base control-total vs read-only | APLICADO |
+
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 
 | Slug | Tipo | Problema que resuelve | Aplica a | Estado |
