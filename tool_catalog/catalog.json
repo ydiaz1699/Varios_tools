@@ -24,6 +24,23 @@
       "file": "entries/prowler-agent-skills.md"
     },
     {
+      "slug": "gentleman-agents-skills-video",
+      "title": "Video Gentleman Programming — arquitectura AGENTS.md + skills + subagentes",
+      "type": "video",
+      "origin": "external",
+      "problem": "Entender la arquitectura de contexto para agentes LLM (AGENTS.md + skills por trigger + auto-invoke + subagentes) sin releer la transcripción completa.",
+      "applies_to": [
+        "diseñar el contexto para agentes en un repo (AGENTS.md + skills)",
+        "decidir tamaño/división de AGENTS.md (uno vs varios por feature)",
+        "saber cuándo delegar en subagentes para no ensuciar el contexto"
+      ],
+      "not_for": ["proyectos sin agentes LLM (firmware Arduino/ESP)"],
+      "tags": ["agent-skills", "agents-md", "auto-invoke", "subagentes", "orquestador", "contexto", "video"],
+      "reference": { "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw", "kind": "youtube" },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/gentleman-agents-skills-video.md"
+    },
+    {
       "slug": "gentleman-dots",
       "title": "Gentleman.Dots — entorno de desarrollo (dotfiles) + capa de IA",
       "type": "dotfiles",

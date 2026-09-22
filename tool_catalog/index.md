@@ -9,6 +9,7 @@ que aplica.
 | Slug | Tipo | Problema que resuelve | Aplica a | Estado |
 |------|------|-----------------------|----------|--------|
 | [prowler-agent-skills](entries/prowler-agent-skills.md) | repo | Contexto para LLM en 3 niveles (AGENTS.md + skills por trigger + auto-invoke) | proyectos con .kiro/skills, agentes LLM | APLICADO |
+| [gentleman-agents-skills-video](entries/gentleman-agents-skills-video.md) | video | Arquitectura AGENTS.md + skills + auto-invoke + subagentes (sin releer la transcripción) | diseñar contexto de agentes, dividir AGENTS.md, subagentes | REVISADO_A_FONDO |
 | [gentleman-dots](entries/gentleman-dots.md) | dotfiles | Entorno de desarrollo completo (Neovim/shells/terminales) + capa de IA opcional | montar entorno terminal/Neovim, capa IA multi-CLI | REVISADO_PARCIAL |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
@@ -21,6 +22,7 @@ que aplica.
 
 ## Cómo elegir
 
+- **¿Quieres entender la arquitectura de agentes (AGENTS.md + skills + subagentes)?** → `gentleman-agents-skills-video` (concepto) y `prowler-agent-skills` (implementación).
 - **¿Tu repo usa agentes/LLM con skills?** → `prowler-agent-skills` (patrón) y `skill-creator` (para crearlas).
 - **¿Necesitas unificar notas dispersas en una guía?** → `unificador-skill`.
 - **¿Diseñas un agente con memoria/aprendizaje?** → `nas-agent-memory`.
