@@ -95,6 +95,26 @@
       "file": "entries/gentleman-programming/engram.md"
     },
     {
+      "slug": "rclone-mcp-servers",
+      "title": "Servidores MCP para rclone (control total vía RC API)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM control de rclone (list/copy/sync/mount/config) como tools MCP hablando con un daemon rclone rcd (RC API, 98 endpoints).",
+      "applies_to": [
+        "exponer rclone a un agente/LLM por MCP (LobeHub, Cursor, Claude, opencode)",
+        "control total de almacenamiento cloud desde el NAS sin escribir un MCP propio",
+        "decidir entre control total vs read-only seguro para un agente"
+      ],
+      "not_for": [
+        "automatización de rclone SIN un agente/LLM (usar systemd timers / scripts)",
+        "solo Google Drive con API nativa por file_id"
+      ],
+      "tags": ["rclone", "mcp", "rc-api", "control-total", "read-only", "docker", "nas", "cloud-storage"],
+      "reference": { "url": "https://github.com/angenge/rclone-mcp-server", "kind": "github" },
+      "status": "APLICADO",
+      "file": "entries/rclone-mcp-servers.md"
+    },
+    {
       "slug": "skill-creator",
       "title": "skill-creator — meta-skill para crear/optimizar skills de agentes LLM",
       "type": "tool",
