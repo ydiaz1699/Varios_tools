@@ -320,13 +320,53 @@ Especiales: `RCLONE_TOOLSETS=default` (mínimo seguro) · **`all` (control total
 > **Kiro Web NO puede** usar este MCP: corre en un sandbox en la nube, sin ruta a tu LAN privada.
 > **Kiro CLI SÍ**, porque se ejecuta en tu máquina. Aquí lo instalamos **en el propio NAS**.
 
+#### 8.4.1 Instalar Kiro CLI en el NAS (Debian)
+
+> Verificado contra el instalador oficial `https://cli.kiro.dev/install` (2026-09-22).
+> El NAS es Debian x86_64 (Dell PowerEdge T20). Instala en `~/.local/bin/` (NO requiere root).
+
+**Paso 1 — dependencias** (el instalador las exige en Linux):
+
+```bash
+instal curl unzip                 # 'curl'/'wget', 'unzip' y 'sha256sum' (coreutils, ya presente)
+```
+
+**Paso 2 — instalar** (script oficial de una línea; se instala en tu usuario, sin sudo):
+
+```bash
+curl -fsSL https://cli.kiro.dev/install | bash
+```
+
+El instalador detecta arquitectura (`x86_64`) y, si tu glibc es antiguo, usa el binario musl
+automáticamente. Descarga a un tmp, verifica checksum SHA-256 y copia a `~/.local/bin/`.
+
+**Paso 3 — asegurar el PATH** (si el instalador avisa que `~/.local/bin` no está en PATH):
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+reload                            # tu alias de 'source ~/.bashrc'
+kiro-cli --version                # verifica que responde
+```
+
+**Paso 4 — autenticar** (abre el navegador; en un NAS headless copia la URL a tu PC):
+
+```bash
+kiro-cli login
+kiro-cli doctor                   # debe decir "Everything looks good!"
+```
+
+> **NAS headless / por SSH:** `kiro-cli login` imprime una URL de autenticación; ábrela en el
+> navegador de tu PC y completa el login. La sesión queda guardada en el NAS.
+
+#### 8.4.2 Configurar el MCP con auto-aprobación selectiva
+
 Idea: control total (`TOOLSETS=all`) pero con **`autoApprove`** para que las tools **no
 destructivas** (leer, listar, copiar, subir, descargar, `sync_copy` aditivo, crear carpeta) se
 ejecuten solas, y las **destructivas** (borrar, purgar, mirror `sync_sync`, mover, crear/borrar
 remotes, montar/desmontar) **pidan confirmación**.
 
-**Requisitos en el NAS:**
-- Node.js instalado (para `npx`): `instal nodejs npm` (o vía nvm).
+**Requisitos en el NAS (además de Kiro CLI del §8.4.1):**
+- Node.js instalado (para que `npx` lance el MCP): `instal nodejs npm` (o vía nvm).
 - Exponer el puerto del daemon **solo a localhost del NAS** (Kiro CLI habla por `localhost`, no está
   en `db_net`). En el `compose.yml` (§5.3) descomenta y usa:
   ```yaml
