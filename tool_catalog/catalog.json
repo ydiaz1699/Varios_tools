@@ -61,6 +61,40 @@
       "file": "entries/gentleman-programming/gentleman-dots.md"
     },
     {
+      "slug": "sdd-video",
+      "title": "Video Gentleman — Spec-Driven Development (SDD) de punta a punta",
+      "type": "video",
+      "origin": "external",
+      "problem": "Que la IA no improvise: guiarla con un proceso (spec → diseño → tareas → apply/verify) en vez de una prompt vaga o demasiado contexto.",
+      "applies_to": [
+        "definir un proceso para que un agente no improvise en cambios de código",
+        "entender SDD (init, preflight, skill registry, strict TDD, fases, PRs encadenadas)",
+        "diseñar un skill registry / orquestador-subagentes con contexto seleccionado"
+      ],
+      "not_for": ["proyectos sin agentes LLM", "cambios triviales sin proceso formal"],
+      "tags": ["sdd", "spec-driven", "tdd", "skill-registry", "orquestador", "subagentes", "proceso", "contexto"],
+      "reference": { "url": "https://www.youtube.com/watch?v=KILEn2VSXX8", "kind": "youtube" },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/gentleman-programming/sdd-video.md"
+    },
+    {
+      "slug": "engram",
+      "title": "Engram — memoria persistente para agentes de código (Go + SQLite/FTS5, MCP)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar memoria persistente y compartible entre sesiones/agentes sin Node/Python/Docker: un binario Go con SQLite local vía MCP.",
+      "applies_to": [
+        "dar memoria persistente a un agente (recordar decisiones/lecciones entre sesiones)",
+        "memoria agent-agnostic vía MCP (Claude Code, OpenCode, Gemini, Codex, Cursor...)",
+        "alternativa lista-para-usar frente a diseñar memoria propia"
+      ],
+      "not_for": ["agentes sin estado entre sesiones", "entornos sin binario local ni MCP"],
+      "tags": ["memoria", "engram", "mcp", "sqlite", "fts5", "go", "agent-agnostic", "recall", "lazy-loading"],
+      "reference": { "url": "https://github.com/Gentleman-Programming/engram", "kind": "github" },
+      "status": "REVISADO_PARCIAL",
+      "file": "entries/gentleman-programming/engram.md"
+    },
+    {
       "slug": "skill-creator",
       "title": "skill-creator — meta-skill para crear/optimizar skills de agentes LLM",
       "type": "tool",

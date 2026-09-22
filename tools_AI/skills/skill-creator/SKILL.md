@@ -162,6 +162,11 @@ Para cómo encaja la skill en la documentación del proyecto —tamaño del AGEN
 y cuándo delegar un flujo en subagentes (contexto aislado que devuelve solo un
 resumen)—: ver `references/agents-md-and-subagents.md`.
 
+Para el proceso completo que evita que el agente improvise (Spec-Driven
+Development: SDD Init, skill registry como índice, strict TDD, fases
+explore→...→verify con subagentes, PRs encadenadas): ver
+`references/spec-driven-development.md`.
+
 Ejemplos reales aplicados (conocimiento destilado para NO clonar los repos):
 - `references/prowler-case-study.md` — repo grande multi-área: 6 AGENTS.md,
   37 skills en 3 familias, frontmatter con scope/auto_invoke, references/ vs assets/.

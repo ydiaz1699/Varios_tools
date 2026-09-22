@@ -82,6 +82,11 @@ patrón subagente/orquestador del video, aplicado:
 Esto confirma en la práctica lo de `agents-md-and-subagents.md`: orquestador
 lightweight + subagentes con contexto aislado que devuelven resultado.
 
+> El **flujo SDD completo** (SDD Init, preflight, skill registry, strict TDD,
+> fases explore→...→verify, PRs encadenadas) está destilado en
+> `spec-driven-development.md`. Aquí solo se ve el orquestador *aplicado* en un
+> repo; allí está la metodología entera.
+
 ## Contributing (cómo añaden una skill, del propio AGENTS.md)
 
 1. Leer la skill `skill-creator` primero.
