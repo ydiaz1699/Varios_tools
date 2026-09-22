@@ -214,6 +214,72 @@ Tras esto **no queda nada** en el host relacionado con Kiro CLI. Ese es el objet
 
 ---
 
+## 📁 Mapa de archivos creados (montaje real — Opción C + MCP rclone)
+
+Inventario COMPLETO de lo que quedó creado en el NAS tras el montaje verificado. Sirve para
+reconstruir, auditar o borrar. `[host]` = lo crea root en el host · `[gen]` = generado por script ·
+`[cont]` = lo crea Kiro CLI dentro del contenedor (persistido en el volumen).
+
+### En `$dkco/kiro-cli/` (el servicio Docker de Kiro CLI)
+
+```
+/docker/kiro-cli/
+├── Dockerfile                                  [host] imagen: Debian + Node + Kiro CLI en /opt/kiro
+├── compose.yml                                 [host] network_mode: host, volumen ./data:/home/kiro
+└── data/                                       [cont] = $HOME del contenedor (uid 1000)
+    ├── .local/…                                [cont] sesion/credenciales del login (device-flow)
+    └── .kiro/
+        ├── agents/                             [cont] agentes de Kiro CLI (autogenerado)
+        ├── sessions/                           [cont] historial de sesiones
+        ├── steering/
+        │   └── idioma.md                       [host] fuerza respuestas en español
+        └── settings/
+            ├── mcp_tools/
+            │   └── rclone.json                 [host] ← EDITAS AQUI el MCP de rclone (${RCLONE_RC_PASS})
+            ├── mcp.json                        [gen]  ← generado por 'mcp-build' (NO editar a mano)
+            └── permissions.yaml                [host] permisos V3 (rclone/* allow; destructivas ask)
+```
+
+### En `$aadm/.local/bin/` (scripts en el host)
+
+```
+/home/aadm/.local/bin/
+├── mcp-build                                   [host] ensambla mcp_tools/*.json → mcp.json (jq)
+└── kiro                                        [host] wrapper: inyecta RCLONE_RC_PASS del .env y lanza --v3
+```
+
+### Dependencia externa (otro servicio, NO parte de kiro-cli)
+
+```
+/docker/rclone-rcd/                             el daemon con el que habla el MCP (guia aparte)
+├── compose.yml, .env
+└── config/rclone.conf                          remotes: mega, gdrive
+```
+
+### Qué contiene cada archivo clave (resumen)
+
+| Archivo | Rol | Editable a mano |
+|---------|-----|-----------------|
+| `Dockerfile` | Instala Kiro CLI en `/opt/kiro` (fuera del volumen) | Sí |
+| `compose.yml` | `network_mode: host` + volumen `data/` | Sí |
+| `settings/mcp_tools/rclone.json` | Bloque `mcpServers.rclone` (command npx, env, `${RCLONE_RC_PASS}`) | **Sí (fuente)** |
+| `settings/mcp.json` | Combinado de todos los `mcp_tools/*.json` | **No (generado)** |
+| `settings/permissions.yaml` | Reglas V3: `rclone/*`=allow, destructivas=ask | Sí |
+| `steering/idioma.md` | Responder en español | Sí |
+| `$aadm/.local/bin/mcp-build` | Regenera `mcp.json` desde los trozos | Sí |
+| `$aadm/.local/bin/kiro` | Lanza el contenedor con la pass inyectada y `--v3` | Sí |
+
+### Flujo de mantenimiento
+
+- **Añadir un MCP:** crear `settings/mcp_tools/<nuevo>.json` → `mcp-build` → relanzar `kiro`.
+- **Editar rclone:** editar `settings/mcp_tools/rclone.json` → `mcp-build` → relanzar.
+- **Cambiar permisos:** editar `settings/permissions.yaml` → relanzar (no requiere `mcp-build`).
+- **Tras tocar archivos en `data/` como root:** `chown -R 1000:1000 $dkco/kiro-cli/data`.
+- **Borrar TODO sin residuos:** `svc down kiro-cli` + `docker image rm kiro-cli-nas:local` +
+  `rm -rf $dkco/kiro-cli` + (opcional) borrar `$aadm/.local/bin/{kiro,mcp-build}`.
+
+---
+
 ## Después de instalar: configurar un MCP
 
 Con Kiro CLI ya instalado (A, B o C), la config de un MCP va en `mcp.json`:
