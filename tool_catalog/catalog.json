@@ -1,0 +1,45 @@
+{
+  "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. La fuente de verdad es cada ficha; regenerar si cambian.",
+  "version": 1,
+  "generated_on": "2026-09-22",
+  "entries": [
+    {
+      "slug": "prowler-agent-skills",
+      "title": "Prowler — arquitectura de Agent Skills (AGENTS.md + skills + auto-invoke)",
+      "type": "repo",
+      "problem": "Contexto para LLM en 3 niveles: AGENTS.md breve + skills por trigger + auto-invoke obligado, sin saturar tokens.",
+      "applies_to": [
+        "proyectos con .kiro/skills (o .claude/.gemini/.codex)",
+        "repos donde un agente/LLM colabora y necesita convenciones",
+        "frameworks con muchas guías a cargar bajo demanda"
+      ],
+      "not_for": [
+        "firmware Arduino/ESP sin agentes LLM",
+        "proyectos triviales sin convenciones repetidas"
+      ],
+      "tags": ["agent-skills", "agents-md", "auto-invoke", "skill-creator", "skill-sync", "llm", "contexto"],
+      "reference": { "url": "https://github.com/prowler-cloud/prowler", "kind": "github" },
+      "status": "APLICADO",
+      "file": "entries/prowler-agent-skills.md"
+    },
+    {
+      "slug": "gentleman-dots",
+      "title": "Gentleman.Dots — entorno de desarrollo (dotfiles) + capa de IA",
+      "type": "dotfiles",
+      "problem": "Entorno de desarrollo completo (Neovim, shells, multiplexores, terminales) + capa de IA opcional para CLIs de LLM.",
+      "applies_to": [
+        "montar/estandarizar entorno terminal + Neovim (macOS/Linux/RPi)",
+        "repos que quieran capa de IA para Claude/OpenCode/Gemini/Cursor",
+        "referencia de skills/ + AGENTS.md en dotfiles reales"
+      ],
+      "not_for": [
+        "proyectos que solo necesitan el patrón de skills (usar prowler-agent-skills)",
+        "firmware/embebidos sin entorno de terminal"
+      ],
+      "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills"],
+      "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
+      "status": "REVISADO_PARCIAL",
+      "file": "entries/gentleman-dots.md"
+    }
+  ]
+}
