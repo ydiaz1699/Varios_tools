@@ -16,7 +16,7 @@ reference:
   url: tools_AI/skills/unificador-skill/SKILL.md
   kind: web
 related:
-  - "Meta-prompt equivalente en nas-dotfiles: docs/meta-prompt-unificar.md"
+  - "Meta-prompt equivalente — nas-dotfiles docs/meta-prompt-unificar.md"
 status: REVISADO_A_FONDO
 evaluated_on: 2026-09-22
 ---

@@ -18,8 +18,8 @@ reference:
   url: tools_AI/resources/nas-agent-memory/README.md
   kind: web
 related:
-  - "Destino final: agent/ en ydiaz1699/nas-dotfiles"
-  - "Inspirado en Hermes Agent (Nous Research)"
+  - "Destino final — nas-dotfiles agent/ (ydiaz1699/nas-dotfiles)"
+  - "Inspiración — Hermes Agent (Nous Research) https://hermes-agent.nousresearch.com/"
 status: SOLO_REFERENCIA
 evaluated_on: 2026-09-22
 ---

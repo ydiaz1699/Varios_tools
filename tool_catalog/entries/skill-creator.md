@@ -16,8 +16,8 @@ reference:
   url: tools_AI/skills/skill-creator/SKILL.md
   kind: web
 related:
-  - "tool_catalog/entries/gentleman-programming/prowler-agent-skills.md (fuente del patrón auto-invoke)"
-  - "Aplicado en: nas-dotfiles .kiro/skills/skill-creator"
+  - "Fuente del patrón auto-invoke — tool_catalog/entries/gentleman-programming/prowler-agent-skills.md"
+  - "Implementación propia — nas-dotfiles .kiro/skills/skill-creator"
 status: APLICADO
 evaluated_on: 2026-09-22
 ---

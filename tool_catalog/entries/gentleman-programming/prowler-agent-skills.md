@@ -17,12 +17,12 @@ reference:
   url: https://github.com/prowler-cloud/prowler
   kind: github
 related:
-  - "Conocimiento destilado (NO clonar el repo): tools_AI/skills/skill-creator/references/prowler-case-study.md"
-  - "Ficha del video: tool_catalog/entries/gentleman-programming/agents-skills-video.md"
-  - "Video Gentleman: https://www.youtube.com/watch?v=Nvn6s3r9ZAw"
-  - "Transcripción (gist): https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
-  - "Estándar: https://agentskills.io"
-  - "Aplicado en: nas-dotfiles (.kiro/skills/, PRs #148/#149/#150)"
+  - "Conocimiento destilado (leer ANTES de clonar) — tools_AI/skills/skill-creator/references/prowler-case-study.md"
+  - "Ficha del video — tool_catalog/entries/gentleman-programming/agents-skills-video.md"
+  - "Video Gentleman (fuente) — https://www.youtube.com/watch?v=Nvn6s3r9ZAw"
+  - "Transcripción (gist) — https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
+  - "Estándar Agent Skills — https://agentskills.io"
+  - "Implementación propia — nas-dotfiles .kiro/skills/ (PRs #148/#149/#150)"
 status: APLICADO
 evaluated_on: 2026-09-22
 ---

@@ -17,9 +17,9 @@ reference:
   url: https://www.youtube.com/watch?v=Nvn6s3r9ZAw
   kind: youtube
 related:
-  - "Transcripción (gist): https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
-  - "Ejemplo del video: tool_catalog/entries/gentleman-programming/prowler-agent-skills.md"
-  - "Aplicado en: tools_AI/skills/skill-creator (Paso 6 + references/)"
+  - "Transcripción (gist) — https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
+  - "Ejemplo del video (Prowler) — tool_catalog/entries/gentleman-programming/prowler-agent-skills.md"
+  - "Patrón aplicado — tools_AI/skills/skill-creator/references/agents-md-and-subagents.md"
 status: REVISADO_A_FONDO
 evaluated_on: 2026-09-22
 ---
