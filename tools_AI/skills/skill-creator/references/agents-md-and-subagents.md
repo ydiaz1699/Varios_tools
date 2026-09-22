@@ -1,7 +1,7 @@
 # AGENTS.md multinivel y subagentes
 
 Ideas del video de Gentleman Programming (ver ficha
-`tool_catalog/entries/gentleman-agents-skills-video.md`) que complementan a
+`tool_catalog/entries/gentleman-programming/agents-skills-video.md`) que complementan a
 `references/auto-invoke-and-metadata.md`. Aquí: cómo dimensionar y dividir el
 AGENTS.md, y cuándo delegar en subagentes.
 

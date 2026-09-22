@@ -21,7 +21,7 @@
       "tags": ["agent-skills", "agents-md", "auto-invoke", "skill-creator", "skill-sync", "llm", "contexto"],
       "reference": { "url": "https://github.com/prowler-cloud/prowler", "kind": "github" },
       "status": "APLICADO",
-      "file": "entries/prowler-agent-skills.md"
+      "file": "entries/gentleman-programming/prowler-agent-skills.md"
     },
     {
       "slug": "gentleman-agents-skills-video",
@@ -38,7 +38,7 @@
       "tags": ["agent-skills", "agents-md", "auto-invoke", "subagentes", "orquestador", "contexto", "video"],
       "reference": { "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw", "kind": "youtube" },
       "status": "REVISADO_A_FONDO",
-      "file": "entries/gentleman-agents-skills-video.md"
+      "file": "entries/gentleman-programming/agents-skills-video.md"
     },
     {
       "slug": "gentleman-dots",
@@ -58,7 +58,7 @@
       "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills", "subagentes", "sdd"],
       "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
       "status": "REVISADO_A_FONDO",
-      "file": "entries/gentleman-dots.md"
+      "file": "entries/gentleman-programming/gentleman-dots.md"
     },
     {
       "slug": "skill-creator",

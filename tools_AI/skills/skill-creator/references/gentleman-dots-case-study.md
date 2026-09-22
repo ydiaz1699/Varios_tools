@@ -111,5 +111,5 @@ skills/setup.sh                        # multi-agente (--all)
 ```
 
 Repo: https://github.com/Gentleman-Programming/Gentleman.Dots · Ficha:
-`tool_catalog/entries/gentleman-dots.md` · Capa IA de usuario:
+`tool_catalog/entries/gentleman-programming/gentleman-dots.md` · Capa IA de usuario:
 https://github.com/Gentleman-Programming/gentle-ai

@@ -1,7 +1,7 @@
 # Auto-invoke y metadata (scope / auto_invoke)
 
 Patrón tomado del estándar [Agent Skills](https://agentskills.io) y de cómo lo
-aplica Prowler (ver ficha `tool_catalog/entries/prowler-agent-skills.md` y el
+aplica Prowler (ver ficha `tool_catalog/entries/gentleman-programming/prowler-agent-skills.md` y el
 video https://www.youtube.com/watch?v=Nvn6s3r9ZAw). Resuelve un problema real:
 **los modelos NO auto-activan una skill de forma fiable solo con su
 `description`** — tratan el trigger como una sugerencia y siguen de largo.

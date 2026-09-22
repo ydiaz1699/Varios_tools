@@ -41,5 +41,5 @@ tools_AI/
 - Estos artefactos están **indexados en** [`tool_catalog/`](../tool_catalog/)
   para que un LLM los descubra desde un único punto de entrada.
 - `skill-creator` usa como fuente externa la ficha
-  [`tool_catalog/entries/prowler-agent-skills.md`](../tool_catalog/entries/prowler-agent-skills.md)
+  [`tool_catalog/entries/gentleman-programming/prowler-agent-skills.md`](../tool_catalog/entries/gentleman-programming/prowler-agent-skills.md)
   (el patrón Agent Skills del video).
