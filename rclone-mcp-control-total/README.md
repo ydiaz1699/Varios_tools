@@ -502,6 +502,173 @@ Luego el MCP apunta a `RCLONE_URL=http://127.0.0.1:5572` (o `http://${SERVER_IP}
 
 ---
 
+## ✅ Verificado en runtime (2026-09-22) — correcciones reales del montaje
+
+> Todo lo de abajo se probó en el NAS real y **corrige/completa** las secciones previas. Si algo
+> aquí contradice una sección anterior, **manda esto** (es lo que funcionó de verdad).
+
+### R1. `--allow-other` NO es flag de `rcd` (rompía el arranque)
+
+El `command:` del §5.3 traía `--allow-other`, que es de `rclone mount`, **no** del daemon `rcd`.
+Provoca `Fatal error: unknown flag: --allow-other` y el contenedor entra en bucle de reinicio.
+**Quítalo del `command`.** `AllowOther` se pasa al montar, como opción del mount:
+
+```bash
+rclone rc mount/mount fs=mega: mountPoint=/mnt/mega mountOpt='{"AllowOther":true}'
+```
+
+### R2. Ruta del config y del volumen (coincidencia exacta)
+
+El `rclone.conf` se creó en `$dkco/rclone-rcd/config/`. El compose debe montar la **carpeta** y el
+`--config` apuntar dentro de ella:
+
+```yaml
+    volumes:
+      - ./config:/config/rclone
+    command:
+      - --config=/config/rclone/rclone.conf
+```
+
+### R3. Crear el `rclone.conf` SIN instalar rclone en el host
+
+Se usó la propia imagen del daemon (contenedor efímero), coherente con el enfoque "sin residuos":
+
+```bash
+mkdir -p $dkco/rclone-rcd/config
+docker run -it --rm -v $dkco/rclone-rcd/config:/config/rclone rclone/rclone:1.75.1 config
+# verificar:
+docker run --rm -v $dkco/rclone-rcd/config:/config/rclone rclone/rclone:1.75.1 lsd <remote>:
+```
+
+Para **Google Drive** (2026): el client_id compartido está retirado → **crear el propio es
+OBLIGATORIO** (Google Cloud Console → Drive API → OAuth Desktop app → Client ID + Secret). Login
+headless con `Use auto config? = n` → `rclone authorize "drive" "..."` en tu PC → pegar el token.
+Para **Mega** (remote de prueba): usuario + contraseña, sin navegador (mucho más simple).
+
+### R4. Kiro CLI en Docker — 3 gotchas verificados (ver `../kiro-cli-nas/`)
+
+1. **Binario en `/opt/kiro`, NO en `/home/kiro/.local/bin`**: el volumen `data/` monta sobre
+   `/home/kiro` y **tapa** la instalación. Instalar en build a `/opt/kiro` (fuera del mount).
+2. **`chown 1000:1000 data/`** obligatorio: el contenedor corre como uid 1000 y la carpeta la crea
+   root → `Failed to open database: Permission denied` si no se ajusta.
+3. **Login headless**: `kiro-cli login --use-device-flow` (el modo navegador falla en el NAS).
+
+### R5. ⭐ Kiro CLI **V3** usa `permissions.yaml`, NO el `autoApprove` del `mcp.json`
+
+Este es el hallazgo clave. En **V2** el `autoApprove` del `mcp.json` **se ignora**; hay que lanzar
+con `--v3` y usar el sistema de permisos por capacidades. Regla: **`deny > ask > allow`** (gana el
+más restrictivo), lo que permite "auto todo lo seguro, confirmar lo destructivo".
+
+`data/.kiro/settings/permissions.yaml`:
+
+```yaml
+rules:
+  # DESTRUCTIVO -> pedir confirmacion (ask gana sobre allow)
+  - capability: mcp
+    match:
+      - "rclone/operations_delete"
+      - "rclone/operations_deletefile"
+      - "rclone/operations_purge"
+      - "rclone/operations_rmdir"
+      - "rclone/operations_rmdirs"
+      - "rclone/operations_cleanup"
+      - "rclone/sync_sync"
+      - "rclone/sync_bisync"
+      - "rclone/sync_move"
+      - "rclone/operations_movefile"
+      - "rclone/config_create"
+      - "rclone/config_update"
+      - "rclone/config_delete"
+      - "rclone/config_password"
+      - "rclone/config_setpath"
+      - "rclone/config_unlock"
+      - "rclone/mount_mount"
+      - "rclone/mount_unmount"
+      - "rclone/mount_unmountall"
+      - "rclone/serve_start"
+      - "rclone/serve_stop"
+      - "rclone/serve_stopall"
+      - "rclone/core_quit"
+      - "rclone/core_command"
+      - "rclone/backend_command"
+      - "rclone/core_gc"
+      - "rclone/options_set"
+      - "rclone/vfs_forget"
+      - "rclone/cache_expire"
+      - "rclone/fscache_clear"
+      - "rclone/operations_settier"
+      - "rclone/operations_settierfile"
+      - "rclone/job_stop"
+      - "rclone/job_stopgroup"
+      - "rclone/pluginsctl_add_plugin"
+      - "rclone/pluginsctl_remove_plugin"
+    effect: ask
+  # NO DESTRUCTIVO -> permitir el resto de rclone sin preguntar
+  - capability: mcp
+    match:
+      - "rclone/*"
+    effect: allow
+```
+
+> El match es `servidor/tool` (`rclone/operations_rmdir`). Verificado: crear/listar/copiar/subir se
+> ejecutan solos; borrar/purgar/mover/mirror/config/mount piden confirmación. El wrapper debe lanzar
+> **siempre con `--v3`** o vuelve a V2 (y pedirá permiso a todo).
+
+### R6. `mcp.json` limpio con trozos por MCP (estilo `!include` de Home Assistant)
+
+Kiro CLI **no** soporta `!include` ni fusión de carpetas. Se emula con un generador (`jq`): cada MCP
+en `settings/mcp_tools/<nombre>.json` (con su bloque `mcpServers`) y un script ensambla el
+`settings/mcp.json` final. Script `mcp-build` (host, `$aadm/.local/bin/mcp-build`):
+
+```bash
+#!/usr/bin/env bash
+set -eu
+DIR="/docker/kiro-cli/data/.kiro/settings"; SRC="$DIR/mcp_tools"; OUT="$DIR/mcp.json"
+shopt -s nullglob; files=("$SRC"/*.json)
+[ ${#files[@]} -eq 0 ] && { echo "No hay MCPs en $SRC"; exit 1; }
+jq -s 'reduce .[] as $f ({}; . * $f) | {mcpServers: .mcpServers}' "${files[@]}" > "$OUT"
+chown 1000:1000 "$OUT" 2>/dev/null || true
+for f in "${files[@]}"; do echo "  - $f"; done
+jq -e . "$OUT" >/dev/null && echo "JSON valido OK"
+```
+
+### R7. Secreto del daemon inyectado desde `.env` (no hardcodear en `mcp.json`)
+
+El `mcp.json` usa `"RCLONE_PASS": "${RCLONE_RC_PASS}"` y el wrapper lee la pass del `.env` del daemon
+y la inyecta al contenedor. Wrapper `$aadm/.local/bin/kiro`:
+
+```bash
+#!/usr/bin/env bash
+set -eu
+RCPASS="$(grep RCLONE_RC_PASS /docker/rclone-rcd/.env | cut -d= -f2)"
+exec docker run -it --rm --network host \
+  -e RCLONE_RC_PASS="$RCPASS" \
+  -v /docker/kiro-cli/data:/home/kiro \
+  kiro-cli-nas:local --v3 "$@"
+```
+
+### R8. Respuestas en español (steering)
+
+Kiro CLI no tiene flag de idioma; se usa un steering en `data/.kiro/steering/idioma.md` que ordena
+responder en español. La UI del programa sigue en inglés; las respuestas del agente pasan a español.
+
+### R9. Gotcha del MCP: `rclone_lsjson` requiere `remote`
+
+La tool `rclone_lsjson` exige el parámetro `remote` aunque sea vacío para la raíz
+(`{fs:"mega:", remote:"", dirsOnly:true}`); con solo `fs` da `400 Didn't find key "remote"`. El
+agente se auto-corrige, pero conviene saberlo.
+
+### Orden real de montaje (resumen verificado)
+
+1. `rclone config` (contenedor efímero) → crea `rclone.conf` con un remote.
+2. `.env` del daemon (pass aleatoria) + `compose.yml` (SIN `--allow-other`) → `svc up rclone-rcd`.
+3. Verificar RC API: `curl -u nasadmin:PASS -X POST http://localhost:5572/config/listremotes`.
+4. Kiro CLI en Docker (binario en `/opt`, `chown 1000`, `login --use-device-flow`).
+5. `mcp_tools/rclone.json` + `mcp-build` → `mcp.json`; `permissions.yaml` (V3); `idioma.md`.
+6. Lanzar con wrapper `kiro` (`--v3`, inyecta pass). Verificar con `/mcp` (101 tools).
+
+---
+
 ## Checklist de placeholders a reemplazar
 
 - `TU_RC_PASS` → el valor real de `RCLONE_RC_PASS` (de `$dkco/rclone-rcd/.env`).
