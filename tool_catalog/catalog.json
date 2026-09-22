@@ -55,9 +55,9 @@
         "proyectos que solo necesitan el patrón de skills (usar prowler-agent-skills)",
         "firmware/embebidos sin entorno de terminal"
       ],
-      "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills"],
+      "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills", "subagentes", "sdd"],
       "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
-      "status": "REVISADO_PARCIAL",
+      "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-dots.md"
     },
     {
