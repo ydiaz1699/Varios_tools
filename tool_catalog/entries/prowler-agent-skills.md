@@ -17,6 +17,7 @@ reference:
   url: https://github.com/prowler-cloud/prowler
   kind: github
 related:
+  - "Conocimiento destilado (NO clonar el repo): tools_AI/skills/skill-creator/references/prowler-case-study.md"
   - "Ficha del video: tool_catalog/entries/gentleman-agents-skills-video.md"
   - "Video Gentleman: https://www.youtube.com/watch?v=Nvn6s3r9ZAw"
   - "Transcripción (gist): https://gist.github.com/ydiaz1699/39b3288dabc5df14ccbcb3dfb8fb2ad9"
@@ -63,7 +64,12 @@ humanos y agentes.
 
 ## Referencia
 
-- Repo: https://github.com/prowler-cloud/prowler (carpeta `skills/`)
+- **Conocimiento ya destilado (leer esto ANTES de clonar):**
+  `tools_AI/skills/skill-creator/references/prowler-case-study.md` — estructura
+  real de `skills/`, frontmatter real, `references/` vs `assets/`, los 6
+  AGENTS.md, y qué adoptar/qué no. Pensado para que un chat sin contexto NO
+  tenga que leer el repo entero.
+- Repo: https://github.com/prowler-cloud/prowler (carpeta `skills/`) — clonar
+  SOLO para un matiz que el caso de estudio no cubra.
 - Video que lo explica (concepto): https://www.youtube.com/watch?v=Nvn6s3r9ZAw
-- Leer el repo completo SOLO si tu proyecto usa agentes/skills. Para el caso
-  ya aplicado, ver nas-dotfiles `.kiro/skills/` como implementación adaptada.
+- Implementación adaptada propia: nas-dotfiles `.kiro/skills/`.
