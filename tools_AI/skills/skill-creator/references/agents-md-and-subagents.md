@@ -5,6 +5,36 @@ Ideas del video de Gentleman Programming (ver ficha
 `references/auto-invoke-and-metadata.md`. Aquí: cómo dimensionar y dividir el
 AGENTS.md, y cuándo delegar en subagentes.
 
+## La arquitectura completa (de un vistazo)
+
+```text
+                    Usuario
+                       │
+                       ▼
+              Agente / Orquestador
+                       │
+                 AGENTS.md raíz            ← mapa: enruta al contexto necesario
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+       UI/API      Auth/etc.     (área N)   ← un AGENTS.md por feature (monorepo)
+          │
+     ┌────┼─────┐
+     ▼    ▼     ▼
+  Skills Skills Skills                       ← conocimiento/tareas bajo demanda
+  React  Tests  Next.js                        (trigger + auto-invoke)
+          │
+          ▼
+      Subagentes                              ← contexto aislado; devuelven un resumen
+          │
+          ▼
+       Codebase
+```
+
+Filosofía: **no darle al agente todo el proyecto de golpe**. Darle un *mapa*
+(AGENTS.md), *instrucciones específicas* (skills bajo demanda) y *delegación
+aislada* (subagentes). El resto de esta reference detalla cada pieza.
+
 ## AGENTS.md = el README para agentes
 
 `AGENTS.md` es el archivo que el agente lee para entender "la cultura del

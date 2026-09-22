@@ -15,9 +15,35 @@ Cada ficha (`entries/<slug>.md`) tiene frontmatter YAML + cuerpo breve.
 | `not_for` | No | Lista de contextos donde NO aplica (ej. `["firmware arduino", "proyectos sin agentes"]`) |
 | `tags` | Sí | Palabras clave para búsqueda (`agent-skills`, `dotfiles`, `docker`, ...) |
 | `reference` | Sí | `{ url, kind }` — la fuente real a leer si aplica. `kind`: `github` \| `youtube` \| `web` |
-| `related` | No | Otras fichas o rutas locales relacionadas |
+| `related` | No | Lista de enlaces relacionados, formato normalizado (ver abajo) |
 | `status` | Sí | Estado de evaluación (ver abajo) |
 | `evaluated_on` | No | Fecha en que se revisó la fuente por última vez |
+
+## Formato de `related` (normalizado)
+
+Cada item es un string `"Etiqueta — destino"`, con un guion largo (`—`) separando
+la etiqueta del destino. El destino es **una sola** URL o ruta, para que sea
+parseable y navegable:
+
+- **Ruta interna** del repo → relativa a la raíz de `Varios_tools`
+  (ej. `tools_AI/skills/skill-creator/references/prowler-case-study.md`).
+- **URL externa** → completa con `https://`.
+
+Ejemplos:
+
+```yaml
+related:
+  - "Conocimiento destilado — tools_AI/skills/skill-creator/references/prowler-case-study.md"
+  - "Video (fuente) — https://www.youtube.com/watch?v=Nvn6s3r9ZAw"
+  - "Ficha del video — entries/gentleman-programming/agents-skills-video.md"
+```
+
+Reglas:
+- Una etiqueta corta + `—` + un único destino. No mezclar dos destinos en un item.
+- Las rutas internas se escriben desde la raíz del repo (sin `../`), para que se
+  entiendan igual desde cualquier ficha.
+- Notas SIN destino (ej. "Mismo autor que X") van igual con etiqueta, pero
+  apuntando a la ficha/recurso concreto en vez de texto suelto.
 
 ## Estados (`status`)
 

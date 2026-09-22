@@ -17,9 +17,9 @@ reference:
   url: https://github.com/Gentleman-Programming/Gentleman.Dots
   kind: github
 related:
-  - "Conocimiento destilado (NO clonar el repo): tools_AI/skills/skill-creator/references/gentleman-dots-case-study.md"
-  - "Capa IA separada: https://github.com/Gentleman-Programming/gentle-ai"
-  - "Mismo autor que el video de Agent Skills (ver gentleman-agents-skills-video / prowler-agent-skills)"
+  - "Conocimiento destilado (leer ANTES de clonar) — tools_AI/skills/skill-creator/references/gentleman-dots-case-study.md"
+  - "Capa IA de usuario (gentle-ai) — https://github.com/Gentleman-Programming/gentle-ai"
+  - "Ficha del video del mismo autor — tool_catalog/entries/gentleman-programming/agents-skills-video.md"
 status: REVISADO_A_FONDO
 evaluated_on: 2026-09-22
 ---
