@@ -130,5 +130,5 @@ AGENTS.md                               # root que enruta
 ```
 
 Repo: https://github.com/prowler-cloud/prowler · Ficha:
-`tool_catalog/entries/prowler-agent-skills.md` · Video:
-`tool_catalog/entries/gentleman-agents-skills-video.md`.
+`tool_catalog/entries/gentleman-programming/prowler-agent-skills.md` · Video:
+`tool_catalog/entries/gentleman-programming/agents-skills-video.md`.

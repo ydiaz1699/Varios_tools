@@ -169,8 +169,8 @@ Ejemplos reales aplicados (conocimiento destilado para NO clonar los repos):
   auto-invoke con columna "Why", auto-invoke manual (sin scope/auto_invoke), y el
   orquestador SDD delegate-only con subagentes (el patrón del video aplicado).
 
-Fuente externa de ambos patrones: `tool_catalog/entries/prowler-agent-skills.md`
-y `tool_catalog/entries/gentleman-agents-skills-video.md` (Agent Skills / video
+Fuente externa de ambos patrones: `tool_catalog/entries/gentleman-programming/prowler-agent-skills.md`
+y `tool_catalog/entries/gentleman-programming/agents-skills-video.md` (Agent Skills / video
 de Gentleman Programming).
 
 ---

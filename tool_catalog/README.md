@@ -60,9 +60,19 @@ tool_catalog/
 ├── _template.md           ← plantilla de ficha
 ├── SCHEMA.md              ← campos y estados permitidos
 └── entries/
-    ├── prowler-agent-skills.md
-    └── gentleman-dots.md
+    ├── gentleman-programming/        ← agrupadas por fuente/ecosistema
+    │   ├── prowler-agent-skills.md
+    │   ├── agents-skills-video.md
+    │   └── gentleman-dots.md
+    ├── skill-creator.md              ← artefactos propios (sin agrupar)
+    ├── unificador-skill.md
+    └── nas-agent-memory.md
 ```
+
+> Las fichas pueden ir sueltas en `entries/` o agrupadas en una subcarpeta por
+> **fuente/ecosistema** (ej. `entries/gentleman-programming/`) cuando varios
+> recursos vienen del mismo autor o del mismo descubrimiento. El `file` de cada
+> entrada en `catalog.json` refleja la ruta real; `index.md` puede agruparlas.
 
 ## Regla de oro (igual que en el resto del repo)
 
@@ -72,7 +82,9 @@ lleva ahí. La ficha es *contexto para decidir*, no una copia de la fuente.
 
 ## Añadir una ficha nueva
 
-1. Copiar `_template.md` a `entries/<slug>.md` y rellenarlo.
-2. Añadir una línea en `index.md` y una entrada en `catalog.json`.
+1. Copiar `_template.md` a `entries/<slug>.md` (o
+   `entries/<fuente>/<slug>.md` si agrupas por fuente/ecosistema) y rellenarlo.
+2. Añadir una línea en `index.md` y una entrada en `catalog.json` (el campo
+   `file` debe apuntar a la ruta real, incluida la subcarpeta si la hay).
 3. Mantener la ficha corta (idealmente < 60 líneas): idea + problema + cuándo
    aplica + referencia. El detalle vive en la fuente enlazada.
