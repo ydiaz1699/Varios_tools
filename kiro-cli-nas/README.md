@@ -224,20 +224,24 @@ reconstruir, auditar o borrar. `[host]` = lo crea root en el host · `[gen]` = g
 
 ```
 /docker/kiro-cli/
-├── Dockerfile                                  [host] imagen: Debian + Node + Kiro CLI en /opt/kiro
+├── Dockerfile                                  [host] Debian + Node + Kiro CLI (/opt/kiro) + uv + nextdns-mcp (/opt/nextdns-venv)
 ├── compose.yml                                 [host] network_mode: host, volumen ./data:/home/kiro
+├── .no-boot                                    [host] excluye del arranque escalonado (bajo demanda)
+├── nextdns.env                                 [host] secretos NextDNS (chmod 600) — API keys por persona
 └── data/                                       [cont] = $HOME del contenedor (uid 1000)
     ├── .local/…                                [cont] sesion/credenciales del login (device-flow)
     └── .kiro/
         ├── agents/                             [cont] agentes de Kiro CLI (autogenerado)
         ├── sessions/                           [cont] historial de sesiones
         ├── steering/
-        │   └── idioma.md                       [host] fuerza respuestas en español
+        │   ├── idioma.md                       [host] fuerza respuestas en español
+        │   └── nextdns-usuarios.md             [host] mapa "papá"→nextdns-papa, "yo"→nextdns-infinix
         └── settings/
             ├── mcp_tools/
-            │   └── rclone.json                 [host] ← EDITAS AQUI el MCP de rclone (${RCLONE_RC_PASS})
+            │   ├── rclone.json                 [host] ← EDITAS: MCP rclone (${RCLONE_RC_PASS})
+            │   └── nextdns.json                [host] ← EDITAS: MCP nextdns (un bloque por persona)
             ├── mcp.json                        [gen]  ← generado por 'mcp-build' (NO editar a mano)
-            └── permissions.yaml                [host] permisos V3 (rclone/* allow; destructivas ask)
+            └── permissions.yaml                [host] permisos V3 (rclone/* + nextdns-*/* allow/ask)
 ```
 
 ### En `$aadm/.local/bin/` (scripts en el host)
@@ -305,6 +309,10 @@ Para el **MCP de rclone con control total y auto-aprobación selectiva** (con el
 `mcp-build` y wrapper ya escritos y probados), ver la guía dedicada:
 [`../rclone-mcp-control-total/README.md`](../rclone-mcp-control-total/README.md) — sección
 "✅ Verificado en runtime" (R5–R8).
+
+Para el **MCP de NextDNS multi-cuenta** (una cuenta/API key por persona, control por lenguaje
+natural tipo "bloquea YouTube a papá", con Python 3.14 en venv aislado dentro de la imagen):
+[`./nextdns-multicuenta.md`](./nextdns-multicuenta.md) — verificado en runtime.
 
 ---
 
