@@ -201,6 +201,13 @@ bloquea YouTube en mi perfil                    # manageLists → pide confirmac
 desbloquea juegos en el perfil de papá          # manageLists → pide confirmación
 ```
 
+## Proyecto pendiente (portabilidad a nas-agent)
+
+El MCP aquí descrito lo usa **Kiro CLI**. Para que el **nas-agent (Strands SDK)** también
+controle NextDNS reutilizando el MISMO código (importando la capa `_impl`/`client` del
+paquete, sin MCP), hay un proyecto anotado — NO implementado:
+[`./PROYECTO-PENDIENTE-nextdns-en-nas-agent.md`](./PROYECTO-PENDIENTE-nextdns-en-nas-agent.md).
+
 ## Referencias
 - MCP: https://github.com/dmeiser/nextdns-mcp (Python/FastMCP, imagen `dmeiser/nextdns-mcp`)
 - API keys: https://my.nextdns.io/account
