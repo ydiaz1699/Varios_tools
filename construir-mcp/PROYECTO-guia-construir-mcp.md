@@ -84,9 +84,23 @@ Documento a crear (en esta carpeta `construir-mcp/`) que cubra:
 - Respetar CONTRIBUTING de nas-dotfiles si el MCP se integra ahí; respetar estructura de
   Varios_tools (cada proyecto en su subcarpeta).
 
+---
+
+## Variante específica: MCP "indexador" (que el LLM conozca nodos/cards)
+
+Además del MCP tipo API (patrón nextdns, arriba), existe el MCP **indexador** como
+`czlonkowski/n8n-mcp`: indexa los "nodos"/"cards" de una plataforma (LOADER → PARSER →
+SQLite+FTS5 → tools de búsqueda) para que el LLM genere configuraciones correctas sin
+inventarlas. Plan de construcción paso a paso (empezando por la librería Mushroom de HA
+como práctica, luego escalando a Node-RED/Flowise/n8n-community): ver
+[`./PLAN-mcp-indexador-nodos.md`](./PLAN-mcp-indexador-nodos.md).
+
+---
+
 ## Referencias
 
-- Ejemplo real analizado: https://github.com/dmeiser/nextdns-mcp (Python/FastMCP)
+- Ejemplo real analizado (MCP tipo API): https://github.com/dmeiser/nextdns-mcp (Python/FastMCP)
+- Ejemplo real analizado (MCP indexador): https://github.com/czlonkowski/n8n-mcp (Node/TS, SQLite+FTS5)
 - FastMCP: https://github.com/jlowin/fastmcp
 - SDK oficial MCP: https://github.com/modelcontextprotocol/python-sdk
 - Spec MCP: https://modelcontextprotocol.io
