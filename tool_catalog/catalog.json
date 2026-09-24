@@ -1,7 +1,7 @@
 {
   "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type/origin SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. origin=external (fuente a leer si aplica) | local (artefacto propio en ../tools_AI). La fuente de verdad es cada ficha; regenerar si cambian.",
   "version": 2,
-  "generated_on": "2026-09-22",
+  "generated_on": "2026-09-24",
   "entries": [
     {
       "slug": "prowler-agent-skills",
@@ -113,6 +113,27 @@
       "reference": { "url": "https://github.com/angenge/rclone-mcp-server", "kind": "github" },
       "status": "APLICADO",
       "file": "entries/rclone-mcp-servers.md"
+    },
+    {
+      "slug": "n8n-mcp",
+      "title": "n8n-mcp (czlonkowski) — que un LLM cree y gestione workflows de n8n",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM conocimiento de los ~525 nodos de n8n y capacidad de crear/validar/actualizar workflows en la instancia real vía la API REST.",
+      "applies_to": [
+        "que un agente/LLM (Kiro CLI, Claude, Cursor) diseñe y cree workflows de n8n",
+        "conocer nodos/parámetros de n8n sin memorizarlos ni abrir la UI",
+        "gestión de workflows por lenguaje natural (list/get/create/update/delete/test)"
+      ],
+      "not_for": [
+        "ejecutar workflows YA creados desde un LLM (eso es el MCP nativo de n8n, otra cosa)",
+        "automatizar n8n sin agente/LLM (usar la propia UI/API o cron)",
+        "Kiro Web (sandbox cloud): sin ruta a la LAN privada; usar Kiro CLI en el NAS"
+      ],
+      "tags": ["n8n", "mcp", "workflows", "automatizacion", "kiro-cli", "nas", "api-rest", "ssrf"],
+      "reference": { "url": "https://github.com/czlonkowski/n8n-mcp", "kind": "github" },
+      "status": "APLICADO",
+      "file": "entries/n8n-mcp.md"
     },
     {
       "slug": "skill-creator",

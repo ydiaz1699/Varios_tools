@@ -22,6 +22,7 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 | Slug | Tipo | Problema que resuelve | Aplica a | Estado |
 |------|------|-----------------------|----------|--------|
 | [rclone-mcp-servers](entries/rclone-mcp-servers.md) | repo | MCP para rclone (control total vía RC API): daemon rcd + rclone-mcp-server con TOOLSETS=all | exponer rclone a un LLM por MCP, elegir base control-total vs read-only | APLICADO |
+| [n8n-mcp](entries/n8n-mcp.md) | repo | MCP para que un LLM cree/gestione workflows de n8n (nodos + API REST); gotcha SSRF WEBHOOK_SECURITY_MODE=permissive | que Kiro CLI diseñe/cree workflows de n8n | APLICADO |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 
@@ -39,4 +40,5 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 - **¿Quieres un proceso para que la IA no improvise (spec → diseño → apply/verify)?** → `sdd-video`.
 - **¿Diseñas un agente con memoria/aprendizaje?** → `nas-agent-memory` (diseño propio) o `engram` (herramienta lista, MCP).
 - **¿Quieres estandarizar tu entorno de terminal/Neovim?** → `gentleman-dots`.
+- **¿Quieres que un LLM cree/gestione workflows de n8n?** → `n8n-mcp` (usa Kiro CLI en el NAS, no Kiro Web).
 - **¿Firmware Arduino/ESP sin agentes?** → ninguna aplica; no leas esos repos.
