@@ -437,6 +437,35 @@
       },
       "status": "APLICADO",
       "file": "entries/idea-forge.md"
+    },
+    {
+      "slug": "alexa-remote2-nodered",
+      "title": "Hacer hablar a Alexa desde Node-RED sin servicio externo (alexa-remote2 y sim.)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Que un Echo hable/anuncie desde Node-RED de forma proactiva SIN un tercero (VoiceMonkey), usando nodos como node-red-contrib-alexa-remote2.",
+      "applies_to": [
+        "notificaciones proactivas n8n/Node-RED -> Alexa habla (solo esa direccion)"
+      ],
+      "not_for": [
+        "comandos de voz Alexa -> backend (es unidireccional)",
+        "produccion estable: API NO oficial de Amazon, sin mantenimiento, re-login/cookie frecuente"
+      ],
+      "tags": [
+        "alexa",
+        "node-red",
+        "tts",
+        "voicemonkey-alternativa",
+        "no-oficial",
+        "descartado",
+        "domotica"
+      ],
+      "reference": {
+        "url": "https://github.com/ajithvasudevan/node-red-contrib-alexa-remote2",
+        "kind": "github"
+      },
+      "status": "DESCARTADO",
+      "file": "entries/alexa-remote2-nodered.md"
     }
   ]
 }

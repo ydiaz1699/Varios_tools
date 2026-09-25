@@ -26,6 +26,7 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 | [chrome-devtools-mcp](entries/chrome-devtools-mcp.md) | repo | MCP oficial: control de Chrome real (Puppeteer) para debug/performance y automatizar webs SIN API | depurar/automatizar una web sin API; NO para crear workflows (usar sus APIs) | REVISADO_A_FONDO |
 | [webmcp](entries/webmcp.md) | repo | Estándar (borrador W3C) para que una web exponga SUS tools a agentes; no sirve para controlar webs ajenas | vigilar tendencia futura; no usar en producción hoy | SOLO_REFERENCIA |
 | [deep-research-mcp](entries/deep-research-mcp.md) | repo | MCP de investigación web profunda e iterativa (GPT Researcher y alternativas); informe con citas | investigar un tema a fondo; brazo externo de idea-forge | SOLO_REFERENCIA |
+| [alexa-remote2-nodered](entries/alexa-remote2-nodered.md) | repo | Hacer hablar a Alexa desde Node-RED sin Voice Monkey (API no oficial, no mantenida) | — DESCARTADO: frágil y unidireccional; alexa_y_n8n ya lo supera | DESCARTADO |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 
