@@ -153,7 +153,7 @@
         "firmware/embebidos ESP sin dispositivo Android ni agente",
         "iOS (en roadmap, aún no soportado)"
       ],
-      "tags": ["android", "automatizacion", "mcp", "adb", "testing", "ui", "llm", "google", "scrcpy", "uiautomator", "vlm"],
+      "tags": ["android", "automatizacion", "mcp", "adb", "testing", "ui", "llm", "google", "scrcpy", "uiautomator", "vlm", "wifi", "usb"],
       "reference": { "url": "https://github.com/google/artemis", "kind": "github" },
       "status": "REVISADO_PARCIAL",
       "file": "entries/artemis-android-automation.md"

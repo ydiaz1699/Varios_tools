@@ -16,7 +16,7 @@ not_for:
   - Tasker / automatización on-device declarativa (ver Tasker_mcp)
   - firmware/embebidos ESP sin dispositivo Android ni agente
   - iOS (en roadmap, aún no soportado)
-tags: [android, automatizacion, mcp, adb, testing, ui, llm, google, scrcpy, uiautomator, vlm]
+tags: [android, automatizacion, mcp, adb, testing, ui, llm, google, scrcpy, uiautomator, vlm, wifi, usb]
 reference:
   url: https://github.com/google/artemis
   kind: github
@@ -72,6 +72,21 @@ harness de ADB a mano.
   de historial (screenshots → resúmenes visuales) para no saturar contexto.
 - **Comparar con `android_agent_bridge`** (propio): ARTEMIS es más completo (NL+MCP+benchmark)
   pero pesado (instala helper de accesibilidad, ADB/scrcpy/FFmpeg/uv); el propio es más ligero y a medida.
+
+## Conexión: USB o WiFi (matiz)
+
+El README solo documenta **USB** ("device with USB Debugging enabled"), pero eso NO
+es una limitación de ARTEMIS: habla con el móvil a través de **ADB** (auto-instala
+ADB/scrcpy/FFmpeg), y ADB soporta también **wireless debugging**. Si ADB ve el
+dispositivo por red, ARTEMIS trabaja contra él sin cable.
+
+- **Android 11+**: Ajustes → Opciones de desarrollador → *Depuración inalámbrica* →
+  emparejar con código → `adb pair IP:PUERTO` + `adb connect IP:PUERTO`.
+- **Cualquier versión** (cable una vez): USB → `adb tcpip 5555` → desconectar cable →
+  `adb connect IP_DEL_MOVIL:5555`.
+- Luego `adb devices` debe listar el teléfono por red y se arranca ARTEMIS normal.
+- Matiz de rendimiento: el espejo de pantalla en vivo (scrcpy/FFmpeg) por WiFi depende
+  de la red; con el perfil Flash (~3–5s/paso) USB va más fino. Funcionalmente igual.
 
 ## Referencia
 
