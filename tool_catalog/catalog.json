@@ -136,6 +136,27 @@
       "file": "entries/n8n-mcp.md"
     },
     {
+      "slug": "tasker-mcp-dceluis",
+      "title": "dceluis/tasker-mcp — MCP que EJECUTA tareas de Tasker en vivo (Go + XTP)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM control en vivo del teléfono exponiendo tareas de Tasker como tools MCP (POST /run_task al server HTTP de Tasker); no genera XML.",
+      "applies_to": [
+        "controlar el teléfono en vivo desde un LLM (flash, SMS, wifi, foto, ubicación...)",
+        "convertir tareas Tasker existentes en tools MCP sin escribir código por tool",
+        "patrón tarea Tasker -> tool MCP leyendo comentario + TaskVariables del .prj.xml"
+      ],
+      "not_for": [
+        "generar XML de Tasker importable offline (para eso está tu propio Tasker_mcp, Python)",
+        "entornos sin Tasker corriendo y accesible por HTTP",
+        "quien no quiera compilar Go / usar binarios en Termux"
+      ],
+      "tags": ["tasker", "mcp", "android", "go", "xtp", "wasm", "ejecucion-en-vivo", "sse", "stdio"],
+      "reference": { "url": "https://github.com/dceluis/tasker-mcp", "kind": "github" },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/tasker-mcp-dceluis.md"
+    },
+    {
       "slug": "skill-creator",
       "title": "skill-creator — meta-skill para crear/optimizar skills de agentes LLM",
       "type": "tool",
