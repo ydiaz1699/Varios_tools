@@ -1,7 +1,7 @@
 {
   "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type/origin SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. origin=external (fuente a leer si aplica) | local (artefacto propio en ../tools_AI). La fuente de verdad es cada ficha; regenerar si cambian.",
   "version": 2,
-  "generated_on": "2026-09-24",
+  "generated_on": "2026-09-25",
   "entries": [
     {
       "slug": "prowler-agent-skills",
@@ -18,8 +18,19 @@
         "firmware Arduino/ESP sin agentes LLM",
         "proyectos triviales sin convenciones repetidas"
       ],
-      "tags": ["agent-skills", "agents-md", "auto-invoke", "skill-creator", "skill-sync", "llm", "contexto"],
-      "reference": { "url": "https://github.com/prowler-cloud/prowler", "kind": "github" },
+      "tags": [
+        "agent-skills",
+        "agents-md",
+        "auto-invoke",
+        "skill-creator",
+        "skill-sync",
+        "llm",
+        "contexto"
+      ],
+      "reference": {
+        "url": "https://github.com/prowler-cloud/prowler",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/gentleman-programming/prowler-agent-skills.md"
     },
@@ -34,9 +45,22 @@
         "decidir tamaño/división de AGENTS.md (uno vs varios por feature)",
         "saber cuándo delegar en subagentes para no ensuciar el contexto"
       ],
-      "not_for": ["proyectos sin agentes LLM (firmware Arduino/ESP)"],
-      "tags": ["agent-skills", "agents-md", "auto-invoke", "subagentes", "orquestador", "contexto", "video"],
-      "reference": { "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw", "kind": "youtube" },
+      "not_for": [
+        "proyectos sin agentes LLM (firmware Arduino/ESP)"
+      ],
+      "tags": [
+        "agent-skills",
+        "agents-md",
+        "auto-invoke",
+        "subagentes",
+        "orquestador",
+        "contexto",
+        "video"
+      ],
+      "reference": {
+        "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw",
+        "kind": "youtube"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/agents-skills-video.md"
     },
@@ -55,8 +79,22 @@
         "proyectos que solo necesitan el patrón de skills (usar prowler-agent-skills)",
         "firmware/embebidos sin entorno de terminal"
       ],
-      "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills", "subagentes", "sdd"],
-      "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
+      "tags": [
+        "dotfiles",
+        "neovim",
+        "shell",
+        "tmux",
+        "zellij",
+        "terminal",
+        "ai-cli",
+        "agent-skills",
+        "subagentes",
+        "sdd"
+      ],
+      "reference": {
+        "url": "https://github.com/Gentleman-Programming/Gentleman.Dots",
+        "kind": "github"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/gentleman-dots.md"
     },
@@ -71,9 +109,24 @@
         "entender SDD (init, preflight, skill registry, strict TDD, fases, PRs encadenadas)",
         "diseñar un skill registry / orquestador-subagentes con contexto seleccionado"
       ],
-      "not_for": ["proyectos sin agentes LLM", "cambios triviales sin proceso formal"],
-      "tags": ["sdd", "spec-driven", "tdd", "skill-registry", "orquestador", "subagentes", "proceso", "contexto"],
-      "reference": { "url": "https://www.youtube.com/watch?v=KILEn2VSXX8", "kind": "youtube" },
+      "not_for": [
+        "proyectos sin agentes LLM",
+        "cambios triviales sin proceso formal"
+      ],
+      "tags": [
+        "sdd",
+        "spec-driven",
+        "tdd",
+        "skill-registry",
+        "orquestador",
+        "subagentes",
+        "proceso",
+        "contexto"
+      ],
+      "reference": {
+        "url": "https://www.youtube.com/watch?v=KILEn2VSXX8",
+        "kind": "youtube"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/sdd-video.md"
     },
@@ -88,9 +141,25 @@
         "memoria agent-agnostic vía MCP (Claude Code, OpenCode, Gemini, Codex, Cursor...)",
         "alternativa lista-para-usar frente a diseñar memoria propia"
       ],
-      "not_for": ["agentes sin estado entre sesiones", "entornos sin binario local ni MCP"],
-      "tags": ["memoria", "engram", "mcp", "sqlite", "fts5", "go", "agent-agnostic", "recall", "lazy-loading"],
-      "reference": { "url": "https://github.com/Gentleman-Programming/engram", "kind": "github" },
+      "not_for": [
+        "agentes sin estado entre sesiones",
+        "entornos sin binario local ni MCP"
+      ],
+      "tags": [
+        "memoria",
+        "engram",
+        "mcp",
+        "sqlite",
+        "fts5",
+        "go",
+        "agent-agnostic",
+        "recall",
+        "lazy-loading"
+      ],
+      "reference": {
+        "url": "https://github.com/Gentleman-Programming/engram",
+        "kind": "github"
+      },
       "status": "REVISADO_PARCIAL",
       "file": "entries/gentleman-programming/engram.md"
     },
@@ -109,8 +178,20 @@
         "automatización de rclone SIN un agente/LLM (usar systemd timers / scripts)",
         "solo Google Drive con API nativa por file_id"
       ],
-      "tags": ["rclone", "mcp", "rc-api", "control-total", "read-only", "docker", "nas", "cloud-storage"],
-      "reference": { "url": "https://github.com/angenge/rclone-mcp-server", "kind": "github" },
+      "tags": [
+        "rclone",
+        "mcp",
+        "rc-api",
+        "control-total",
+        "read-only",
+        "docker",
+        "nas",
+        "cloud-storage"
+      ],
+      "reference": {
+        "url": "https://github.com/angenge/rclone-mcp-server",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/rclone-mcp-servers.md"
     },
@@ -130,8 +211,20 @@
         "automatizar n8n sin agente/LLM (usar la propia UI/API o cron)",
         "Kiro Web (sandbox cloud): sin ruta a la LAN privada; usar Kiro CLI en el NAS"
       ],
-      "tags": ["n8n", "mcp", "workflows", "automatizacion", "kiro-cli", "nas", "api-rest", "ssrf"],
-      "reference": { "url": "https://github.com/czlonkowski/n8n-mcp", "kind": "github" },
+      "tags": [
+        "n8n",
+        "mcp",
+        "workflows",
+        "automatizacion",
+        "kiro-cli",
+        "nas",
+        "api-rest",
+        "ssrf"
+      ],
+      "reference": {
+        "url": "https://github.com/czlonkowski/n8n-mcp",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/n8n-mcp.md"
     },
@@ -146,9 +239,21 @@
         "mejorar/optimizar una skill existente",
         "entender best practices de authoring de skills"
       ],
-      "not_for": ["proyectos sin agentes LLM"],
-      "tags": ["skill", "meta-skill", "authoring", "agent-skills", "auto-invoke", "kiro"],
-      "reference": { "url": "tools_AI/skills/skill-creator/SKILL.md", "kind": "web" },
+      "not_for": [
+        "proyectos sin agentes LLM"
+      ],
+      "tags": [
+        "skill",
+        "meta-skill",
+        "authoring",
+        "agent-skills",
+        "auto-invoke",
+        "kiro"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/skill-creator/SKILL.md",
+        "kind": "web"
+      },
       "status": "APLICADO",
       "file": "entries/skill-creator.md"
     },
@@ -162,9 +267,21 @@
         "consolidar múltiples fragmentos de un mismo tema en una guía",
         "convertir notas sueltas o handoffs en un documento autocontenido"
       ],
-      "not_for": ["redactar desde cero sin fragmentos fuente"],
-      "tags": ["unificar", "consolidar", "documentacion", "guia", "deduplicar", "drafts"],
-      "reference": { "url": "tools_AI/skills/unificador-skill/SKILL.md", "kind": "web" },
+      "not_for": [
+        "redactar desde cero sin fragmentos fuente"
+      ],
+      "tags": [
+        "unificar",
+        "consolidar",
+        "documentacion",
+        "guia",
+        "deduplicar",
+        "drafts"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/unificador-skill/SKILL.md",
+        "kind": "web"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/unificador-skill.md"
     },
@@ -182,10 +299,173 @@
         "agentes sin necesidad de estado entre sesiones",
         "proyectos sin componente de agente"
       ],
-      "tags": ["memoria", "agente", "learning-loop", "auto-mejora", "strands", "nudge", "diseño"],
-      "reference": { "url": "tools_AI/resources/nas-agent-memory/README.md", "kind": "web" },
+      "tags": [
+        "memoria",
+        "agente",
+        "learning-loop",
+        "auto-mejora",
+        "strands",
+        "nudge",
+        "diseño"
+      ],
+      "reference": {
+        "url": "tools_AI/resources/nas-agent-memory/README.md",
+        "kind": "web"
+      },
       "status": "SOLO_REFERENCIA",
       "file": "entries/nas-agent-memory.md"
+    },
+    {
+      "slug": "chrome-devtools-mcp",
+      "title": "chrome-devtools-mcp — control de Chrome real para un agente (MCP)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM control de un Chrome real (navegar, clicar, screenshots, red, consola, performance) via Puppeteer, para automatizar/depurar webs sobre todo sin API.",
+      "applies_to": [
+        "depurar/analizar una web (performance, red, consola) desde el agente",
+        "automatizar una web que NO expone API REST",
+        "probar tu propio frontend con un LLM"
+      ],
+      "not_for": [
+        "crear workflows en n8n/Node-RED/Flowise (usar sus APIs REST, no la UI)",
+        "tareas donde exista una API oficial (la API es mas fiable que la UI)"
+      ],
+      "tags": [
+        "mcp",
+        "chrome",
+        "devtools",
+        "puppeteer",
+        "browser-automation",
+        "debug",
+        "performance",
+        "scraping"
+      ],
+      "reference": {
+        "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+        "kind": "github"
+      },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/chrome-devtools-mcp.md"
+    },
+    {
+      "slug": "webmcp",
+      "title": "WebMCP — estandar (borrador W3C) para que una web exponga tools a agentes",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Estandar propuesto para que una WEB exponga sus propias funciones como tools (document.modelContext.registerTool()) consumibles por agentes del navegador.",
+      "applies_to": [
+        "vigilar como tendencia futura del web + agentes (no usar hoy)",
+        "si algun dia construyes una web propia y quieres exponer sus acciones a un agente"
+      ],
+      "not_for": [
+        "controlar webs de terceros (requiere que ESA web lo implemente; Flowise/Node-RED no lo hacen)",
+        "cualquier uso en produccion hoy (spec en borrador, soporte incipiente)"
+      ],
+      "tags": [
+        "webmcp",
+        "w3c",
+        "estandar",
+        "borrador",
+        "browser-agents",
+        "tendencia-futura"
+      ],
+      "reference": {
+        "url": "https://github.com/webmachinelearning/webmcp",
+        "kind": "github"
+      },
+      "status": "SOLO_REFERENCIA",
+      "file": "entries/webmcp.md"
+    },
+    {
+      "slug": "deep-research-mcp",
+      "title": "MCP de deep research (GPT Researcher y alternativas)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM investigacion web PROFUNDA e iterativa (busca, scrapea, sintetiza informe con citas) en vez de una busqueda simple.",
+      "applies_to": [
+        "investigar un tema nuevo a fondo (informe con fuentes)",
+        "brazo externo de la skill idea-forge cuando falta info"
+      ],
+      "not_for": [
+        "busquedas puntuales (Kiro ya trae web search)",
+        "si no quieres otra API key (casi todos la piden)"
+      ],
+      "tags": [
+        "mcp",
+        "deep-research",
+        "web-search",
+        "gpt-researcher",
+        "investigacion"
+      ],
+      "reference": {
+        "url": "https://github.com/assafelovic/gptr-mcp",
+        "kind": "github"
+      },
+      "status": "SOLO_REFERENCIA",
+      "file": "entries/deep-research-mcp.md"
+    },
+    {
+      "slug": "idea-forge",
+      "title": "idea-forge — formular ideas, conectar el ecosistema e investigar",
+      "type": "tool",
+      "origin": "local",
+      "problem": "Formular ideas fundadas en lo que el usuario YA tiene: cruza tool_catalog + repo-index para proponer combinaciones, evita reinventar, e investiga afuera solo si falta.",
+      "applies_to": [
+        "brainstorming / que construyo o mejoro con lo que tengo",
+        "conectar dos proyectos/herramientas del ecosistema",
+        "evaluar un recurso nuevo frente a lo que ya existe",
+        "investigar un tema y aterrizarlo al caso del usuario"
+      ],
+      "not_for": [
+        "crear la skill en si (skill-creator)",
+        "unificar drafts (unificador-skill)",
+        "construir un MCP (construir-mcp/)",
+        "implementar/ejecutar la idea (skill o proyecto especifico)"
+      ],
+      "tags": [
+        "ideacion",
+        "brainstorming",
+        "research",
+        "conectar",
+        "catalogo",
+        "repo-index",
+        "procedencia"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/idea-forge/SKILL.md",
+        "kind": "web"
+      },
+      "status": "APLICADO",
+      "file": "entries/idea-forge.md"
+    },
+    {
+      "slug": "alexa-remote2-nodered",
+      "title": "Hacer hablar a Alexa desde Node-RED sin servicio externo (alexa-remote2 y sim.)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Que un Echo hable/anuncie desde Node-RED de forma proactiva SIN un tercero (VoiceMonkey), usando nodos como node-red-contrib-alexa-remote2.",
+      "applies_to": [
+        "notificaciones proactivas n8n/Node-RED -> Alexa habla (solo esa direccion)"
+      ],
+      "not_for": [
+        "comandos de voz Alexa -> backend (es unidireccional)",
+        "produccion estable: API NO oficial de Amazon, sin mantenimiento, re-login/cookie frecuente"
+      ],
+      "tags": [
+        "alexa",
+        "node-red",
+        "tts",
+        "voicemonkey-alternativa",
+        "no-oficial",
+        "descartado",
+        "domotica"
+      ],
+      "reference": {
+        "url": "https://github.com/ajithvasudevan/node-red-contrib-alexa-remote2",
+        "kind": "github"
+      },
+      "status": "DESCARTADO",
+      "file": "entries/alexa-remote2-nodered.md"
     }
   ]
 }

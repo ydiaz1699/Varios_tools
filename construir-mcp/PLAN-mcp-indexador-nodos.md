@@ -27,6 +27,12 @@ el LLM busca el nodo/card real, lee sus parámetros exactos y genera config vál
 El **nivel 1 ya aporta ~80% del valor** y es mucho más fácil (no toca API de escritura).
 Empezamos siempre por el nivel 1.
 
+> **Nivel 2 — APIs de despliegue verificadas (2026-09-25):** n8n, Node-RED (`POST /flows`)
+> y Flowise (`POST /api/v1/chatflows`) tienen API REST para crear/desplegar workflows → el
+> Nivel 2 se hace por API, **sin automatizar el navegador**. Detalle y comandos en
+> [`./HALLAZGO-apis-despliegue-workflows.md`](./HALLAZGO-apis-despliegue-workflows.md).
+> (Descartado chrome-devtools-mcp/WebMCP para este fin; ver ese hallazgo.)
+
 ---
 
 ## 1. El patrón, leído del código real de n8n-mcp
