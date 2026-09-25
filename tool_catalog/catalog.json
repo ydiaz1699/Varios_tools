@@ -136,6 +136,29 @@
       "file": "entries/n8n-mcp.md"
     },
     {
+      "slug": "artemis-android-automation",
+      "title": "ARTEMIS (google/artemis) — automatización de Android por lenguaje natural + MCP",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Que un LLM/IDE de IA maneje un teléfono Android real (o emulador) desde lenguaje natural, con servidor MCP nativo, para automatizar apps y testing de UI end-to-end.",
+      "applies_to": [
+        "dar a un agente/LLM control de un Android real por MCP (Antigravity, Claude Code, Codex, Cursor, Windsurf)",
+        "testing de UI / QA móvil end-to-end desde lenguaje natural (planes, logs, capturas, reportes)",
+        "automatizar flujos cotidianos entre apps Android (Maps, YouTube, Ajustes...)",
+        "integrar automatización móvil en pytest / CI-CD vía SDK Python"
+      ],
+      "not_for": [
+        "control de Android por ADB SIN un LLM/agente (usar android_agent_bridge o scripts ADB)",
+        "Tasker / automatización on-device declarativa (ver Tasker_mcp)",
+        "firmware/embebidos ESP sin dispositivo Android ni agente",
+        "iOS (en roadmap, aún no soportado)"
+      ],
+      "tags": ["android", "automatizacion", "mcp", "adb", "testing", "ui", "llm", "google", "scrcpy", "uiautomator", "vlm"],
+      "reference": { "url": "https://github.com/google/artemis", "kind": "github" },
+      "status": "REVISADO_PARCIAL",
+      "file": "entries/artemis-android-automation.md"
+    },
+    {
       "slug": "skill-creator",
       "title": "skill-creator — meta-skill para crear/optimizar skills de agentes LLM",
       "type": "tool",

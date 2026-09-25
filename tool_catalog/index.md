@@ -23,6 +23,7 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 |------|------|-----------------------|----------|--------|
 | [rclone-mcp-servers](entries/rclone-mcp-servers.md) | repo | MCP para rclone (control total vía RC API): daemon rcd + rclone-mcp-server con TOOLSETS=all | exponer rclone a un LLM por MCP, elegir base control-total vs read-only | APLICADO |
 | [n8n-mcp](entries/n8n-mcp.md) | repo | MCP para que un LLM cree/gestione workflows de n8n (nodos + API REST); gotcha SSRF WEBHOOK_SECURITY_MODE=permissive | que Kiro CLI diseñe/cree workflows de n8n | APLICADO |
+| [artemis-android-automation](entries/artemis-android-automation.md) | repo | Automatización de Android por lenguaje natural + MCP nativo (Google): que un LLM maneje un móvil real (Flash/Pro, multimodal, 99%+ AndroidWorld) | dar a un agente control de Android por MCP, QA/testing de UI móvil | REVISADO_PARCIAL |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 
@@ -41,4 +42,5 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 - **¿Diseñas un agente con memoria/aprendizaje?** → `nas-agent-memory` (diseño propio) o `engram` (herramienta lista, MCP).
 - **¿Quieres estandarizar tu entorno de terminal/Neovim?** → `gentleman-dots`.
 - **¿Quieres que un LLM cree/gestione workflows de n8n?** → `n8n-mcp` (usa Kiro CLI en el NAS, no Kiro Web).
+- **¿Quieres que un agente/LLM maneje un móvil Android real por MCP (o testing de UI móvil)?** → `artemis-android-automation` (comparar con `android_agent_bridge` propio si buscas algo más ligero por ADB).
 - **¿Firmware Arduino/ESP sin agentes?** → ninguna aplica; no leas esos repos.
