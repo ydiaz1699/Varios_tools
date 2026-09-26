@@ -1,0 +1,104 @@
+{
+  "$comment": "Índice máquina de artefactos_proyecto. Un LLM lo lee para filtrar por applies_to/tags según la situación del proyecto actual, SIN abrir cada ficha. 'artifact' = archivo que se crea; 'template' = plantilla lista para pegar; 'owner_source' = fuente dueña si el tema ya existe en el ecosistema (enlazar-no-duplicar). La fuente de verdad es cada ficha; regenerar si cambian.",
+  "version": 1,
+  "generated_on": "2026-09-25",
+  "entries": [
+    {
+      "slug": "upstream",
+      "title": "UPSTREAM.md — procedencia de un espejo/fork",
+      "artifact": "UPSTREAM.md",
+      "problem": "Documenta de dónde viene un mirror/fork: fuente, autor, licencia, commit espejado y motivo.",
+      "applies_to": [
+        "hacer un mirror o fork de un repo ajeno",
+        "preservar un proyecto ajeno por si el original se borra",
+        "vendorizar código externo dentro de un repo propio"
+      ],
+      "not_for": ["repos 100% propios", "dependencias por package manager"],
+      "tags": ["procedencia", "mirror", "fork", "licencia", "atribucion", "upstream"],
+      "template": "templates/UPSTREAM.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/upstream.md"
+    },
+    {
+      "slug": "contributing",
+      "title": "CONTRIBUTING.md — cómo contribuir al proyecto",
+      "artifact": "CONTRIBUTING.md",
+      "problem": "Define convenciones para contribuir (ramas, commits, tests, PRs) para humanos y agentes LLM.",
+      "applies_to": [
+        "repo que va a recibir PRs (de otros o de un agente LLM)",
+        "proyecto con convenciones repetidas (ramas, commits, linters)"
+      ],
+      "not_for": ["scripts personales de un solo uso", "repos privados de notas"],
+      "tags": ["contributing", "pr", "ramas", "commits", "convenciones", "colaboracion"],
+      "template": "templates/CONTRIBUTING.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/contributing.md"
+    },
+    {
+      "slug": "env-example",
+      "title": ".env.example — plantilla de variables de entorno",
+      "artifact": ".env.example",
+      "problem": "Documenta qué variables de entorno necesita el proyecto sin filtrar secretos.",
+      "applies_to": [
+        "proyecto que lee configuración/secretos de variables de entorno",
+        "servicios Docker, MCP servers, apps con API keys/tokens"
+      ],
+      "not_for": ["proyectos sin configuración por entorno"],
+      "tags": ["env", "secretos", "configuracion", "dotenv", "seguridad"],
+      "template": "templates/env.example",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/env-example.md"
+    },
+    {
+      "slug": "changelog",
+      "title": "CHANGELOG.md — historial de cambios",
+      "artifact": "CHANGELOG.md",
+      "problem": "Registra los cambios relevantes por versión sin leer todo el historial de git.",
+      "applies_to": [
+        "proyecto con versiones/releases",
+        "librería o herramienta que otros consumen"
+      ],
+      "not_for": ["repos experimentales sin releases"],
+      "tags": ["changelog", "versiones", "releases", "keepachangelog", "semver"],
+      "template": "templates/CHANGELOG.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/changelog.md"
+    },
+    {
+      "slug": "adr-decisiones",
+      "title": "ADR / registro de decisiones (ideas-decisions.md)",
+      "artifact": "docs/ideas-decisions.md",
+      "problem": "Registra el POR QUÉ de las decisiones técnicas para que un LLM futuro no repita caminos ya descartados.",
+      "applies_to": [
+        "proyecto donde se toman decisiones técnicas que querrás recordar",
+        "repos con agentes LLM que deben conocer el por qué"
+      ],
+      "not_for": ["scripts triviales sin decisiones de diseño"],
+      "tags": ["adr", "decisiones", "ideas-decisions", "aprendizajes", "contexto", "arquitectura"],
+      "template": "templates/ideas-decisions.md",
+      "owner_source": "nas-dotfiles/docs/ideas-decisions.md",
+      "status": "ESTABLE",
+      "file": "entries/adr-decisiones.md"
+    },
+    {
+      "slug": "security",
+      "title": "SECURITY.md — política de seguridad y reporte de vulnerabilidades",
+      "artifact": "SECURITY.md",
+      "problem": "Indica cómo reportar una vulnerabilidad en privado y qué versiones se soportan.",
+      "applies_to": [
+        "proyecto público que otros pueden usar",
+        "servicios expuestos, MCP servers, apps con auth/secretos"
+      ],
+      "not_for": ["scripts personales privados sin usuarios externos"],
+      "tags": ["security", "vulnerabilidades", "reporte", "disclosure", "seguridad"],
+      "template": "templates/SECURITY.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/security.md"
+    }
+  ]
+}
