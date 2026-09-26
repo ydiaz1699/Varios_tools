@@ -1,0 +1,204 @@
+{
+  "$comment": "Índice máquina de artefactos_proyecto. Un LLM lo lee para filtrar por applies_to/tags según la situación del proyecto actual, SIN abrir cada ficha. 'artifact' = archivo que se crea; 'template' = plantilla lista para pegar; 'owner_source' = fuente dueña si el tema ya existe en el ecosistema (enlazar-no-duplicar). La fuente de verdad es cada ficha; regenerar si cambian.",
+  "version": 1,
+  "generated_on": "2026-09-25",
+  "entries": [
+    {
+      "slug": "upstream",
+      "title": "UPSTREAM.md — procedencia de un espejo/fork",
+      "artifact": "UPSTREAM.md",
+      "problem": "Documenta de dónde viene un mirror/fork: fuente, autor, licencia, commit espejado y motivo.",
+      "applies_to": [
+        "hacer un mirror o fork de un repo ajeno",
+        "preservar un proyecto ajeno por si el original se borra",
+        "vendorizar código externo dentro de un repo propio"
+      ],
+      "not_for": ["repos 100% propios", "dependencias por package manager"],
+      "tags": ["procedencia", "mirror", "fork", "licencia", "atribucion", "upstream"],
+      "template": "templates/UPSTREAM.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/upstream.md"
+    },
+    {
+      "slug": "contributing",
+      "title": "CONTRIBUTING.md — cómo contribuir al proyecto",
+      "artifact": "CONTRIBUTING.md",
+      "problem": "Define convenciones para contribuir (ramas, commits, tests, PRs) para humanos y agentes LLM.",
+      "applies_to": [
+        "repo que va a recibir PRs (de otros o de un agente LLM)",
+        "proyecto con convenciones repetidas (ramas, commits, linters)"
+      ],
+      "not_for": ["scripts personales de un solo uso", "repos privados de notas"],
+      "tags": ["contributing", "pr", "ramas", "commits", "convenciones", "colaboracion"],
+      "template": "templates/CONTRIBUTING.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/contributing.md"
+    },
+    {
+      "slug": "env-example",
+      "title": ".env.example — plantilla de variables de entorno",
+      "artifact": ".env.example",
+      "problem": "Documenta qué variables de entorno necesita el proyecto sin filtrar secretos.",
+      "applies_to": [
+        "proyecto que lee configuración/secretos de variables de entorno",
+        "servicios Docker, MCP servers, apps con API keys/tokens"
+      ],
+      "not_for": ["proyectos sin configuración por entorno"],
+      "tags": ["env", "secretos", "configuracion", "dotenv", "seguridad"],
+      "template": "templates/env.example",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/env-example.md"
+    },
+    {
+      "slug": "changelog",
+      "title": "CHANGELOG.md — historial de cambios",
+      "artifact": "CHANGELOG.md",
+      "problem": "Registra los cambios relevantes por versión sin leer todo el historial de git.",
+      "applies_to": [
+        "proyecto con versiones/releases",
+        "librería o herramienta que otros consumen"
+      ],
+      "not_for": ["repos experimentales sin releases"],
+      "tags": ["changelog", "versiones", "releases", "keepachangelog", "semver"],
+      "template": "templates/CHANGELOG.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/changelog.md"
+    },
+    {
+      "slug": "adr-decisiones",
+      "title": "ADR / registro de decisiones (ideas-decisions.md)",
+      "artifact": "docs/ideas-decisions.md",
+      "problem": "Registra el POR QUÉ de las decisiones técnicas para que un LLM futuro no repita caminos ya descartados.",
+      "applies_to": [
+        "proyecto donde se toman decisiones técnicas que querrás recordar",
+        "repos con agentes LLM que deben conocer el por qué"
+      ],
+      "not_for": ["scripts triviales sin decisiones de diseño"],
+      "tags": ["adr", "decisiones", "ideas-decisions", "aprendizajes", "contexto", "arquitectura"],
+      "template": "templates/ideas-decisions.md",
+      "owner_source": "nas-dotfiles/docs/ideas-decisions.md",
+      "status": "ESTABLE",
+      "file": "entries/adr-decisiones.md"
+    },
+    {
+      "slug": "security",
+      "title": "SECURITY.md — política de seguridad y reporte de vulnerabilidades",
+      "artifact": "SECURITY.md",
+      "problem": "Indica cómo reportar una vulnerabilidad en privado y qué versiones se soportan.",
+      "applies_to": [
+        "proyecto público que otros pueden usar",
+        "servicios expuestos, MCP servers, apps con auth/secretos"
+      ],
+      "not_for": ["scripts personales privados sin usuarios externos"],
+      "tags": ["security", "vulnerabilidades", "reporte", "disclosure", "seguridad"],
+      "template": "templates/SECURITY.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/security.md"
+    },
+    {
+      "slug": "license",
+      "title": "LICENSE — licencia del proyecto",
+      "artifact": "LICENSE",
+      "problem": "Define los términos legales de uso/copia/modificación; sin licencia, copyright total por defecto.",
+      "applies_to": [
+        "cualquier repo público que otros puedan ver o reusar",
+        "antes de publicar código abierto"
+      ],
+      "not_for": ["repos privados personales sin intención de compartir"],
+      "tags": ["license", "licencia", "mit", "legal", "open-source", "copyright"],
+      "template": "templates/LICENSE-MIT.txt",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/license.md"
+    },
+    {
+      "slug": "gitignore",
+      "title": ".gitignore — archivos que git NO debe rastrear",
+      "artifact": ".gitignore",
+      "problem": "Evita commitear secretos, dependencias, caches y artefactos generados.",
+      "applies_to": [
+        "prácticamente cualquier repo con código",
+        "proyectos con .env, venv/node_modules, artefactos de build",
+        "repos con .kiro/ donde skills/steering se ignoran por defecto"
+      ],
+      "not_for": ["repos de solo-documentación muy simples"],
+      "tags": ["gitignore", "git", "secretos", "artefactos", "kiro", "venv"],
+      "template": "templates/gitignore",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/gitignore.md"
+    },
+    {
+      "slug": "editorconfig",
+      "title": ".editorconfig — estilo consistente entre editores",
+      "artifact": ".editorconfig",
+      "problem": "Unifica indentación, fin de línea y charset entre distintos editores/IDEs.",
+      "applies_to": [
+        "proyecto tocado por varios editores o colaboradores",
+        "mezcla de lenguajes con estilos de indentación distintos"
+      ],
+      "not_for": ["script de un archivo de un solo uso"],
+      "tags": ["editorconfig", "estilo", "indentacion", "formato", "editores"],
+      "template": "templates/editorconfig",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/editorconfig.md"
+    },
+    {
+      "slug": "agents-md",
+      "title": "AGENTS.md — contexto e instrucciones para agentes LLM",
+      "artifact": "AGENTS.md",
+      "problem": "Da a cualquier agente LLM el contexto y las convenciones del repo para que no improvise.",
+      "applies_to": [
+        "repos donde un agente LLM colabora (Kiro Web/CLI, Claude, Cursor)",
+        "proyectos con convenciones o arquitectura que el agente debe respetar"
+      ],
+      "not_for": ["repos sin agentes LLM"],
+      "tags": ["agents-md", "llm", "contexto", "kiro", "convenciones", "agentes"],
+      "template": "templates/AGENTS.md",
+      "owner_source": "nas-dotfiles/AGENTS.md y repo-index/AGENTS.md",
+      "status": "ESTABLE",
+      "file": "entries/agents-md.md"
+    },
+    {
+      "slug": "readme",
+      "title": "README.md — puerta de entrada del proyecto",
+      "artifact": "README.md",
+      "problem": "Explica qué es el proyecto, cómo instalarlo y cómo usarlo; lo primero que se ve al abrir el repo.",
+      "applies_to": [
+        "absolutamente cualquier repo",
+        "lo primero que se crea al iniciar un proyecto"
+      ],
+      "not_for": [],
+      "tags": ["readme", "documentacion", "portada", "instalacion", "uso"],
+      "template": "templates/README.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/readme.md"
+    },
+    {
+      "slug": "makefile",
+      "title": "Makefile — atajos de comandos del proyecto",
+      "artifact": "Makefile",
+      "problem": "Reúne los comandos habituales (install/test/lint/run/build) tras nombres cortos y memorables.",
+      "applies_to": [
+        "proyecto con varios comandos repetidos (test/lint/build/run/deploy)",
+        "repos donde quieres un punto único de entrada a las tareas"
+      ],
+      "not_for": [
+        "proyecto con un solo comando trivial",
+        "ecosistemas con su propio runner (npm scripts, uv, cargo)"
+      ],
+      "tags": ["makefile", "make", "tareas", "comandos", "automatizacion", "dx"],
+      "template": "templates/Makefile",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/makefile.md"
+    }
+  ]
+}

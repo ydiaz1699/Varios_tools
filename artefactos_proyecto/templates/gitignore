@@ -1,0 +1,41 @@
+# === Secretos y entorno ===
+.env
+.env.local
+*.key
+*.pem
+
+# === Python ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Node ===
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# === Artefactos generados (ejemplo) ===
+# *.db
+# *.sqlite
+
+# === OS / editores ===
+.DS_Store
+Thumbs.db
+*.swp
+
+# === Kiro (patrón del ecosistema) ===
+# Por defecto .kiro/skills y .kiro/steering suelen ignorarse; versiona solo lo que quieras
+# con excepciones explícitas. Ejemplo:
+# .kiro/skills/*
+# !.kiro/skills/mi-skill/
+# !.kiro/skills/mi-skill/SKILL.md
+# .kiro/steering/*
+# !.kiro/steering/
+# !.kiro/steering/mi-regla.md
