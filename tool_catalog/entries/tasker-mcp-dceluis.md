@@ -19,6 +19,7 @@ reference:
   url: https://github.com/dceluis/tasker-mcp
   kind: github
 related:
+  - "Espejo de seguridad propio — https://github.com/ydiaz1699/tasker-mcp-dceluis"
   - "Tu MCP propio (genera XML, Python) — https://github.com/ydiaz1699/Tasker_mcp"
   - "Control Android por ADB (ecosistema) — https://github.com/ydiaz1699/android_agent_bridge"
 status: REVISADO_A_FONDO
@@ -89,3 +90,5 @@ screenshot.
 
 - Fuente: https://github.com/dceluis/tasker-mcp (MIT). Leer completo solo si vas a montar
   ejecución en vivo o a reusar el parser XML→tools. Para generar XML, tu repo propio ya cubre.
+- **Espejo de seguridad:** https://github.com/ydiaz1699/tasker-mcp-dceluis (copia propia
+  por si el original —inactivo desde 2025-03— se borra; ver su `UPSTREAM.md`).
