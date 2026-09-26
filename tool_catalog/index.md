@@ -23,6 +23,7 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 |------|------|-----------------------|----------|--------|
 | [rclone-mcp-servers](entries/rclone-mcp-servers.md) | repo | MCP para rclone (control total vía RC API): daemon rcd + rclone-mcp-server con TOOLSETS=all | exponer rclone a un LLM por MCP, elegir base control-total vs read-only | APLICADO |
 | [n8n-mcp](entries/n8n-mcp.md) | repo | MCP para que un LLM cree/gestione workflows de n8n (nodos + API REST); gotcha SSRF WEBHOOK_SECURITY_MODE=permissive | que Kiro CLI diseñe/cree workflows de n8n | APLICADO |
+| [tasker-mcp-dceluis](entries/tasker-mcp-dceluis.md) | repo | MCP (Go) que EJECUTA tareas de Tasker en vivo en el teléfono (POST /run_task); tarea+TaskVariables → tool MCP | controlar el teléfono en vivo por LLM; parser XML→tools; complementa tu Tasker_mcp (que genera XML) | REVISADO_A_FONDO |
 
 ### Artefactos propios (viven en `../tools_AI/`, listos para usar)
 
@@ -41,4 +42,5 @@ es de `prowler-cloud`, se incluye por ser el ejemplo del video.)
 - **¿Diseñas un agente con memoria/aprendizaje?** → `nas-agent-memory` (diseño propio) o `engram` (herramienta lista, MCP).
 - **¿Quieres estandarizar tu entorno de terminal/Neovim?** → `gentleman-dots`.
 - **¿Quieres que un LLM cree/gestione workflows de n8n?** → `n8n-mcp` (usa Kiro CLI en el NAS, no Kiro Web).
+- **¿Quieres que un LLM controle el teléfono en vivo vía Tasker?** → `tasker-mcp-dceluis` (Go, ejecuta tareas). Para GENERAR XML de Tasker offline → tu propio `Tasker_mcp` (Python).
 - **¿Firmware Arduino/ESP sin agentes?** → ninguna aplica; no leas esos repos.
