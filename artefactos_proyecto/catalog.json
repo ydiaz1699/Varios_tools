@@ -99,6 +99,106 @@
       "owner_source": null,
       "status": "ESTABLE",
       "file": "entries/security.md"
+    },
+    {
+      "slug": "license",
+      "title": "LICENSE — licencia del proyecto",
+      "artifact": "LICENSE",
+      "problem": "Define los términos legales de uso/copia/modificación; sin licencia, copyright total por defecto.",
+      "applies_to": [
+        "cualquier repo público que otros puedan ver o reusar",
+        "antes de publicar código abierto"
+      ],
+      "not_for": ["repos privados personales sin intención de compartir"],
+      "tags": ["license", "licencia", "mit", "legal", "open-source", "copyright"],
+      "template": "templates/LICENSE-MIT.txt",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/license.md"
+    },
+    {
+      "slug": "gitignore",
+      "title": ".gitignore — archivos que git NO debe rastrear",
+      "artifact": ".gitignore",
+      "problem": "Evita commitear secretos, dependencias, caches y artefactos generados.",
+      "applies_to": [
+        "prácticamente cualquier repo con código",
+        "proyectos con .env, venv/node_modules, artefactos de build",
+        "repos con .kiro/ donde skills/steering se ignoran por defecto"
+      ],
+      "not_for": ["repos de solo-documentación muy simples"],
+      "tags": ["gitignore", "git", "secretos", "artefactos", "kiro", "venv"],
+      "template": "templates/gitignore",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/gitignore.md"
+    },
+    {
+      "slug": "editorconfig",
+      "title": ".editorconfig — estilo consistente entre editores",
+      "artifact": ".editorconfig",
+      "problem": "Unifica indentación, fin de línea y charset entre distintos editores/IDEs.",
+      "applies_to": [
+        "proyecto tocado por varios editores o colaboradores",
+        "mezcla de lenguajes con estilos de indentación distintos"
+      ],
+      "not_for": ["script de un archivo de un solo uso"],
+      "tags": ["editorconfig", "estilo", "indentacion", "formato", "editores"],
+      "template": "templates/editorconfig",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/editorconfig.md"
+    },
+    {
+      "slug": "agents-md",
+      "title": "AGENTS.md — contexto e instrucciones para agentes LLM",
+      "artifact": "AGENTS.md",
+      "problem": "Da a cualquier agente LLM el contexto y las convenciones del repo para que no improvise.",
+      "applies_to": [
+        "repos donde un agente LLM colabora (Kiro Web/CLI, Claude, Cursor)",
+        "proyectos con convenciones o arquitectura que el agente debe respetar"
+      ],
+      "not_for": ["repos sin agentes LLM"],
+      "tags": ["agents-md", "llm", "contexto", "kiro", "convenciones", "agentes"],
+      "template": "templates/AGENTS.md",
+      "owner_source": "nas-dotfiles/AGENTS.md y repo-index/AGENTS.md",
+      "status": "ESTABLE",
+      "file": "entries/agents-md.md"
+    },
+    {
+      "slug": "readme",
+      "title": "README.md — puerta de entrada del proyecto",
+      "artifact": "README.md",
+      "problem": "Explica qué es el proyecto, cómo instalarlo y cómo usarlo; lo primero que se ve al abrir el repo.",
+      "applies_to": [
+        "absolutamente cualquier repo",
+        "lo primero que se crea al iniciar un proyecto"
+      ],
+      "not_for": [],
+      "tags": ["readme", "documentacion", "portada", "instalacion", "uso"],
+      "template": "templates/README.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/readme.md"
+    },
+    {
+      "slug": "makefile",
+      "title": "Makefile — atajos de comandos del proyecto",
+      "artifact": "Makefile",
+      "problem": "Reúne los comandos habituales (install/test/lint/run/build) tras nombres cortos y memorables.",
+      "applies_to": [
+        "proyecto con varios comandos repetidos (test/lint/build/run/deploy)",
+        "repos donde quieres un punto único de entrada a las tareas"
+      ],
+      "not_for": [
+        "proyecto con un solo comando trivial",
+        "ecosistemas con su propio runner (npm scripts, uv, cargo)"
+      ],
+      "tags": ["makefile", "make", "tareas", "comandos", "automatizacion", "dx"],
+      "template": "templates/Makefile",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/makefile.md"
     }
   ]
 }

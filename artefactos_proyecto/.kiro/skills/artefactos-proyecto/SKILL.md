@@ -36,12 +36,15 @@ Antes de actuar, si la situación encaja con alguna de estas, consulta el catál
 
 | Situación | Artefacto a considerar |
 |-----------|------------------------|
+| Cualquier repo nuevo | `README.md`, `.gitignore` (siempre); `LICENSE` si es público |
 | Mirror/fork de un repo ajeno, vendoring | `UPSTREAM.md` (procedencia + licencia) |
-| El repo recibirá PRs o lo toca un agente | `CONTRIBUTING.md` |
+| El repo recibirá PRs o lo toca un agente | `CONTRIBUTING.md`, `AGENTS.md` |
 | Usa API keys / hosts / tokens | `.env.example` (+ `.env` en `.gitignore`) |
 | Tiene versiones/releases | `CHANGELOG.md` |
 | Decisiones técnicas que querrás recordar | `docs/ideas-decisions.md` (ADR) |
-| Proyecto público / servicio o MCP expuesto | `SECURITY.md` |
+| Proyecto público / servicio o MCP expuesto | `SECURITY.md`, `LICENSE` |
+| Varios editores/colaboradores | `.editorconfig` |
+| Comandos repetidos (test/lint/build/run) | `Makefile` |
 
 ## Cómo usarla
 
