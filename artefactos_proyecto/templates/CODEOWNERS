@@ -1,0 +1,12 @@
+# CODEOWNERS — revisores automáticos por ruta.
+# Formato: <patrón de ruta>  <@usuario o @org/equipo> ...
+# Gana la ÚLTIMA regla que coincide. Doc: https://docs.github.com/es/repositories/.../about-code-owners
+
+# Propietario por defecto de todo el repo
+*                 @CAMBIAR_USUARIO
+
+# Ejemplos por área (ajusta o borra)
+# /src/           @CAMBIAR_USUARIO
+# /docs/          @CAMBIAR_USUARIO
+# /infra/         @CAMBIAR_ORG/equipo-infra
+# *.md            @CAMBIAR_USUARIO
