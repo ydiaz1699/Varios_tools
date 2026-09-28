@@ -45,6 +45,11 @@ Antes de actuar, si la situación encaja con alguna de estas, consulta el catál
 | Proyecto público / servicio o MCP expuesto | `SECURITY.md`, `LICENSE` |
 | Varios editores/colaboradores | `.editorconfig` |
 | Comandos repetidos (test/lint/build/run) | `Makefile` |
+| Proyecto público con comunidad | `CODE_OF_CONDUCT.md` |
+| Calidad automática al commitear | `.pre-commit-config.yaml` |
+| Varias áreas/equipos, revisión por zona | `.github/CODEOWNERS` |
+| El repo recibe PRs | `.github/pull_request_template.md` |
+| Se despliega en contenedor (Docker/NAS) | `Dockerfile` |
 
 ## Cómo usarla
 
@@ -53,6 +58,13 @@ Antes de actuar, si la situación encaja con alguna de estas, consulta el catál
 3. Abre la ficha `entries/<slug>.md` candidata y revisa "Cuándo SÍ / NO aplica".
 4. Si aplica, copia la plantilla de `artefactos_proyecto/templates/<archivo>` y adáptala
    (rellena los placeholders en MAYÚSCULAS).
+
+## Descubrir artefactos de otros repos
+
+`tools/artefacto_scan.py` escanea repos de referencia (`tools/sources.txt`, arranca con
+Prowler), compara con el catálogo y reporta qué **añadir**/**mejorar**; `--seed` crea
+fichas `BORRADOR`. Los ejemplos descargados a `tools/_referencias/` son **referencia**,
+NO plantillas: generalízalos antes de crear/mejorar una plantilla propia.
 
 ## Frontera (qué NO cubre)
 

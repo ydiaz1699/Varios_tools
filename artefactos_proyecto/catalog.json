@@ -199,6 +199,86 @@
       "owner_source": null,
       "status": "ESTABLE",
       "file": "entries/makefile.md"
+    },
+    {
+      "slug": "code-of-conduct",
+      "title": "CODE_OF_CONDUCT.md — código de conducta de la comunidad",
+      "artifact": "CODE_OF_CONDUCT.md",
+      "problem": "Fija normas de convivencia y a quién acudir ante conductas inapropiadas.",
+      "applies_to": [
+        "proyecto público con comunidad o colaboradores externos",
+        "repos que reciben issues/PRs de terceros"
+      ],
+      "not_for": ["repos personales privados sin comunidad"],
+      "tags": ["code-of-conduct", "comunidad", "conducta", "contributor-covenant", "colaboracion"],
+      "template": "templates/CODE_OF_CONDUCT.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/code-of-conduct.md"
+    },
+    {
+      "slug": "pre-commit",
+      "title": ".pre-commit-config.yaml — hooks automáticos antes de commitear",
+      "artifact": ".pre-commit-config.yaml",
+      "problem": "Corre validadores/formateadores/linters automáticamente antes de cada commit.",
+      "applies_to": [
+        "proyecto con linters/formateadores (Python, JS, YAML, etc.)",
+        "repos donde quieres calidad consistente sin depender de recordarlo"
+      ],
+      "not_for": ["repo trivial de un solo archivo", "quien no quiera el framework pre-commit"],
+      "tags": ["pre-commit", "hooks", "lint", "formato", "calidad", "git"],
+      "template": "templates/pre-commit-config.yaml",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/pre-commit.md"
+    },
+    {
+      "slug": "codeowners",
+      "title": "CODEOWNERS — propietarios por ruta (revisores automáticos)",
+      "artifact": ".github/CODEOWNERS",
+      "problem": "Asigna automáticamente revisores a los PRs según qué archivos se tocan.",
+      "applies_to": [
+        "repo con varias áreas y varios colaboradores/equipos",
+        "proyecto donde quieres revisión obligatoria por zona"
+      ],
+      "not_for": ["repo de un solo autor", "proyectos pequeños sin división por áreas"],
+      "tags": ["codeowners", "revisores", "github", "pr", "ownership"],
+      "template": "templates/CODEOWNERS",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/codeowners.md"
+    },
+    {
+      "slug": "pull-request-template",
+      "title": "pull_request_template.md — plantilla de descripción de PR",
+      "artifact": ".github/pull_request_template.md",
+      "problem": "Precarga la descripción de cada PR con secciones y checklist.",
+      "applies_to": [
+        "repo que recibe PRs (de humanos o de agentes)",
+        "proyecto donde quieres PRs consistentes y revisables"
+      ],
+      "not_for": ["repo de un solo autor que no usa PRs"],
+      "tags": ["pull-request", "pr", "template", "github", "revision", "checklist"],
+      "template": "templates/pull_request_template.md",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/pull-request-template.md"
+    },
+    {
+      "slug": "dockerfile",
+      "title": "Dockerfile — imagen contenedor del proyecto",
+      "artifact": "Dockerfile",
+      "problem": "Define cómo empaquetar el proyecto en una imagen Docker reproducible.",
+      "applies_to": [
+        "servicio/app que se despliega en contenedor (el ecosistema NAS es Docker)",
+        "MCP server o herramienta que quieres aislar/portar"
+      ],
+      "not_for": ["librería que se instala por package manager sin runtime propio", "script local trivial"],
+      "tags": ["docker", "dockerfile", "contenedor", "despliegue", "imagen", "nas"],
+      "template": "templates/Dockerfile",
+      "owner_source": null,
+      "status": "ESTABLE",
+      "file": "entries/dockerfile.md"
     }
   ]
 }

@@ -1,0 +1,5 @@
+# Repos de referencia para artefacto_scan (uno por línea, formato owner/name).
+# Buenos ejemplos de artefactos de proyecto para descubrir/comparar.
+# Comentarios con #.
+
+prowler-cloud/prowler

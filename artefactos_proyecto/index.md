@@ -18,6 +18,11 @@ solo si aplica.
 | [agents-md](entries/agents-md.md) | `AGENTS.md` | Contexto y convenciones del repo para agentes LLM | repos donde colabora un agente LLM | ESTABLE |
 | [readme](entries/readme.md) | `README.md` | Portada: qué es, instalación, uso | cualquier repo | ESTABLE |
 | [makefile](entries/makefile.md) | `Makefile` | Atajos de comandos (install/test/lint/run) | proyecto con comandos repetidos | ESTABLE |
+| [code-of-conduct](entries/code-of-conduct.md) | `CODE_OF_CONDUCT.md` | Normas de convivencia + a quién reportar abusos | proyecto público con comunidad | ESTABLE |
+| [pre-commit](entries/pre-commit.md) | `.pre-commit-config.yaml` | Hooks automáticos antes de commitear (lint/formato/secretos) | proyecto con linters/formateadores | ESTABLE |
+| [codeowners](entries/codeowners.md) | `.github/CODEOWNERS` | Revisores automáticos de PR por ruta | repo con varias áreas/equipos | ESTABLE |
+| [pull-request-template](entries/pull-request-template.md) | `.github/pull_request_template.md` | Precarga la descripción de cada PR (contexto + checklist) | repo que recibe PRs | ESTABLE |
+| [dockerfile](entries/dockerfile.md) | `Dockerfile` | Empaqueta el proyecto en imagen contenedor | servicio/app/MCP en Docker | ESTABLE |
 
 ## Cómo elegir (por situación)
 
@@ -33,3 +38,16 @@ solo si aplica.
 - **¿Varios editores/colaboradores?** → `editorconfig`.
 - **¿Colabora un agente LLM?** → `agents-md` (contexto y convenciones).
 - **¿Comandos repetidos (test/lint/build/run)?** → `makefile`.
+- **¿Proyecto público con comunidad?** → `code-of-conduct`.
+- **¿Quieres calidad automática al commitear?** → `pre-commit` (lint/formato/secretos).
+- **¿Varias áreas/equipos y revisión por zona?** → `codeowners`.
+- **¿El repo recibe PRs?** → `pull-request-template` (+ `contributing`, `codeowners`).
+- **¿Se despliega en contenedor (Docker/NAS)?** → `dockerfile`.
+
+## Descubrir artefactos de otros repos (herramienta)
+
+`tools/artefacto_scan.py` escanea repos de referencia (ver `tools/sources.txt`, arranca
+con Prowler), compara con este catálogo y reporta qué **añadir** (`NUEVO`) o **mejorar**
+(`YA_TIENES`). Con `--seed` crea fichas `BORRADOR`. Descarga los ejemplos a
+`tools/_referencias/` (gitignored) como **referencia** — nunca como copia directa: la
+generalización la haces tú/un LLM. Ver `tools/README.md`.

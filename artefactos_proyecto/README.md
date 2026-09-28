@@ -50,9 +50,20 @@ artefactos_proyecto/
 ├── _template.md       ← plantilla de FICHA (para catalogar un artefacto nuevo)
 ├── entries/           ← una ficha por artefacto
 │   └── <slug>.md
-└── templates/         ← el ARCHIVO listo para pegar en un proyecto
-    └── <archivo>
+├── templates/         ← el ARCHIVO listo para pegar en un proyecto
+│   └── <archivo>
+└── tools/             ← herramienta para descubrir artefactos en repos de referencia
+    ├── artefacto_scan.py
+    ├── sources.txt    ← repos de referencia (Prowler, …)
+    └── README.md
 ```
+
+## Descubrir artefactos de otros repos
+
+`tools/artefacto_scan.py` escanea repos de referencia (empieza por Prowler en
+`tools/sources.txt`), compara con este catálogo y te dice qué **añadir** o **mejorar**,
+descargando los ejemplos como referencia. Regla: los ejemplos NO se copian tal cual;
+se **generalizan** antes de convertirse en plantilla. Ver `tools/README.md`.
 
 > Distinción clave: `entries/<slug>.md` describe **cuándo usar** el artefacto;
 > `templates/<archivo>` es el **contenido listo** para copiar al proyecto destino.
