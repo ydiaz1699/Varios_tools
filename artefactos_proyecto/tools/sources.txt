@@ -1,5 +1,12 @@
 # Repos de referencia para artefacto_scan (uno por línea, formato owner/name).
 # Buenos ejemplos de artefactos de proyecto para descubrir/comparar.
 # Comentarios con #.
+#
+# Nota: al 2026-09, estos repos NO aportan artefactos NUEVOS al catálogo (ya cubierto),
+# pero sirven como REFERENCIA DE CALIDAD para MEJORAR plantillas existentes
+# (ej. cómo estructuran pre-commit, pull_request_template, README, Makefile).
 
 prowler-cloud/prowler
+pallets/flask
+psf/requests
+astral-sh/uv
