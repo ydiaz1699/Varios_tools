@@ -97,6 +97,20 @@ como práctica, luego escalando a Node-RED/Flowise/n8n-community): ver
 
 ---
 
+---
+
+## Variante específica: MCP "hub de actors" (Apify self-hosted, por fases)
+
+Un **tercer patrón**, distinto del tipo-API y del indexador: **UN solo conector MCP** con **N
+"actors"** propios detrás (como Apify, pero en el NAS y sin coste). El primer actor es **rclone**;
+el diseño usa un **contrato de actor portable** (`core.run(input)->output` + `manifest.json`) para
+migrar en el futuro a una plataforma self-hosted estilo Apify (**Crawlee Cloud** sobre
+**Firecracker**) sin reescribir el core. Incluye la aclaración de por qué el modelo Apify es seguro
+con código ajeno aunque el socket de Docker sea peligroso. Plan por fases:
+[`./PLAN-hub-de-actors.md`](./PLAN-hub-de-actors.md).
+
+---
+
 ## Referencias
 
 - Ejemplo real analizado (MCP tipo API): https://github.com/dmeiser/nextdns-mcp (Python/FastMCP)
