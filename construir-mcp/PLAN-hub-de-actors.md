@@ -186,6 +186,33 @@ aislamiento lo dan por diseño con namespaces / microVMs → compatible con la r
 
 ---
 
+---
+
+## 8-bis. Patrón de referencia: Docker MCP Gateway (con su gotcha del socket)
+
+El repo **`MariyaSha/Docker_MCPGUIApp`** (codebase del video que motivó la sesión) implementa el
+mismo concepto "**un conector → N cosas**": una app Python habla con **UN** `docker/mcp-gateway`
+que federa varios MCP servers (DuckDuckGo local, HuggingFace/Stripe remotos) declarados en un
+**`catalog.yaml`**. Ficha: [`../tool_catalog/entries/docker-mcp-gateway-app.md`](../tool_catalog/entries/docker-mcp-gateway-app.md).
+
+**Qué tomar de él:**
+- La idea del **`catalog.yaml`** = registro declarativo de servers/actors → inspira el registro
+  del hub (declarar actors en YAML en vez de hardcodearlos).
+- La separación **app ↔ 1 gateway** (no la app contra cada server) = misma filosofía del contrato
+  de actor portable (§5).
+
+**Qué NO tomar (gotcha crítico):**
+- Su compose monta **`/var/run/docker.sock`** en los dos gateways → **viola la regla anti-socket**.
+  El Docker MCP Gateway lo necesita porque lanza cada MCP server como contenedor bajo demanda
+  (controla el daemon). El hub propio logra "un conector → N" **sin** socket, con FastMCP + registry.
+- Es un **federador** de MCPs que ya existen, **no un creador de actors** con lógica propia (que es
+  lo que busca el hub). Docker federa; el hub fabrica.
+
+> Moraleja: el Docker MCP Gateway resuelve "muchos MCPs, un endpoint" **a costa del socket**. El
+> hub quiere lo mismo **sin** socket → por eso la Fase A es un MCP propio, no este gateway.
+
+---
+
 ## 9. Referencias (verificar contra fuente real al retomar)
 - Actor Apify (cerrado, de pago) que motivó todo: https://apify.com/streamers/youtube-video-downloader
 - Herramienta libre real debajo: yt-dlp — https://github.com/yt-dlp/yt-dlp
