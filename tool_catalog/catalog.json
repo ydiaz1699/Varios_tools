@@ -229,27 +229,25 @@
       "file": "entries/n8n-mcp.md"
     },
     {
-      "slug": "artemis-android-automation",
-      "title": "ARTEMIS (google/artemis) — automatización de Android por lenguaje natural + MCP",
+      "slug": "tasker-mcp-dceluis",
+      "title": "dceluis/tasker-mcp — MCP que EJECUTA tareas de Tasker en vivo (Go + XTP)",
       "type": "repo",
       "origin": "external",
-      "problem": "Que un LLM/IDE de IA maneje un teléfono Android real (o emulador) desde lenguaje natural, con servidor MCP nativo, para automatizar apps y testing de UI end-to-end.",
+      "problem": "Dar a un LLM control en vivo del teléfono exponiendo tareas de Tasker como tools MCP (POST /run_task al server HTTP de Tasker); no genera XML.",
       "applies_to": [
-        "dar a un agente/LLM control de un Android real por MCP (Antigravity, Claude Code, Codex, Cursor, Windsurf)",
-        "testing de UI / QA móvil end-to-end desde lenguaje natural (planes, logs, capturas, reportes)",
-        "automatizar flujos cotidianos entre apps Android (Maps, YouTube, Ajustes...)",
-        "integrar automatización móvil en pytest / CI-CD vía SDK Python"
+        "controlar el teléfono en vivo desde un LLM (flash, SMS, wifi, foto, ubicación...)",
+        "convertir tareas Tasker existentes en tools MCP sin escribir código por tool",
+        "patrón tarea Tasker -> tool MCP leyendo comentario + TaskVariables del .prj.xml"
       ],
       "not_for": [
-        "control de Android por ADB SIN un LLM/agente (usar android_agent_bridge o scripts ADB)",
-        "Tasker / automatización on-device declarativa (ver Tasker_mcp)",
-        "firmware/embebidos ESP sin dispositivo Android ni agente",
-        "iOS (en roadmap, aún no soportado)"
+        "generar XML de Tasker importable offline (para eso está tu propio Tasker_mcp, Python)",
+        "entornos sin Tasker corriendo y accesible por HTTP",
+        "quien no quiera compilar Go / usar binarios en Termux"
       ],
-      "tags": ["android", "automatizacion", "mcp", "adb", "testing", "ui", "llm", "google", "scrcpy", "uiautomator", "vlm", "wifi", "usb"],
-      "reference": { "url": "https://github.com/google/artemis", "kind": "github" },
-      "status": "REVISADO_PARCIAL",
-      "file": "entries/artemis-android-automation.md"
+      "tags": ["tasker", "mcp", "android", "go", "xtp", "wasm", "ejecucion-en-vivo", "sse", "stdio"],
+      "reference": { "url": "https://github.com/dceluis/tasker-mcp", "kind": "github" },
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/tasker-mcp-dceluis.md"
     },
     {
       "slug": "skill-creator",
