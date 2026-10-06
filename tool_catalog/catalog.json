@@ -1,7 +1,7 @@
 {
   "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type/origin SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. origin=external (fuente a leer si aplica) | local (artefacto propio en ../tools_AI). La fuente de verdad es cada ficha; regenerar si cambian.",
   "version": 2,
-  "generated_on": "2026-09-24",
+  "generated_on": "2026-09-28",
   "entries": [
     {
       "slug": "prowler-agent-skills",
@@ -18,8 +18,19 @@
         "firmware Arduino/ESP sin agentes LLM",
         "proyectos triviales sin convenciones repetidas"
       ],
-      "tags": ["agent-skills", "agents-md", "auto-invoke", "skill-creator", "skill-sync", "llm", "contexto"],
-      "reference": { "url": "https://github.com/prowler-cloud/prowler", "kind": "github" },
+      "tags": [
+        "agent-skills",
+        "agents-md",
+        "auto-invoke",
+        "skill-creator",
+        "skill-sync",
+        "llm",
+        "contexto"
+      ],
+      "reference": {
+        "url": "https://github.com/prowler-cloud/prowler",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/gentleman-programming/prowler-agent-skills.md"
     },
@@ -34,9 +45,22 @@
         "decidir tamaño/división de AGENTS.md (uno vs varios por feature)",
         "saber cuándo delegar en subagentes para no ensuciar el contexto"
       ],
-      "not_for": ["proyectos sin agentes LLM (firmware Arduino/ESP)"],
-      "tags": ["agent-skills", "agents-md", "auto-invoke", "subagentes", "orquestador", "contexto", "video"],
-      "reference": { "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw", "kind": "youtube" },
+      "not_for": [
+        "proyectos sin agentes LLM (firmware Arduino/ESP)"
+      ],
+      "tags": [
+        "agent-skills",
+        "agents-md",
+        "auto-invoke",
+        "subagentes",
+        "orquestador",
+        "contexto",
+        "video"
+      ],
+      "reference": {
+        "url": "https://www.youtube.com/watch?v=Nvn6s3r9ZAw",
+        "kind": "youtube"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/agents-skills-video.md"
     },
@@ -55,8 +79,22 @@
         "proyectos que solo necesitan el patrón de skills (usar prowler-agent-skills)",
         "firmware/embebidos sin entorno de terminal"
       ],
-      "tags": ["dotfiles", "neovim", "shell", "tmux", "zellij", "terminal", "ai-cli", "agent-skills", "subagentes", "sdd"],
-      "reference": { "url": "https://github.com/Gentleman-Programming/Gentleman.Dots", "kind": "github" },
+      "tags": [
+        "dotfiles",
+        "neovim",
+        "shell",
+        "tmux",
+        "zellij",
+        "terminal",
+        "ai-cli",
+        "agent-skills",
+        "subagentes",
+        "sdd"
+      ],
+      "reference": {
+        "url": "https://github.com/Gentleman-Programming/Gentleman.Dots",
+        "kind": "github"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/gentleman-dots.md"
     },
@@ -71,9 +109,24 @@
         "entender SDD (init, preflight, skill registry, strict TDD, fases, PRs encadenadas)",
         "diseñar un skill registry / orquestador-subagentes con contexto seleccionado"
       ],
-      "not_for": ["proyectos sin agentes LLM", "cambios triviales sin proceso formal"],
-      "tags": ["sdd", "spec-driven", "tdd", "skill-registry", "orquestador", "subagentes", "proceso", "contexto"],
-      "reference": { "url": "https://www.youtube.com/watch?v=KILEn2VSXX8", "kind": "youtube" },
+      "not_for": [
+        "proyectos sin agentes LLM",
+        "cambios triviales sin proceso formal"
+      ],
+      "tags": [
+        "sdd",
+        "spec-driven",
+        "tdd",
+        "skill-registry",
+        "orquestador",
+        "subagentes",
+        "proceso",
+        "contexto"
+      ],
+      "reference": {
+        "url": "https://www.youtube.com/watch?v=KILEn2VSXX8",
+        "kind": "youtube"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/gentleman-programming/sdd-video.md"
     },
@@ -88,9 +141,25 @@
         "memoria agent-agnostic vía MCP (Claude Code, OpenCode, Gemini, Codex, Cursor...)",
         "alternativa lista-para-usar frente a diseñar memoria propia"
       ],
-      "not_for": ["agentes sin estado entre sesiones", "entornos sin binario local ni MCP"],
-      "tags": ["memoria", "engram", "mcp", "sqlite", "fts5", "go", "agent-agnostic", "recall", "lazy-loading"],
-      "reference": { "url": "https://github.com/Gentleman-Programming/engram", "kind": "github" },
+      "not_for": [
+        "agentes sin estado entre sesiones",
+        "entornos sin binario local ni MCP"
+      ],
+      "tags": [
+        "memoria",
+        "engram",
+        "mcp",
+        "sqlite",
+        "fts5",
+        "go",
+        "agent-agnostic",
+        "recall",
+        "lazy-loading"
+      ],
+      "reference": {
+        "url": "https://github.com/Gentleman-Programming/engram",
+        "kind": "github"
+      },
       "status": "REVISADO_PARCIAL",
       "file": "entries/gentleman-programming/engram.md"
     },
@@ -109,8 +178,20 @@
         "automatización de rclone SIN un agente/LLM (usar systemd timers / scripts)",
         "solo Google Drive con API nativa por file_id"
       ],
-      "tags": ["rclone", "mcp", "rc-api", "control-total", "read-only", "docker", "nas", "cloud-storage"],
-      "reference": { "url": "https://github.com/angenge/rclone-mcp-server", "kind": "github" },
+      "tags": [
+        "rclone",
+        "mcp",
+        "rc-api",
+        "control-total",
+        "read-only",
+        "docker",
+        "nas",
+        "cloud-storage"
+      ],
+      "reference": {
+        "url": "https://github.com/angenge/rclone-mcp-server",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/rclone-mcp-servers.md"
     },
@@ -130,8 +211,20 @@
         "automatizar n8n sin agente/LLM (usar la propia UI/API o cron)",
         "Kiro Web (sandbox cloud): sin ruta a la LAN privada; usar Kiro CLI en el NAS"
       ],
-      "tags": ["n8n", "mcp", "workflows", "automatizacion", "kiro-cli", "nas", "api-rest", "ssrf"],
-      "reference": { "url": "https://github.com/czlonkowski/n8n-mcp", "kind": "github" },
+      "tags": [
+        "n8n",
+        "mcp",
+        "workflows",
+        "automatizacion",
+        "kiro-cli",
+        "nas",
+        "api-rest",
+        "ssrf"
+      ],
+      "reference": {
+        "url": "https://github.com/czlonkowski/n8n-mcp",
+        "kind": "github"
+      },
       "status": "APLICADO",
       "file": "entries/n8n-mcp.md"
     },
@@ -169,9 +262,21 @@
         "mejorar/optimizar una skill existente",
         "entender best practices de authoring de skills"
       ],
-      "not_for": ["proyectos sin agentes LLM"],
-      "tags": ["skill", "meta-skill", "authoring", "agent-skills", "auto-invoke", "kiro"],
-      "reference": { "url": "tools_AI/skills/skill-creator/SKILL.md", "kind": "web" },
+      "not_for": [
+        "proyectos sin agentes LLM"
+      ],
+      "tags": [
+        "skill",
+        "meta-skill",
+        "authoring",
+        "agent-skills",
+        "auto-invoke",
+        "kiro"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/skill-creator/SKILL.md",
+        "kind": "web"
+      },
       "status": "APLICADO",
       "file": "entries/skill-creator.md"
     },
@@ -185,9 +290,21 @@
         "consolidar múltiples fragmentos de un mismo tema en una guía",
         "convertir notas sueltas o handoffs en un documento autocontenido"
       ],
-      "not_for": ["redactar desde cero sin fragmentos fuente"],
-      "tags": ["unificar", "consolidar", "documentacion", "guia", "deduplicar", "drafts"],
-      "reference": { "url": "tools_AI/skills/unificador-skill/SKILL.md", "kind": "web" },
+      "not_for": [
+        "redactar desde cero sin fragmentos fuente"
+      ],
+      "tags": [
+        "unificar",
+        "consolidar",
+        "documentacion",
+        "guia",
+        "deduplicar",
+        "drafts"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/unificador-skill/SKILL.md",
+        "kind": "web"
+      },
       "status": "REVISADO_A_FONDO",
       "file": "entries/unificador-skill.md"
     },
@@ -205,10 +322,53 @@
         "agentes sin necesidad de estado entre sesiones",
         "proyectos sin componente de agente"
       ],
-      "tags": ["memoria", "agente", "learning-loop", "auto-mejora", "strands", "nudge", "diseño"],
-      "reference": { "url": "tools_AI/resources/nas-agent-memory/README.md", "kind": "web" },
+      "tags": [
+        "memoria",
+        "agente",
+        "learning-loop",
+        "auto-mejora",
+        "strands",
+        "nudge",
+        "diseño"
+      ],
+      "reference": {
+        "url": "tools_AI/resources/nas-agent-memory/README.md",
+        "kind": "web"
+      },
       "status": "SOLO_REFERENCIA",
       "file": "entries/nas-agent-memory.md"
+    },
+    {
+      "slug": "docker-mcp-gateway-app",
+      "title": "Docker MCP Gateway GUI App (MariyaSha) — 1 gateway federando N MCP servers",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Un solo endpoint (Docker MCP Gateway) que federa varios MCP servers locales y remotos vía catalog.yaml; app Python + Docker Model Runner.",
+      "applies_to": [
+        "entender el patron 'un conector -> N MCP servers' (federacion por catalog.yaml)",
+        "disenar el registro declarativo de actors del hub MCP propio (construir-mcp/PLAN-hub-de-actors.md)",
+        "conectar Claude/Cursor/una app Python a MCPs existentes (Stripe, HuggingFace, DuckDuckGo)"
+      ],
+      "not_for": [
+        "montarlo tal cual en el NAS (usa /var/run/docker.sock -> viola la regla anti-socket)",
+        "crear actors PROPIOS con logica nueva (el gateway federa MCPs existentes, no los fabrica)",
+        "entornos headless sin Docker Desktop / Model Runner"
+      ],
+      "tags": [
+        "docker",
+        "mcp",
+        "gateway",
+        "catalog",
+        "federacion",
+        "streamlit",
+        "socket-gotcha"
+      ],
+      "reference": {
+        "url": "https://github.com/MariyaSha/Docker_MCPGUIApp",
+        "kind": "github"
+      },
+      "status": "REVISADO_PARCIAL",
+      "file": "entries/docker-mcp-gateway-app.md"
     }
   ]
 }
