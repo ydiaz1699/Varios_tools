@@ -314,6 +314,11 @@ Para el **MCP de NextDNS multi-cuenta** (una cuenta/API key por persona, control
 natural tipo "bloquea YouTube a papá", con Python 3.14 en venv aislado dentro de la imagen):
 [`./nextdns-multicuenta.md`](./nextdns-multicuenta.md) — verificado en runtime.
 
+Para el **MCP de JDownloader** (MCP propio `proyec_jdw2`, 78 tools + auto-solver de captchas,
+control por lenguaje natural vía My.JDownloader; incluye los 3 bugs encontrados al instalar en
+limpio + el truco del ARG cache-bust para rebuilds rápidos):
+[`./jdownloader-mcp.md`](./jdownloader-mcp.md) — imagen reconstruida y `import` verificado.
+
 ---
 
 ## Referencias

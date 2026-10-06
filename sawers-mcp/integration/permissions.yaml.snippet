@@ -1,0 +1,21 @@
+# Reglas de permisos V3 para sawers-mcp (Kiro CLI --v3).
+# Las tools de catalogo son SOLO LECTURA -> allow.
+# `login` maneja credenciales / abre sesion -> ask (confirmacion del usuario).
+# Pegar estas lineas dentro de la seccion `rules:` de tu permissions.yaml,
+# manteniendo la indentacion (2 espacios, todas al mismo nivel).
+
+  - capability: mcp
+    tool: sawers/search_products
+    effect: allow
+  - capability: mcp
+    tool: sawers/get_product
+    effect: allow
+  - capability: mcp
+    tool: sawers/list_specials
+    effect: allow
+  - capability: mcp
+    tool: sawers/session_status
+    effect: allow
+  - capability: mcp
+    tool: sawers/login
+    effect: ask

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sawers": {
+      "command": "/opt/sawers-venv/bin/python",
+      "args": ["-m", "sawers_mcp.server"],
+      "env": {
+        "FASTMCP_CHECK_FOR_UPDATES": "off",
+        "SAWERS_EMAIL": "${SAWERS_EMAIL}",
+        "SAWERS_PASSWORD": "${SAWERS_PASSWORD}"
+      },
+      "disabled": false
+    }
+  }
+}
