@@ -1,7 +1,7 @@
 {
   "$comment": "Índice máquina de tool_catalog. Un LLM lo lee para filtrar por applies_to/tags/type/origin SIN abrir cada ficha, y solo abre entries/<slug>.md de las candidatas. origin=external (fuente a leer si aplica) | local (artefacto propio en ../tools_AI). La fuente de verdad es cada ficha; regenerar si cambian.",
   "version": 2,
-  "generated_on": "2026-09-28",
+  "generated_on": "2026-09-25",
   "entries": [
     {
       "slug": "prowler-agent-skills",
@@ -337,36 +337,156 @@
       "file": "entries/nas-agent-memory.md"
     },
     {
-      "slug": "docker-mcp-gateway-app",
-      "title": "Docker MCP Gateway GUI App (MariyaSha) — 1 gateway federando N MCP servers",
+      "slug": "chrome-devtools-mcp",
+      "title": "chrome-devtools-mcp — control de Chrome real para un agente (MCP)",
       "type": "repo",
       "origin": "external",
-      "problem": "Un solo endpoint (Docker MCP Gateway) que federa varios MCP servers locales y remotos vía catalog.yaml; app Python + Docker Model Runner.",
+      "problem": "Dar a un LLM control de un Chrome real (navegar, clicar, screenshots, red, consola, performance) via Puppeteer, para automatizar/depurar webs sobre todo sin API.",
       "applies_to": [
-        "entender el patron 'un conector -> N MCP servers' (federacion por catalog.yaml)",
-        "disenar el registro declarativo de actors del hub MCP propio (construir-mcp/PLAN-hub-de-actors.md)",
-        "conectar Claude/Cursor/una app Python a MCPs existentes (Stripe, HuggingFace, DuckDuckGo)"
+        "depurar/analizar una web (performance, red, consola) desde el agente",
+        "automatizar una web que NO expone API REST",
+        "probar tu propio frontend con un LLM"
       ],
       "not_for": [
-        "montarlo tal cual en el NAS (usa /var/run/docker.sock -> viola la regla anti-socket)",
-        "crear actors PROPIOS con logica nueva (el gateway federa MCPs existentes, no los fabrica)",
-        "entornos headless sin Docker Desktop / Model Runner"
+        "crear workflows en n8n/Node-RED/Flowise (usar sus APIs REST, no la UI)",
+        "tareas donde exista una API oficial (la API es mas fiable que la UI)"
       ],
       "tags": [
-        "docker",
         "mcp",
-        "gateway",
-        "catalog",
-        "federacion",
-        "streamlit",
-        "socket-gotcha"
+        "chrome",
+        "devtools",
+        "puppeteer",
+        "browser-automation",
+        "debug",
+        "performance",
+        "scraping"
       ],
       "reference": {
-        "url": "https://github.com/MariyaSha/Docker_MCPGUIApp",
+        "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
         "kind": "github"
       },
-      "status": "REVISADO_PARCIAL",
-      "file": "entries/docker-mcp-gateway-app.md"
+      "status": "REVISADO_A_FONDO",
+      "file": "entries/chrome-devtools-mcp.md"
+    },
+    {
+      "slug": "webmcp",
+      "title": "WebMCP — estandar (borrador W3C) para que una web exponga tools a agentes",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Estandar propuesto para que una WEB exponga sus propias funciones como tools (document.modelContext.registerTool()) consumibles por agentes del navegador.",
+      "applies_to": [
+        "vigilar como tendencia futura del web + agentes (no usar hoy)",
+        "si algun dia construyes una web propia y quieres exponer sus acciones a un agente"
+      ],
+      "not_for": [
+        "controlar webs de terceros (requiere que ESA web lo implemente; Flowise/Node-RED no lo hacen)",
+        "cualquier uso en produccion hoy (spec en borrador, soporte incipiente)"
+      ],
+      "tags": [
+        "webmcp",
+        "w3c",
+        "estandar",
+        "borrador",
+        "browser-agents",
+        "tendencia-futura"
+      ],
+      "reference": {
+        "url": "https://github.com/webmachinelearning/webmcp",
+        "kind": "github"
+      },
+      "status": "SOLO_REFERENCIA",
+      "file": "entries/webmcp.md"
+    },
+    {
+      "slug": "deep-research-mcp",
+      "title": "MCP de deep research (GPT Researcher y alternativas)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Dar a un LLM investigacion web PROFUNDA e iterativa (busca, scrapea, sintetiza informe con citas) en vez de una busqueda simple.",
+      "applies_to": [
+        "investigar un tema nuevo a fondo (informe con fuentes)",
+        "brazo externo de la skill idea-forge cuando falta info"
+      ],
+      "not_for": [
+        "busquedas puntuales (Kiro ya trae web search)",
+        "si no quieres otra API key (casi todos la piden)"
+      ],
+      "tags": [
+        "mcp",
+        "deep-research",
+        "web-search",
+        "gpt-researcher",
+        "investigacion"
+      ],
+      "reference": {
+        "url": "https://github.com/assafelovic/gptr-mcp",
+        "kind": "github"
+      },
+      "status": "SOLO_REFERENCIA",
+      "file": "entries/deep-research-mcp.md"
+    },
+    {
+      "slug": "idea-forge",
+      "title": "idea-forge — formular ideas, conectar el ecosistema e investigar",
+      "type": "tool",
+      "origin": "local",
+      "problem": "Formular ideas fundadas en lo que el usuario YA tiene: cruza tool_catalog + repo-index para proponer combinaciones, evita reinventar, e investiga afuera solo si falta.",
+      "applies_to": [
+        "brainstorming / que construyo o mejoro con lo que tengo",
+        "conectar dos proyectos/herramientas del ecosistema",
+        "evaluar un recurso nuevo frente a lo que ya existe",
+        "investigar un tema y aterrizarlo al caso del usuario"
+      ],
+      "not_for": [
+        "crear la skill en si (skill-creator)",
+        "unificar drafts (unificador-skill)",
+        "construir un MCP (construir-mcp/)",
+        "implementar/ejecutar la idea (skill o proyecto especifico)"
+      ],
+      "tags": [
+        "ideacion",
+        "brainstorming",
+        "research",
+        "conectar",
+        "catalogo",
+        "repo-index",
+        "procedencia"
+      ],
+      "reference": {
+        "url": "tools_AI/skills/idea-forge/SKILL.md",
+        "kind": "web"
+      },
+      "status": "APLICADO",
+      "file": "entries/idea-forge.md"
+    },
+    {
+      "slug": "alexa-remote2-nodered",
+      "title": "Hacer hablar a Alexa desde Node-RED sin servicio externo (alexa-remote2 y sim.)",
+      "type": "repo",
+      "origin": "external",
+      "problem": "Que un Echo hable/anuncie desde Node-RED de forma proactiva SIN un tercero (VoiceMonkey), usando nodos como node-red-contrib-alexa-remote2.",
+      "applies_to": [
+        "notificaciones proactivas n8n/Node-RED -> Alexa habla (solo esa direccion)"
+      ],
+      "not_for": [
+        "comandos de voz Alexa -> backend (es unidireccional)",
+        "produccion estable: API NO oficial de Amazon, sin mantenimiento, re-login/cookie frecuente"
+      ],
+      "tags": [
+        "alexa",
+        "node-red",
+        "tts",
+        "voicemonkey-alternativa",
+        "no-oficial",
+        "descartado",
+        "domotica"
+      ],
+      "reference": {
+        "url": "https://github.com/ajithvasudevan/node-red-contrib-alexa-remote2",
+        "kind": "github"
+      },
+      "status": "DESCARTADO",
+      "file": "entries/alexa-remote2-nodered.md"
     }
   ]
 }
