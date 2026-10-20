@@ -319,6 +319,11 @@ control por lenguaje natural vía My.JDownloader; incluye los 3 bugs encontrados
 limpio + el truco del ARG cache-bust para rebuilds rápidos):
 [`./jdownloader-mcp.md`](./jdownloader-mcp.md) — imagen reconstruida y `import` verificado.
 
+Para el **MCP de Karakeep** (MCP oficial `@karakeep/mcp`, 34 tools; operar la biblioteca de
+bookmarks de Karakeep por lenguaje natural: buscar, crear, etiquetar y organizar en listas):
+[`./karakeep-mcp.md`](./karakeep-mcp.md) — pendiente de verificación en runtime (requiere Karakeep
+levantado en el NAS).
+
 ---
 
 ## Referencias
